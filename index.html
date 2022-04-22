@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Rat Elevator</title>
+</head>
+
+<body>
+    <div id="elev-container">
+        <div id="elev-left">
+            <div id="passenger-panel">
+                <div id="passenger-display-number">
+                    <div id="passenger-display-text" class="unselectable l10n-text-ui" lkey="PERSON_NUM"></div>
+                    <div id="passenger-display-count" class="unselectable">1</div>
+                </div>
+                <div id="passenger-list" class="noscrollbar">
+                    <div class="passenger-item">我</div>
+                </div>
+            </div>
+            <div id="task-list-warp">
+                <div id="task-list">
+                    <div id="task-container" class="noscrollbar">
+                        <!-- <div class="task-item">去五楼</div>
+                        <div class="task-item task-done-item">与老鼠见面</div> -->
+                    </div>
+                </div>
+            </div>
+            <div id="save-panel">
+                <div id="top-arch">
+                    <div id="save-open-button"></div>
+                </div>
+                <div id="save-panel-body">
+                    <div id="save-panel-cover" style="top:0;">
+                        <div id="cover-circle">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div id="save-panel-container">
+                        <div id="save-text-area-warp">
+                            <textarea id="save-text-area" class="noscrollbar"></textarea>
+                            <div id="save-copy-button" class="unselectable l10n-text-ui" lkey="COPY"></div>
+                        </div>
+                        <div id="save-button-row">
+                            <div class="save-button-warp" id="save-export-button-warp">
+                                <div class="save-button" id="save-export-button">
+                                    <!-- <div class="save-opration-succ">
+                                        <div></div>
+                                        <div></div>
+                                    </div> -->
+                                </div>
+                                <div class="save-button-text unselectable l10n-text-ui" lkey="EXPORT"></div>
+                            </div>
+                            <div class="save-button-warp" id="save-import-button-warp">
+                                <div class="save-button" id="save-import-button">
+                                    <!-- <div class="save-opration-fail">
+                                        <div></div>
+                                        <div></div>
+                                    </div> -->
+                                </div>
+                                <div class="save-button-text unselectable l10n-text-ui" lkey="IMPORT"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="elev-center">
+            <div id="men-mei">
+                <div id="lang-display">
+                    <div id="lang-outer-circle">
+                        <div id="lang-switch-button-l" class="lang-switch-button-part">
+                            <div></div>
+                        </div>
+                        <div id="lang-inner-circle"></div>
+                        <div id="lang-switch-button-r" class="lang-switch-button-part">
+                            <div></div>
+                        </div>
+                    </div>
+                    <div id="lang-name-body">
+                        <div class="lang-name-row">
+                            <div class="lang-name-block" id="lang-name-prev">
+                                <div class="lang-name-text unselectable"></div>
+                            </div>
+                            <div class="lang-name-block" id="lang-name-cur">
+                                <div class="lang-name-text unselectable"></div>
+                            </div>
+                        </div>
+                        <div class="lang-name-row">
+                            <div class="lang-name-block">
+                            </div>
+                            <div class="lang-name-block" id="lang-name-next">
+                                <div class="lang-name-text unselectable"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="elev-door">
+                <div style="left: 0;"></div>
+                <div style="left: 0;"></div>
+            </div>
+            <div id="scene">
+                <div id="dialog-container" class="noscrollbar">
+                    <div class="left-dialog-row dialog-row">
+                        <div class="avatar">
+                            <div class="unselectable">IL</div>
+                        </div>
+                        <div class="left-dialog-box dialog-box">老鼠，你好</div>
+                    </div>
+                    <div class="left-dialog-row dialog-row">
+                        <div class="left-dialog-box left-not-first-line dialog-box">
+                            我是雇佣兵
+                        </div>
+                    </div>
+                    <div class="right-dialog-row dialog-row">
+                        <div class="right-dialog-box dialog-box">芜湖芜湖好满足</div>
+                        <div class="avatar">
+                            <div class="unselectable">我</div>
+                        </div>
+                    </div>
+                    <div class="right-dialog-row dialog-row">
+                        <div class="right-dialog-box right-not-first-line dialog-box">嘉然可爱捏</div>
+                    </div>
+                    <div class="mid-dialog-row dialog-row">
+                        <div class="mid-dialog-box dialog-box">AbliILaB</div>
+                    </div>
+                </div>
+                <div id="sheng-lue-dots">
+                    <div class="sl-dot"></div>
+                    <div class="sl-dot"></div>
+                    <div class="sl-dot"></div>
+                </div>
+                <div id="go-on-button-row">
+                    <div id="go-on-button">
+                        <div></div>
+                    </div>
+                </div>
+                <div id="options-row">
+                    <div class="option-button unselectable">说点好听的吧</div>
+                    <div class="option-button unselectable">感觉不如</div>
+                    <div class="option-button unselectable">还可以ABCDILsdd</div>
+                    <div class="option-button unselectable">可是说这么多不也无济于事吗？</div>
+                </div>
+                <div id="background"></div>
+            </div>
+        </div>
+        <div id="elev-right">
+            <div id="floor-display">
+                <div class="direction-icon invisible" id="up-icon">
+                    <div></div>
+                    <div></div>
+                </div>
+                <div id="display-number" class="unselectable">1</div>
+                <div class="direction-icon invisible" id="down-icon">
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+            <div id="floor-buttons">
+                <div class="button-row" id="func-buttons">
+                    <div class="button-col" id="close-button">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="button-col" id="open-button">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- JS -->
+<script src="./js/elev.js"></script>
+
+</html>

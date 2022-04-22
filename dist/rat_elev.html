@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style type="text/css">
+body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0;
+    padding: 4px 0;
+    min-width: 1000px;
+    background-color: #343641;
+}
+
+#elev-container {
+    display: flex;
+    position: absolute;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 750px;
+    height: 750px;
+    background-color: white;
+    overflow: hidden;
+}
+
+#elev-left {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 20%;
+    height: 100%;
+    background-color: #A0A0A0;
+    border-right: 4px solid #524A4E;
+    box-shadow: 4px 0 4px rgba(0, 0, 0, .2);
+    z-index: 50;
+}
+
+#elev-right {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    width: 20%;
+    height: 100%;
+    background-color: #A0A0A0;
+    border-left: 4px solid #524A4E;
+    box-shadow: -4px 0 4px rgba(0, 0, 0, .2);
+    z-index: 50;
+}
+
+#elev-center {
+    position: relative;
+    width: 60%;
+    height: 100%;
+}
+
+#passenger-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 70%;
+    margin: 80px 0 0 0;
+}
+
+#passenger-display-number {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 30px;
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+    background-color: black;
+    border-bottom: 2px solid rgba(38, 102, 207, .4);
+}
+
+#passenger-display-text {
+    font-size: 0.8rem;
+    margin: 0 0 5px 15px;
+    color: #2666CF;
+    opacity: .6;
+}
+
+#passenger-display-count {
+    font-size: 1.4rem;
+    margin: 0 15px 5px 0;
+    color: #2666CF;
+    font-family: Georgia;
+}
+
+#passenger-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 120px;
+    border-radius: 0 0 8px 8px;
+    background-color: black;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 4px 0;
+}
+
+#passenger-list .passenger-item {
+    position: relative;
+    color: rgba(38, 102, 207, .8);
+    width: 80%;
+    padding: 0 0 4px 5px;
+    margin: 2px 0;
+    font-family: 'DFKai-SB';
+    border-bottom: 1px dotted #2666CF;
+}
+
+#passenger-list .passenger-item::before {
+    display: inline-block;
+    position: relative;
+    content: '';
+    height: 5px;
+    width: 5px;
+    left: -5px;
+    top: -2px;
+    border-radius: 50%;
+    background-color: #2666CF;
+    opacity: .6;
+}
+
+#task-list-warp {
+    width: 80%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    filter: drop-shadow( rgba(0, 0, 0, .25) 0px 0px 3px);
+}
+
+#task-list {
+    width: 100%;
+    height: 150px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #F5F2E7;
+    border-radius: 2px;
+    padding: 12px 0;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 85% 100%, 0 100%);
+}
+
+#task-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+#task-list-warp::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: #C84B31;
+    border-radius: 50%;
+    top: -4px;
+    box-shadow: rgba(0, 0, 0, .4) 0 0 2px;
+    z-index: 11;
+}
+
+#task-list::after {
+    content: '';
+    position: absolute;
+    width: 15%;
+    height: 10%;
+    background-color: #C0A080;
+    border-radius: 2px;
+    bottom: 0px;
+    right: 0px;
+    box-shadow: rgba(0, 0, 0, .25) 0 0 2px;
+    z-index: 11;
+}
+
+.task-item {
+    width: 86%;
+    margin-bottom: 4px;
+    font-size: 0.8rem;
+    flex-wrap: wrap;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    user-select: text;
+    word-wrap: break-word;
+    word-break: break-all;
+    font-family: "Palatino Linotype";
+    color: #2C3333;
+    border-bottom: 2px solid rgba(240, 84, 84, .4);
+}
+
+.task-item.task-done-item {
+    color: rgb(95, 95, 95);
+    text-decoration: line-through;
+    opacity: .6;
+    border-bottom-color: rgb(200, 200, 200);
+}
+
+#floor-display {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    height: 160px;
+    margin: 80px 0 40px 0;
+    background-color: black;
+    border-radius: 60px;
+}
+
+.direction-icon {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 20%;
+    overflow: hidden;
+}
+
+.direction-icon>div {
+    position: relative;
+    color: #4E9F3D;
+    background-color: #4E9F3D;
+    width: 20px;
+    border: 3px solid #4E9F3D;
+    border-radius: 5px;
+}
+
+#up-icon>div:nth-child(1) {
+    transform: rotate(-45deg);
+    left: 5px;
+}
+
+#up-icon>div:nth-child(2) {
+    transform: rotate(45deg);
+    left: -5px;
+}
+
+#down-icon>div:nth-child(1) {
+    transform: rotate(45deg);
+    left: 5px;
+}
+
+#down-icon>div:nth-child(2) {
+    transform: rotate(-45deg);
+    left: -5px;
+}
+
+
+/* #up-icon>div {
+    animation: 1.2s linear 0s infinite normal icon-up;
+}
+
+#down-icon>div {
+    animation: 1.2s linear 0s infinite normal icon-down;
+} */
+
+@keyframes icon-up {
+    from {
+        top: 32px
+    }
+    to {
+        top: -32px
+    }
+}
+
+@keyframes icon-down {
+    from {
+        top: -32px
+    }
+    to {
+        top: 32px
+    }
+}
+
+#display-number {
+    width: 100%;
+    height: 40px;
+    color: #4E9F3D;
+    text-align: center;
+    line-height: 35px;
+    font-size: 2.25rem;
+    font-family: Georgia;
+}
+
+#floor-buttons {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    width: 80%;
+}
+
+#floor-buttons .button-row {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    margin: 4px 0;
+}
+
+.unselectable {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.invisible {
+    opacity: 0;
+    cursor: default !important;
+    pointer-events: none;
+}
+
+#floor-buttons .button-col {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    height: 36px;
+    width: 36px;
+    border: 4px solid #FDEFF4;
+    border-radius: 50%;
+    color: #FDEFF4;
+    background-color: black;
+    font-size: 1.25rem;
+    font-family: 'Lucida Console';
+    text-align: center;
+    line-height: 36px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, .4);
+}
+
+#floor-buttons .button-col:hover {
+    border-color: #FFC0D3;
+    color: #FFC0D3;
+}
+
+#floor-buttons .button-col.button-selected {
+    border-color: #FF5C8D;
+    color: #FF5C8D;
+}
+
+#floor-buttons #close-button:hover {
+    border-color: #90E0EF;
+    color: #90E0EF;
+}
+
+#floor-buttons #close-button:active {
+    border-color: #00B4D8;
+    color: #00B4D8;
+}
+
+#floor-buttons #open-button:hover {
+    border-color: #ffe5a7;
+    color: #ffe5a7;
+}
+
+#floor-buttons #open-button:active {
+    border-color: #ffbb1c;
+    color: #ffbb1c;
+}
+
+#close-button>div,
+#open-button>div {
+    position: relative;
+}
+
+#close-button>div:nth-child(1),
+#open-button>div:nth-child(3) {
+    height: 0;
+    width: 0;
+    border: 8px solid transparent;
+    border-left-color: #FDEFF4;
+    left: 5px;
+}
+
+#close-button>div:nth-child(2),
+#open-button>div:nth-child(2) {
+    width: 1px;
+    height: 18px;
+    border: 1px solid #FDEFF4;
+    border-radius: 4px;
+    background-color: #FDEFF4;
+}
+
+#close-button>div:nth-child(3),
+#open-button>div:nth-child(1) {
+    height: 0;
+    width: 0;
+    border: 8px solid transparent;
+    border-right-color: #FDEFF4;
+    left: -5px;
+}
+
+#close-button:hover>div:nth-child(1) {
+    border-left-color: #90E0EF;
+}
+
+#close-button:active>div:nth-child(1) {
+    border-left-color: #00B4D8;
+}
+
+#close-button:hover>div:nth-child(2) {
+    border-color: #90E0EF;
+    background-color: #90E0EF;
+}
+
+#close-button:active>div:nth-child(2) {
+    border-color: #00B4D8;
+    background-color: #00B4D8;
+}
+
+#close-button:hover>div:nth-child(3) {
+    border-right-color: #90E0EF;
+}
+
+#close-button:active>div:nth-child(3) {
+    border-right-color: #00B4D8;
+}
+
+#open-button:hover>div:nth-child(1) {
+    border-right-color: #ffe5a7;
+}
+
+#open-button:active>div:nth-child(1) {
+    border-right-color: #ffbb1c;
+}
+
+#open-button:hover>div:nth-child(2) {
+    border-color: #ffe5a7;
+    background-color: #ffe5a7;
+}
+
+#open-button:active>div:nth-child(2) {
+    border-color: #ffbb1c;
+    background-color: #ffbb1c;
+}
+
+#open-button:hover>div:nth-child(3) {
+    border-left-color: #ffe5a7;
+}
+
+#open-button:active>div:nth-child(3) {
+    border-left-color: #ffbb1c;
+}
+
+#men-mei {
+    position: relative;
+    width: 100%;
+    height: 10%;
+    background-color: #A0A0A0;
+    border-bottom: 4px solid #524A4E;
+    z-index: 100;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, .2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#elev-door {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    width: 100%;
+    height: 90%;
+    z-index: 20;
+}
+
+#elev-door>div:nth-child(1) {
+    position: relative;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #A0A0A0;
+    border-right: 2px solid #524A4E;
+}
+
+#elev-door>div:nth-child(2) {
+    position: relative;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #A0A0A0;
+    border-left: 2px solid #524A4E;
+}
+
+.noscrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.noscrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+#scene {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    bottom: 0;
+    width: 100%;
+    height: 90%;
+    z-index: 10;
+}
+
+#background {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, .7);
+    z-index: 5;
+}
+
+#dialog-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    top: 3px;
+    width: 100%;
+    height: 85%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    /* border: 1px solid red; */
+    padding-top: 5px;
+    z-index: 10;
+}
+
+.avatar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    width: 45px;
+    flex-shrink: 0;
+}
+
+.avatar>div {
+    width: 35px;
+    height: 35px;
+    /* margin-top: 3px; */
+    background-color: #ccaf0e;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    line-height: 35px;
+    font-size: 1.2rem;
+    font-family: Georgia, '黑体';
+    /* text-shadow: black 0 0 2px; */
+}
+
+.dialog-row {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin: 6px 0;
+    /* border: 1px solid black; */
+}
+
+.dialog-box {
+    color: white;
+    font-family: "Palatino Linotype";
+    max-width: 82%;
+    padding: 6px 8px;
+    text-shadow: black 0 0 1px;
+    /* border: 1px solid red; */
+    flex-wrap: wrap;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    user-select: text;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.dialog-row.left-dialog-row {
+    justify-content: flex-start;
+}
+
+.dialog-box.left-dialog-box {
+    /* background: linear-gradient(90deg, rgba(125, 125, 125, .6) 50%, transparent 100%); */
+    background-color: rgba(125, 125, 125, .6);
+    border-left: 5px solid #398AB9;
+    border-radius: 0 15px 15px 0;
+}
+
+.left-not-first-line {
+    margin-left: 45px;
+}
+
+.dialog-row.right-dialog-row {
+    justify-content: flex-end;
+}
+
+.dialog-box.right-dialog-box {
+    /* background: linear-gradient(-90deg, rgba(125, 125, 125, .6) 0%, transparent 100%); */
+    background-color: rgba(125, 125, 125, .6);
+    border-right: 5px solid #8BDB81;
+    border-radius: 15px 0 0 15px;
+}
+
+.right-not-first-line {
+    margin-right: 45px;
+}
+
+.dialog-row.mid-dialog-row {
+    justify-content: center;
+}
+
+.dialog-box.mid-dialog-box {
+    /* background: linear-gradient(90deg, transparent 0%, rgba(125, 125, 125, .6) 50%, transparent 100%); */
+    max-width: 90%;
+    background-color: rgba(125, 125, 125, .6);
+    border-radius: 10px;
+}
+
+#sheng-lue-dots {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 5%;
+    z-index: 11;
+    opacity: .7;
+}
+
+.sl-dot {
+    height: 13px;
+    width: 13px;
+    border-radius: 50%;
+    margin: 0 12px;
+    z-index: 0;
+    border: 3px solid gray;
+}
+
+.dark-dot {
+    background-color: #323232;
+    border-color: #524A4E;
+}
+
+.light-dot {
+    background-color: #FF5C8D;
+    border-color: #FFC0D3;
+}
+
+#go-on-button-row {
+    cursor: pointer;
+    width: 100%;
+    height: 10%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* background-color: blue; */
+    z-index: 11;
+    transition: background-color .2s;
+}
+
+#go-on-button-row:hover {
+    background-color: rgba(255, 255, 225, .1);
+}
+
+#go-on-button-row:hover>#go-on-button {
+    opacity: 1;
+}
+
+#go-on-button-row:active {
+    background-color: rgba(255, 255, 225, .25);
+}
+
+#go-on-button {
+    position: relative;
+    top: calc(12.5px*1.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    transform: scale(1.2);
+    transition: opacity .2s;
+    opacity: .25;
+}
+
+#go-on-button>div {
+    position: relative;
+    top: -30.66px;
+    width: calc(50px/1.4142);
+    height: calc(50px/1.4142);
+    /*#787A91 #B2B1B9*/
+    background-color: #787A91;
+    border: 4px solid #B2B1B9;
+    border-radius: 4px;
+    transform: rotate(45deg);
+}
+
+#options-row {
+    width: 100%;
+    height: 15%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 11;
+}
+
+.option-button {
+    width: 18%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: "Palatino Linotype";
+    word-wrap: break-word;
+    word-break: break-all;
+    outline: 2px solid rgba(255, 255, 255, .6);
+    color: rgba(255, 255, 255, .8);
+    padding: 0 4px;
+    transition: background-color .2s, color .2s, outline .2s;
+    border-radius: 18px 18px 18px 0;
+    text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
+    overflow: hidden;
+}
+
+.option-button:hover {
+    outline-color: rgba(244, 115, 185, .6);
+    background-color: rgba(255, 255, 255, .05);
+    color: rgba(244, 115, 185, .9);
+}
+
+.option-button:active {
+    background-color: rgba(244, 115, 185, .6);
+    color: rgba(255, 255, 255, .75);
+}
+
+#save-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+    width: 90%;
+    margin-top: 120px;
+}
+
+#top-arch {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    width: 50px;
+    background-color: rgba(0, 0, 0, .05);
+    /* box-shadow: 0 0 3px rgba(0, 0, 0, .25); */
+    border-radius: 50px 50px 0 0;
+    cursor: pointer;
+}
+
+#save-open-button {
+    position: relative;
+    top: 2px;
+    height: 20px;
+    width: 20px;
+    background-color: rgba(255, 255, 255, .25);
+    border-radius: 50%;
+    transition: background-color .1s;
+    box-shadow: 0 0 2px rgba(0, 0, 0, .25);
+}
+
+#top-arch:hover>#save-open-button {
+    background-color: rgba(246, 137, 137, .75);
+}
+
+#top-arch:active>#save-open-button {
+    background-color: rgba(198, 93, 123, .75);
+}
+
+#save-panel-body {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    /* border: 2px solid rgba(0, 0, 0, 0.2); */
+    background-color: #646464;
+    border-radius: 2px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, .25);
+    overflow: hidden;
+}
+
+#save-panel-cover {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    background-color: #A0A0A0;
+    z-index: 30;
+}
+
+#cover-circle {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+#cover-circle>div {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(127, 127, 127, .25);
+    border-radius: 20px;
+}
+
+#save-panel-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    height: 100%;
+    /* background-color: #2C3333; */
+}
+
+#save-text-area-warp {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#save-text-area {
+    width: 90%;
+    height: 50px;
+    resize: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 0.7rem;
+    font-family: "Lucida Console";
+    outline: 0;
+    border: 0;
+    border-radius: 2px 2px 0 0;
+    background-color: rgba(0, 0, 0, .35);
+    color: white;
+}
+
+#save-copy-button {
+    width: 90%;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(150, 150, 150);
+    cursor: pointer;
+    border-radius: 0 0 2px 2px;
+    color: rgba(0, 0, 0, .6);
+    font-size: 14px;
+    font-family: Arial;
+    transition: background-color .1s;
+}
+
+#save-copy-button:hover {
+    background-color: rgb(151, 139, 119);
+}
+
+#save-copy-button:active {
+    background-color: rgb(148, 128, 94);
+}
+
+#save-button-row {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.save-button-warp {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 46%;
+    height: 28px;
+    background-color: #323232;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: outline .1s;
+    overflow: hiddens;
+}
+
+.save-button-warp:hover {
+    outline: 2px solid rgba(255, 255, 255, .25);
+}
+
+.save-button-warp:active {
+    outline: 2px solid rgba(255, 255, 255, .6);
+}
+
+.save-button-warp:active>#save-export-button {
+    background-color: #aaeefa;
+}
+
+.save-button-warp:active>#save-import-button {
+    background-color: #fde6b0;
+}
+
+.save-button {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgb(224, 224, 224);
+    margin: 0px 2px 0 2px;
+    box-shadow: inset 0 0 1px rgba(0, 0, 0, .4);
+    transition: background-color .1s;
+}
+
+.save-button-text {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: rgb(224, 224, 224);
+    font-family: serif;
+}
+
+.save-opration-succ {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.save-opration-succ>div {
+    position: absolute;
+    background-color: #019267;
+    border-radius: 20px;
+}
+
+.save-opration-succ>div:nth-child(1) {
+    top: 10px;
+    left: 5px;
+    height: 10px;
+    width: 4px;
+    transform: rotate(-45deg);
+}
+
+.save-opration-succ>div:nth-child(2) {
+    top: 5px;
+    left: 12px;
+    height: 16px;
+    width: 4px;
+    transform: rotate(45deg);
+}
+
+.save-opration-fail {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.save-opration-fail>div {
+    position: absolute;
+    height: 16px;
+    width: 4px;
+    background-color: #D82148;
+    border-radius: 20px;
+}
+
+.save-opration-fail>div:nth-child(1) {
+    transform: rotate(-45deg);
+}
+
+.save-opration-fail>div:nth-child(2) {
+    transform: rotate(45deg);
+}
+
+#lang-display {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 100px;
+    border-radius: 100px 100px 0 0;
+    border: 0px solid #A0A0A0;
+    z-index: 5;
+    overflow: hidden;
+}
+
+#lang-outer-circle {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 110px;
+    width: 110px;
+    border-radius: 50%;
+    background-image: linear-gradient(135deg, transparent 50%, #A0A0A0 50%), linear-gradient(45deg, #A0A0A0 50%, transparent 50%);
+    z-index: 15;
+    margin-top: 40px;
+}
+
+#lang-inner-circle {
+    background-color: #A0A0A0;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.lang-switch-button-part {
+    position: relative;
+    top: -4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    background-color: #3e7c31;
+    z-index: 16;
+    overflow: hidden;
+    transition: background-color .1s;
+}
+
+.lang-switch-button-part:hover {
+    background-color: #549647;
+}
+
+.lang-switch-button-part:active {
+    background-color: rgb(48, 107, 36);
+}
+
+#lang-switch-button-l {
+    transform: rotate(-45deg);
+}
+
+#lang-switch-button-r {
+    transform: rotate(45deg);
+}
+
+.lang-switch-button-part>div {
+    position: relative;
+    top: -4px;
+    transform: scaleY(.8);
+    border: 8px solid transparent;
+}
+
+#lang-switch-button-l>div {
+    border-right-color: rgba(255, 255, 255, .75);
+    transform: rotate(45deg);
+}
+
+#lang-switch-button-r>div {
+    border-left-color: rgba(255, 255, 255, .75);
+    transform: rotate(-45deg);
+}
+
+@keyframes rot {
+    0% {
+        transform: rotate(-45deg);
+    }
+    100% {
+        transform: rotate(315deg);
+    }
+}
+
+#lang-name-body {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    height: 92px;
+    width: 92px;
+    border-radius: 50%;
+    overflow: hidden;
+    transform: rotate(-45deg);
+    background-color: black;
+    z-index: 10;
+    /* animation: 3s linear 0s infinite rot; */
+    margin-top: 40px;
+}
+
+.lang-name-row {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 50%;
+    width: 100%;
+}
+
+.lang-name-block {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    /* outline: 1px solid black; */
+}
+
+.lang-name-text {
+    font-size: 13px;
+    transform: rotate(45deg);
+    color: #4E9F3D;
+    /* font-weight: bold; */
+    font-family: 'Lucida Sans';
+}
+
+#lang-name-prev>.lang-name-text {
+    transform: rotate(-45deg);
+}
+
+#lang-name-next>.lang-name-text {
+    transform: rotate(135deg);
+}</style>
+    <title>Rat Elevator</title>
+</head>
+
+<body>
+    <div id="elev-container">
+        <div id="elev-left">
+            <div id="passenger-panel">
+                <div id="passenger-display-number">
+                    <div id="passenger-display-text" class="unselectable l10n-text-ui" lkey="PERSON_NUM"></div>
+                    <div id="passenger-display-count" class="unselectable">1</div>
+                </div>
+                <div id="passenger-list" class="noscrollbar">
+                    <div class="passenger-item">我</div>
+                </div>
+            </div>
+            <div id="task-list-warp">
+                <div id="task-list">
+                    <div id="task-container" class="noscrollbar">
+                        <!-- <div class="task-item">去五楼</div>
+                        <div class="task-item task-done-item">与老鼠见面</div> -->
+                    </div>
+                </div>
+            </div>
+            <div id="save-panel">
+                <div id="top-arch">
+                    <div id="save-open-button"></div>
+                </div>
+                <div id="save-panel-body">
+                    <div id="save-panel-cover" style="top:0;">
+                        <div id="cover-circle">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div id="save-panel-container">
+                        <div id="save-text-area-warp">
+                            <textarea id="save-text-area" class="noscrollbar"></textarea>
+                            <div id="save-copy-button" class="unselectable l10n-text-ui" lkey="COPY"></div>
+                        </div>
+                        <div id="save-button-row">
+                            <div class="save-button-warp" id="save-export-button-warp">
+                                <div class="save-button" id="save-export-button">
+                                    <!-- <div class="save-opration-succ">
+                                        <div></div>
+                                        <div></div>
+                                    </div> -->
+                                </div>
+                                <div class="save-button-text unselectable l10n-text-ui" lkey="EXPORT"></div>
+                            </div>
+                            <div class="save-button-warp" id="save-import-button-warp">
+                                <div class="save-button" id="save-import-button">
+                                    <!-- <div class="save-opration-fail">
+                                        <div></div>
+                                        <div></div>
+                                    </div> -->
+                                </div>
+                                <div class="save-button-text unselectable l10n-text-ui" lkey="IMPORT"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="elev-center">
+            <div id="men-mei">
+                <div id="lang-display">
+                    <div id="lang-outer-circle">
+                        <div id="lang-switch-button-l" class="lang-switch-button-part">
+                            <div></div>
+                        </div>
+                        <div id="lang-inner-circle"></div>
+                        <div id="lang-switch-button-r" class="lang-switch-button-part">
+                            <div></div>
+                        </div>
+                    </div>
+                    <div id="lang-name-body">
+                        <div class="lang-name-row">
+                            <div class="lang-name-block" id="lang-name-prev">
+                                <div class="lang-name-text unselectable"></div>
+                            </div>
+                            <div class="lang-name-block" id="lang-name-cur">
+                                <div class="lang-name-text unselectable"></div>
+                            </div>
+                        </div>
+                        <div class="lang-name-row">
+                            <div class="lang-name-block">
+                            </div>
+                            <div class="lang-name-block" id="lang-name-next">
+                                <div class="lang-name-text unselectable"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="elev-door">
+                <div style="left: 0;"></div>
+                <div style="left: 0;"></div>
+            </div>
+            <div id="scene">
+                <div id="dialog-container" class="noscrollbar">
+                    <div class="left-dialog-row dialog-row">
+                        <div class="avatar">
+                            <div class="unselectable">IL</div>
+                        </div>
+                        <div class="left-dialog-box dialog-box">老鼠，你好</div>
+                    </div>
+                    <div class="left-dialog-row dialog-row">
+                        <div class="left-dialog-box left-not-first-line dialog-box">
+                            我是雇佣兵
+                        </div>
+                    </div>
+                    <div class="right-dialog-row dialog-row">
+                        <div class="right-dialog-box dialog-box">芜湖芜湖好满足</div>
+                        <div class="avatar">
+                            <div class="unselectable">我</div>
+                        </div>
+                    </div>
+                    <div class="right-dialog-row dialog-row">
+                        <div class="right-dialog-box right-not-first-line dialog-box">嘉然可爱捏</div>
+                    </div>
+                    <div class="mid-dialog-row dialog-row">
+                        <div class="mid-dialog-box dialog-box">AbliILaB</div>
+                    </div>
+                </div>
+                <div id="sheng-lue-dots">
+                    <div class="sl-dot"></div>
+                    <div class="sl-dot"></div>
+                    <div class="sl-dot"></div>
+                </div>
+                <div id="go-on-button-row">
+                    <div id="go-on-button">
+                        <div></div>
+                    </div>
+                </div>
+                <div id="options-row">
+                    <div class="option-button unselectable">说点好听的吧</div>
+                    <div class="option-button unselectable">感觉不如</div>
+                    <div class="option-button unselectable">还可以ABCDILsdd</div>
+                    <div class="option-button unselectable">可是说这么多不也无济于事吗？</div>
+                </div>
+                <div id="background"></div>
+            </div>
+        </div>
+        <div id="elev-right">
+            <div id="floor-display">
+                <div class="direction-icon invisible" id="up-icon">
+                    <div></div>
+                    <div></div>
+                </div>
+                <div id="display-number" class="unselectable">1</div>
+                <div class="direction-icon invisible" id="down-icon">
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+            <div id="floor-buttons">
+                <div class="button-row" id="func-buttons">
+                    <div class="button-col" id="close-button">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="button-col" id="open-button">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+/*TODO:
+ *存档功能
+ *分支选项
+ */
+function sleep(time) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, time)
+    })
+}
+
+function range() {
+    let start = 0
+    let end = 0
+    if (arguments.length <= 0) {
+        return []
+    } else if (arguments.length === 1) {
+        if (arguments[0] <= 0) {
+            return []
+        }
+        start = 0
+        end = arguments[0] - 1
+    } else {
+        start = arguments[0]
+        end = arguments[1]
+    }
+    if (start > end) {
+        let tmp = end
+        end = start
+        start = tmp
+    }
+    let arr = []
+    for (let i = start; i <= end; ++i) {
+        arr.push(i)
+    }
+    return arr
+}
+
+function clearChildren(elem) {
+    for (let child of Array.from(elem.childNodes)) {
+        elem.removeChild(child)
+    }
+}
+
+function toggleElementClass(elem, class_name) {
+    if (elem.classList.contains(class_name)) {
+        elem.classList.remove(class_name)
+    } else {
+        elem.classList.add(class_name)
+    }
+}
+
+function addElementClass(elem, class_name) {
+    if (!elem.classList.contains(class_name)) {
+        elem.classList.add(class_name)
+    }
+}
+
+function removeElementClass(elem, class_name) {
+    if (elem.classList.contains(class_name)) {
+        elem.classList.remove(class_name)
+    }
+}
+
+const qs = function(v) {
+    return document.querySelector(v)
+}
+
+const qsAll = function(v) {
+    return document.querySelectorAll(v)
+}
+
+class WaitingDotsAnimation {
+    constructor() {
+        this.dots = []
+        this.orders = []
+        this.step = 0
+        this.timer = undefined
+        this.interval = 250
+    }
+    generateOrders(num) {
+        if (num === 0) {
+            return []
+        }
+        let res = []
+        for (let i of range(num * 2)) {
+            if (i === 0) {
+                res.push(Array(num).fill(0))
+            } else {
+                let order = [...res[i - 1]]
+                let is_all_same = true
+                for (let j of range(order.length)) {
+                    if (j !== 0) {
+                        if (order[j - 1] !== order[j]) {
+                            order[j] = order[j - 1]
+                            is_all_same = false
+                            break
+                        }
+                    }
+                }
+                if (is_all_same) {
+                    // order[0] = order[0] === 0 ? 1 : 0
+                    order[0] ^= 1
+                }
+                res.push(order)
+            }
+        }
+        return res
+    }
+    toggle(dot, type) {
+        switch (type) {
+            case 0: //dark
+                removeElementClass(dot, 'light-dot')
+                addElementClass(dot, 'dark-dot')
+                break
+            case 1: //light
+                removeElementClass(dot, 'dark-dot')
+                addElementClass(dot, 'light-dot')
+                break
+            default:
+                break
+        }
+    }
+    start() {
+        this.dots = Array.from(qsAll('#sheng-lue-dots .sl-dot'))
+        this.orders = this.generateOrders(this.dots.length)
+        clearInterval(this.timer)
+        this.timer = setInterval(() => {
+            for (let i of range(this.orders[this.step].length)) {
+                this.toggle(this.dots[i], this.orders[this.step][i])
+            }
+            this.step = (this.step + 1) % this.orders.length
+        }, this.interval)
+    }
+    stop() {
+        clearInterval(this.timer)
+    }
+}
+
+class FloorButton {
+    constructor(index, text, available) {
+        this.index = index //number
+        this.text = text //string
+        this.available = available //bool
+        this.selected = false //bool
+    }
+}
+
+class Door {
+    constructor() {
+        this.is_moving = false
+        this.is_open = false
+        this.direction = 'open'
+        this.timer_count = 20
+        this.sleep_time = 6
+        this.l_part = undefined
+        this.r_part = undefined
+        this.step = 0
+    }
+    stop() {
+        this.is_moving = false
+        switch (this.direction) {
+            case 'open':
+                this.is_open = true
+                this.direction = 'close'
+                qs('#elev-door').style.display = 'none'
+                break
+            case 'close':
+                this.is_open = false
+                this.direction = 'open'
+                break
+            default:
+                break
+        }
+    }
+    move() {
+        let l_part_left = parseInt(this.l_part.style.left)
+        let r_part_left = parseInt(this.r_part.style.left)
+        switch (this.direction) {
+            case 'open':
+                this.l_part.style.left = `${l_part_left-this.step}px`
+                this.r_part.style.left = `${r_part_left+this.step}px`
+                break
+            case 'close':
+                this.l_part.style.left = `${l_part_left+this.step}px`
+                this.r_part.style.left = `${r_part_left-this.step}px`
+                break
+            default:
+                break
+        }
+    }
+    syncStart(direction) {
+        this.direction = direction
+        this.is_moving = true
+        this.l_part = qs('#elev-door>div:nth-child(1)')
+        this.r_part = qs('#elev-door>div:nth-child(2)')
+        qs('#elev-door').style.display = 'flex'
+        this.step = Math.ceil(this.l_part.clientWidth / this.timer_count)
+        for (let i in range(this.timer_count)) {
+            this.move()
+        }
+        this.stop()
+    }
+    async start(direction) {
+        this.direction = direction
+        this.is_moving = true
+        this.l_part = qs('#elev-door>div:nth-child(1)')
+        this.r_part = qs('#elev-door>div:nth-child(2)')
+        qs('#elev-door').style.display = 'flex'
+        this.step = Math.ceil(this.l_part.clientWidth / this.timer_count)
+        for (let i in range(this.timer_count)) {
+            this.move()
+            await sleep(this.sleep_time)
+        }
+        this.stop()
+    }
+}
+
+const supported_langs = ['zh_cn', 'en']
+
+class L10nText {
+    constructor(data) {
+        this.data = data
+        return new Proxy(this, {
+            get: (obj, key) => {
+                if (typeof(key) === 'string' && supported_langs.indexOf(key) !== -1) {
+                    return obj.data[key]
+                }
+                return ''
+            },
+            set: (obj, key, v) => {
+                if (typeof(key) === 'string' && supported_langs.indexOf(key) !== -1) {
+                    return obj.data[key] = v
+                }
+                return ''
+            }
+        })
+    }
+}
+
+class Passenger {
+    constructor(id, name, color, font_color, avatar_text) {
+        this.id = id
+        this.name = name
+        this.avatar_color = color
+        this.avatar_font_color = font_color
+        this.avatar_text = avatar_text
+    }
+}
+
+class Dialog {
+    constructor(id, text) {
+        this.person_id = id
+        this.text = text
+    }
+}
+
+class DialogBlock {
+    constructor() {
+        this.data = []
+    }
+}
+
+class Task {
+    constructor() {}
+}
+
+class Floor {
+    constructor() {
+        this.dialogs = {}
+        for (let i of range(-2, 6)) {
+            if (i !== 0) {
+                this.dialogs[i] = `这里是${i}层`
+            }
+        }
+    }
+}
+
+class PendingQueue {
+    constructor() {
+        this.data = []
+    }
+    sort() {
+        for (let i = 0; i < this.data.length; i++) {
+            this.data[i].index = i
+        }
+    }
+    length() {
+        return this.data.length
+    }
+    indexOf(value) {
+        for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i].floor === value) {
+                return i
+            }
+        }
+        return -1
+    }
+    add(value) {
+        if (this.indexOf(value) === -1) {
+            this.data.push({ floor: value, index: this.data.length })
+            this.sort()
+        }
+    }
+    remove(value) {
+        let i = this.indexOf(value)
+        if (i !== -1) {
+            this.data.splice(i, 1)
+            this.sort()
+        }
+    }
+    getMax() {
+        if (this.data.length <= 0) {
+            return { floor: 0, index: -1 }
+        }
+        let k = 0
+        for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i].floor > this.data[k].floor) {
+                k = i
+            }
+        }
+        return this.data[k]
+    }
+    getMin() {
+        if (this.data.length <= 0) {
+            return { floor: 0, index: -1 }
+        }
+        let k = 0
+        for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i].floor < this.data[k].floor) {
+                k = i
+            }
+        }
+        return this.data[k]
+    }
+}
+
+class FloorDisplay {
+    constructor() {
+        this.display_number = undefined
+        this.up_icon = undefined
+        this.down_icon = undefined
+    }
+    updateIcon(state) { // up down none both
+        if (!this.up_icon) {
+            this.up_icon = qs('#up-icon')
+        }
+        if (!this.down_icon) {
+            this.down_icon = qs('#down-icon')
+        }
+        let class_name = 'invisible'
+        switch (state) {
+            case 'up':
+                removeElementClass(this.up_icon, class_name)
+                addElementClass(this.down_icon, class_name)
+                break
+            case 'down':
+                removeElementClass(this.down_icon, class_name)
+                addElementClass(this.up_icon, class_name)
+                break
+            case 'none':
+                addElementClass(this.up_icon, class_name)
+                addElementClass(this.down_icon, class_name)
+                break
+            case 'both':
+                removeElementClass(this.up_icon, class_name)
+                removeElementClass(this.down_icon, class_name)
+                break
+            default:
+                break
+        }
+    }
+    updateNumber(num) {
+        if (!this.display_number) {
+            this.display_number = qs('#display-number')
+        }
+        this.display_number.textContent = num.toString()
+    }
+}
+
+class SavePanel {
+    constructor() {
+        this.is_moving = false
+        this.is_open = false
+        this.direction = 'open'
+        this.timer_count = 15
+        this.sleep_time = 5
+        this.cover = undefined
+        this.step = 0
+    }
+    stop() {
+        this.is_moving = false
+        switch (this.direction) {
+            case 'open':
+                this.is_open = true
+                this.direction = 'close'
+                break
+            case 'close':
+                this.is_open = false
+                this.direction = 'open'
+                break
+            default:
+                break
+        }
+    }
+    move() {
+        let cover_top = parseInt(this.cover.style.top)
+        switch (this.direction) {
+            case 'open':
+                this.cover.style.top = `${cover_top-this.step}px`
+                break
+            case 'close':
+                this.cover.style.top = `${cover_top+this.step}px`
+                break
+            default:
+                break
+        }
+    }
+    syncStart(direction) {
+        this.direction = direction
+        this.is_moving = true
+        this.cover = qs('#save-panel-cover')
+        this.step = Math.ceil(this.cover.clientHeight / this.timer_count)
+        for (let i in range(this.timer_count)) {
+            this.move()
+        }
+        this.stop()
+    }
+    async start(direction) {
+        this.direction = direction
+        this.is_moving = true
+        this.cover = qs('#save-panel-cover')
+        this.step = Math.ceil(this.cover.clientHeight / this.timer_count)
+        for (let i in range(this.timer_count)) {
+            this.move()
+            await sleep(this.sleep_time)
+        }
+        this.stop()
+    }
+}
+
+class LanguageDisplay {
+    constructor() {
+        this.language_list = ['zh_cn', 'en']
+        this.index = 0
+        this.next_index = 0
+        this.is_moving = false
+        this.direction = ''
+        this.angle = 90
+        this.ori_angle = -45
+        this.timer_count = 15
+        this.sleep_time = 8
+        this.spin = undefined
+        this.step = 0
+        this.counter = 0
+    }
+    getLanguageName(key) {
+        switch (key) {
+            case 'zh_cn':
+                return '中文'
+            case 'en':
+                return 'EN'
+            case 'ru':
+                return 'РУ'
+            default:
+                return ''
+        }
+    }
+    stop() {
+        this.is_moving = false
+        this.direction = ''
+        this.counter = 0
+        this.index = this.next_index
+        qs('#lang-name-prev>.lang-name-text').textContent = ''
+        qs('#lang-name-cur>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.index])
+        qs('#lang-name-next>.lang-name-text').textContent = ''
+        this.spin.style.transform = `rotate(${this.ori_angle}deg)`
+    }
+    move() {
+        this.counter += 1
+        switch (this.direction) {
+            case 'left':
+                this.spin.style.transform = `rotate(${this.ori_angle-this.step*this.counter}deg)`
+                break
+            case 'right':
+                this.spin.style.transform = `rotate(${this.ori_angle+this.step*this.counter}deg)`
+                break
+            default:
+                break
+        }
+    }
+    syncStart(direction) {
+        this.direction = direction
+        this.is_moving = true
+        this.spin = qs('#lang-name-body')
+        this.step = Math.ceil(this.angle / this.timer_count)
+        switch (this.direction) {
+            case 'right':
+                this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length
+                qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
+                qs('#lang-name-next>.lang-name-text').textContent = ''
+                break
+            case 'left':
+                this.next_index = (this.index + 1) % this.language_list.length
+                qs('#lang-name-prev>.lang-name-text').textContent = ''
+                qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
+                break
+            default:
+                break
+        }
+        for (let i in range(this.timer_count)) {
+            this.move()
+        }
+        this.stop()
+    }
+    async start(direction) {
+        this.direction = direction
+        this.is_moving = true
+        this.spin = qs('#lang-name-body')
+        this.step = Math.ceil(this.angle / this.timer_count)
+        switch (this.direction) {
+            case 'right':
+                this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length
+                qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
+                qs('#lang-name-next>.lang-name-text').textContent = ''
+                break
+            case 'left':
+                this.next_index = (this.index + 1) % this.language_list.length
+                qs('#lang-name-prev>.lang-name-text').textContent = ''
+                qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
+                break
+            default:
+                break
+        }
+        for (let i in range(this.timer_count)) {
+            this.move()
+            await sleep(this.sleep_time)
+        }
+        this.stop()
+    }
+    set(key) {
+        let i = this.language_list.indexOf(key)
+        if (i === -1) {
+            i = 0
+        }
+        this.index = i
+        qs('#lang-name-prev>.lang-name-text').textContent = ''
+        qs('#lang-name-cur>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.index])
+        qs('#lang-name-next>.lang-name-text').textContent = ''
+    }
+    get() {
+        return this.language_list[this.index]
+    }
+}
+
+const binding_buttons = [{
+        selector: '.number-button',
+        is_single: false,
+        func: (event) => {
+            let class_name = 'button-selected'
+            let index = parseInt(event.target.getAttribute('index'))
+            if (!game.is_lifting && index === game.cur_floor) {
+                return
+            }
+            if (event.target.classList.contains(class_name)) {
+                event.target.classList.remove(class_name)
+                game.pending_queue.remove(index)
+                if (index === game.cur_dest) {
+                    game.calcLiftDirection()
+                }
+            } else {
+                event.target.classList.add(class_name)
+                game.pending_queue.add(index)
+            }
+            if (!game.is_lifting && !game.door.is_open) {
+                game.checkBeforeLift()
+            }
+        }
+    },
+    {
+        selector: '#close-button',
+        is_single: true,
+        func: async() => {
+            if (!game.is_lifting &&
+                game.door.is_open &&
+                !game.door.is_moving) {
+                await game.door.start('close')
+                game.checkBeforeLift()
+            }
+        }
+    },
+    {
+        selector: '#open-button',
+        is_single: true,
+        func: async() => {
+            if (!game.is_lifting &&
+                !game.door.is_open &&
+                !game.door.is_moving) {
+                game.renderFloor()
+                await game.door.start('open')
+            }
+        }
+    },
+    {
+        selector: '#go-on-button-row',
+        is_single: true,
+        func: () => {}
+    },
+    {
+        selector: '#top-arch',
+        is_single: true,
+        func: async() => {
+            if (!game.save_panel.is_moving) {
+                if (game.save_panel.is_open) {
+                    game.save_panel.start('close')
+                } else {
+                    game.save_panel.start('open')
+                }
+            }
+        }
+    },
+    {
+        selector: '#save-export-button-warp',
+        is_single: true,
+        func: () => {
+            clearChildren(qs('#save-export-button'))
+            clearChildren(qs('#save-import-button'))
+            let res = game.serializate()
+            qs('#save-export-button').appendChild(game.getTFIcon(res.status))
+        }
+    },
+    {
+        selector: '#save-import-button-warp',
+        is_single: true,
+        func: () => {
+            clearChildren(qs('#save-export-button'))
+            clearChildren(qs('#save-import-button'))
+            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate()))
+        }
+    },
+    {
+        selector: '#save-copy-button',
+        is_single: true,
+        func: async() => {
+            await navigator.clipboard.writeText(qs('#save-text-area').value)
+        }
+    },
+    {
+        selector: '#lang-switch-button-l',
+        is_single: true,
+        func: async() => {
+            if (!game.language_display.is_moving) {
+                await game.language_display.start('left')
+                game.lang = game.language_display.get()
+                game.updateUIStrings()
+            }
+        }
+
+    },
+    {
+        selector: '#lang-switch-button-r',
+        is_single: true,
+        func: async() => {
+            if (!game.language_display.is_moving) {
+                await game.language_display.start('right')
+                game.lang = game.language_display.get()
+                game.updateUIStrings()
+            }
+        }
+
+    }
+]
+
+class Game {
+    constructor() {
+        this.lang = 'zh_cn'
+        this.floor_buttons = []
+        this.cur_floor = 1
+        this.max_floor = 6
+        this.min_floor = -2
+        this.is_lifting = false
+        this.lift_interval = 200
+        this.lift_direction = '' //up down
+        this.cur_dest = 0
+        this.pending_queue = new PendingQueue()
+        this.door = new Door()
+        this.floors = new Floor()
+        this.dots_animation = new WaitingDotsAnimation()
+        this.floor_display = new FloorDisplay()
+        this.save_panel = new SavePanel()
+        this.language_display = new LanguageDisplay()
+        this.characters = [
+            new Passenger(0, new L10nText({ zh_cn: '我', en: 'Me' }), '', '', new L10nText({ zh_cn: '我', en: 'ME' }))
+        ]
+        this.ui_string = {
+            'PERSON_NUM': new L10nText({ zh_cn: '人数', en: 'Persons' }),
+            'COPY': new L10nText({ zh_cn: '复制', en: 'COPY' }),
+            'IMPORT': new L10nText({ zh_cn: '导入', en: 'IMP' }),
+            'EXPORT': new L10nText({ zh_cn: '导出', en: 'EXP' }),
+        }
+    }
+    getTFIcon(type) {
+        switch (type) {
+            case true:
+                let icon_t = document.createElement('div')
+                icon_t.classList.add('save-opration-succ')
+                for (let i in range(2)) {
+                    icon_t.appendChild(document.createElement('div'))
+                }
+                return icon_t
+            case false:
+                let icon_f = document.createElement('div')
+                icon_f.classList.add('save-opration-fail')
+                for (let i in range(2)) {
+                    icon_f.appendChild(document.createElement('div'))
+                }
+                return icon_f
+            default:
+                return undefined
+        }
+    }
+    renderFloor() {
+        let dialog_container = qs('#dialog-container')
+        let dialog_item = document.createElement('div')
+        let dialog_text = document.createElement('div')
+        clearChildren(dialog_container)
+        dialog_item.classList.add('dialog-row', 'mid-dialog-row')
+        dialog_text.classList.add('dialog-box', 'mid-dialog-box')
+        dialog_text.textContent = this.floors.dialogs[this.cur_floor]
+        dialog_item.appendChild(dialog_text)
+        dialog_container.appendChild(dialog_item)
+    }
+    isLiftable() {
+        return !(this.pending_queue.length() <= 0 ||
+            this.lift_direction !== 'up' && this.lift_direction !== 'down' ||
+            this.cur_dest > this.max_floor ||
+            this.cur_dest < this.min_floor ||
+            this.cur_dest === 0 ||
+            this.cur_dest === this.cur_floor)
+    }
+    calcLiftDirection() {
+        if (this.pending_queue.length() > 0) {
+            if (this.pending_queue.length() === 1) {
+                let dest = this.pending_queue.getMax().floor
+                this.lift_direction = dest > this.cur_floor ? 'up' : (dest < this.cur_floor ? 'down' : '')
+                this.cur_dest = dest
+            } else {
+                let top = this.pending_queue.getMax()
+                let bottom = this.pending_queue.getMin()
+                if (top.floor >= this.cur_floor &&
+                    this.cur_floor >= bottom.floor) {
+                    if (top.index <= bottom.index) {
+                        this.lift_direction = 'up'
+                        this.cur_dest = top.floor
+                    } else {
+                        this.lift_direction = 'down'
+                        this.cur_dest = bottom.floor
+                    }
+                } else if (bottom.floor >= this.cur_floor) {
+                    this.lift_direction = 'up'
+                    this.cur_dest = top.floor
+                } else if (top.floor <= this.cur_floor) {
+                    this.lift_direction = 'down'
+                    this.cur_dest = bottom.floor
+                } else {
+                    this.lift_direction = ''
+                    this.cur_dest = 0
+                }
+            }
+        } else {
+            this.lift_direction = ''
+            this.cur_dest = 0
+        }
+    }
+    checkPassingFloor() {
+        return this.pending_queue.indexOf(this.cur_floor) !== -1
+    }
+    async lift() {
+        if (this.lift_direction !== 'up' && this.lift_direction !== 'down') {
+            return
+        }
+        this.floor_display.updateIcon(this.lift_direction)
+        this.is_lifting = true
+        lift_loop: do {
+            switch (this.lift_direction) {
+                case 'up':
+                    this.cur_floor = Math.min(this.cur_floor + 1 === 0 ? 1 : this.cur_floor + 1, this.max_floor)
+                    break
+                case 'down':
+                    this.cur_floor = Math.max(this.cur_floor - 1 === 0 ? -1 : this.cur_floor - 1, this.min_floor)
+                    break
+                default:
+                    break lift_loop
+            }
+            this.floor_display.updateNumber(this.cur_floor)
+            if (this.cur_floor === this.dest) {
+                break
+            }
+            if (this.cur_floor >= this.max_floor || this.cur_floor <= this.min_floor) {
+                break
+            }
+            await sleep(this.lift_interval)
+        } while (!this.checkPassingFloor())
+        this.pending_queue.remove(this.cur_floor)
+        removeElementClass(qs(`.number-button[index="${this.cur_floor}"]`), 'button-selected')
+        this.is_lifting = false
+        this.floor_display.updateIcon('none')
+    }
+    checkBeforeLift() {
+        this.pending_queue.remove(this.cur_floor)
+        this.calcLiftDirection()
+        if (this.isLiftable()) {
+            this.lift()
+        }
+    }
+    createFloorButtons() {
+        let func_button_row = qs('#func-buttons')
+        let button_container = qs('#floor-buttons')
+        for (let child of Array.from(button_container.childNodes)) {
+            if (child.id !== 'func-buttons') {
+                button_container.removeChild(child)
+            }
+        }
+        this.floor_buttons = []
+        for (let i = this.max_floor - 1; i >= 1; i -= 2) { //地上部分
+            this.floor_buttons.push([
+                new FloorButton(i, i.toString(), true),
+                new FloorButton(
+                    i + 1,
+                    (i + 1) === this.max_floor ? '∞' : (i + 1).toString(),
+                    (i + 1) !== this.max_floor
+                )
+            ])
+        }
+        for (let i = -2; i >= this.min_floor; i -= 2) { //地下部分
+            this.floor_buttons.push([
+                new FloorButton(i + 1, (i + 1).toString(), true),
+                new FloorButton(
+                    i,
+                    i === this.min_floor ? '-∞' : i.toString(),
+                    i !== this.min_floor
+                )
+            ])
+        }
+        this.floor_buttons.forEach(button_row => {
+            let row = document.createElement('div')
+            row.classList.add('button-row')
+            for (let button of button_row) {
+                let col = document.createElement('div')
+                col.classList.add('button-col', 'unselectable', 'number-button')
+                if (!button.available) {
+                    col.classList.add('invisible')
+                }
+                col.textContent = button.text
+                col.setAttribute('index', button.index)
+                row.appendChild(col)
+            }
+            button_container.insertBefore(row, func_button_row)
+        });
+    }
+    bindFunctionToButtons() {
+        for (let bind of binding_buttons) {
+            if (bind.is_single) {
+                qs(bind.selector).addEventListener('click', bind.func)
+            } else {
+                for (let button of Array.from(qsAll(bind.selector))) {
+                    button.addEventListener('click', bind.func)
+                }
+            }
+        }
+    }
+    encrypt() {
+
+    }
+    decipher() {
+
+    }
+    serializate() {
+        return { status: true, data: {} }
+    }
+    deserializate() {
+        return false
+    }
+    updateUIStrings() {
+        for (let e of Array.from(qsAll('.l10n-text-ui'))) {
+            e.textContent = this.ui_string[e.getAttribute('lkey')][this.lang]
+        }
+    }
+    initialize() {
+        this.createFloorButtons()
+        this.bindFunctionToButtons()
+        this.renderFloor()
+        this.language_display.set(this.lang)
+        this.updateUIStrings()
+    }
+    async debug() {
+        this.door.syncStart('open');
+        // this.save_panel.syncStart('open')
+        // qs('.number-button[index="5"]').click()
+        qs('#sheng-lue-dots').style.display = 'none'
+        qs('#go-on-button-row').style.display = 'none'
+        qs('#options-row').style.display = 'none'
+        qs('#save-text-area').value = ''
+        this.dots_animation.start()
+    }
+}
+
+const game = new Game()
+
+document.addEventListener("DOMContentLoaded", () => {
+    game.initialize()
+    game.debug()
+})</script>
+
+</html>
