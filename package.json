@@ -1,0 +1,15 @@
+{
+    "name": "RatElev",
+    "version": "0.0.1",
+    "description": "Ups adn downs.",
+    "scripts": {
+        "build": "tsc",
+        "watch": "tsc -w",
+        "dist": "node ./script/dist.js",
+        "start": "npm run build & npm run dist"
+    },
+    "author": "sealleci",
+    "devDependencies": {
+        "typescript": "^4.7.2"
+    }
+}

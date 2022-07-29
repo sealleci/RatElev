@@ -4,6 +4,10 @@
 
 Ups and downs, meet different pepople.
 
+## 技术 TechSupports
+
+- TypeScript
+
 ## 开发者 Staff
 
 - Sealleci
