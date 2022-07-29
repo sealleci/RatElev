@@ -61,11 +61,11 @@ function removeElementClass(elem, class_name) {
     }
 }
 
-const qs = function(v) {
+const qs = function (v) {
     return document.querySelector(v)
 }
 
-const qsAll = function(v) {
+const qsa = function (v) {
     return document.querySelectorAll(v)
 }
 
@@ -121,7 +121,7 @@ class WaitingDotsAnimation {
         }
     }
     start() {
-        this.dots = Array.from(qsAll('#sheng-lue-dots .sl-dot'))
+        this.dots = Array.from(qsa('#sheng-lue-dots .sl-dot'))
         this.orders = this.generateOrders(this.dots.length)
         clearInterval(this.timer)
         this.timer = setInterval(() => {
@@ -177,12 +177,12 @@ class Door {
         let r_part_left = parseInt(this.r_part.style.left)
         switch (this.direction) {
             case 'open':
-                this.l_part.style.left = `${l_part_left-this.step}px`
-                this.r_part.style.left = `${r_part_left+this.step}px`
+                this.l_part.style.left = `${l_part_left - this.step}px`
+                this.r_part.style.left = `${r_part_left + this.step}px`
                 break
             case 'close':
-                this.l_part.style.left = `${l_part_left+this.step}px`
-                this.r_part.style.left = `${r_part_left-this.step}px`
+                this.l_part.style.left = `${l_part_left + this.step}px`
+                this.r_part.style.left = `${r_part_left - this.step}px`
                 break
             default:
                 break
@@ -222,13 +222,13 @@ class L10nText {
         this.data = data
         return new Proxy(this, {
             get: (obj, key) => {
-                if (typeof(key) === 'string' && supported_langs.indexOf(key) !== -1) {
+                if (typeof (key) === 'string' && supported_langs.indexOf(key) !== -1) {
                     return obj.data[key]
                 }
                 return ''
             },
             set: (obj, key, v) => {
-                if (typeof(key) === 'string' && supported_langs.indexOf(key) !== -1) {
+                if (typeof (key) === 'string' && supported_langs.indexOf(key) !== -1) {
                     return obj.data[key] = v
                 }
                 return ''
@@ -261,7 +261,7 @@ class DialogBlock {
 }
 
 class Task {
-    constructor() {}
+    constructor() { }
 }
 
 class Floor {
@@ -406,10 +406,10 @@ class SavePanel {
         let cover_top = parseInt(this.cover.style.top)
         switch (this.direction) {
             case 'open':
-                this.cover.style.top = `${cover_top-this.step}px`
+                this.cover.style.top = `${cover_top - this.step}px`
                 break
             case 'close':
-                this.cover.style.top = `${cover_top+this.step}px`
+                this.cover.style.top = `${cover_top + this.step}px`
                 break
             default:
                 break
@@ -479,10 +479,10 @@ class LanguageDisplay {
         this.counter += 1
         switch (this.direction) {
             case 'left':
-                this.spin.style.transform = `rotate(${this.ori_angle-this.step*this.counter}deg)`
+                this.spin.style.transform = `rotate(${this.ori_angle - this.step * this.counter}deg)`
                 break
             case 'right':
-                this.spin.style.transform = `rotate(${this.ori_angle+this.step*this.counter}deg)`
+                this.spin.style.transform = `rotate(${this.ori_angle + this.step * this.counter}deg)`
                 break
             default:
                 break
@@ -553,121 +553,121 @@ class LanguageDisplay {
 }
 
 const binding_buttons = [{
-        selector: '.number-button',
-        is_single: false,
-        func: (event) => {
-            let class_name = 'button-selected'
-            let index = parseInt(event.target.getAttribute('index'))
-            if (!game.is_lifting && index === game.cur_floor) {
-                return
+    selector: '.number-button',
+    is_single: false,
+    func: (event) => {
+        let class_name = 'button-selected'
+        let index = parseInt(event.target.getAttribute('index'))
+        if (!game.is_lifting && index === game.cur_floor) {
+            return
+        }
+        if (event.target.classList.contains(class_name)) {
+            event.target.classList.remove(class_name)
+            game.pending_queue.remove(index)
+            if (index === game.cur_dest) {
+                game.calcLiftDirection()
             }
-            if (event.target.classList.contains(class_name)) {
-                event.target.classList.remove(class_name)
-                game.pending_queue.remove(index)
-                if (index === game.cur_dest) {
-                    game.calcLiftDirection()
-                }
-            } else {
-                event.target.classList.add(class_name)
-                game.pending_queue.add(index)
-            }
-            if (!game.is_lifting && !game.door.is_open) {
-                game.checkBeforeLift()
-            }
+        } else {
+            event.target.classList.add(class_name)
+            game.pending_queue.add(index)
         }
-    },
-    {
-        selector: '#close-button',
-        is_single: true,
-        func: async() => {
-            if (!game.is_lifting &&
-                game.door.is_open &&
-                !game.door.is_moving) {
-                await game.door.start('close')
-                game.checkBeforeLift()
-            }
+        if (!game.is_lifting && !game.door.is_open) {
+            game.checkBeforeLift()
         }
-    },
-    {
-        selector: '#open-button',
-        is_single: true,
-        func: async() => {
-            if (!game.is_lifting &&
-                !game.door.is_open &&
-                !game.door.is_moving) {
-                game.renderFloor()
-                await game.door.start('open')
-            }
-        }
-    },
-    {
-        selector: '#go-on-button-row',
-        is_single: true,
-        func: () => {}
-    },
-    {
-        selector: '#top-arch',
-        is_single: true,
-        func: async() => {
-            if (!game.save_panel.is_moving) {
-                if (game.save_panel.is_open) {
-                    game.save_panel.start('close')
-                } else {
-                    game.save_panel.start('open')
-                }
-            }
-        }
-    },
-    {
-        selector: '#save-export-button-warp',
-        is_single: true,
-        func: () => {
-            clearChildren(qs('#save-export-button'))
-            clearChildren(qs('#save-import-button'))
-            let res = game.serializate()
-            qs('#save-export-button').appendChild(game.getTFIcon(res.status))
-        }
-    },
-    {
-        selector: '#save-import-button-warp',
-        is_single: true,
-        func: () => {
-            clearChildren(qs('#save-export-button'))
-            clearChildren(qs('#save-import-button'))
-            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate()))
-        }
-    },
-    {
-        selector: '#save-copy-button',
-        is_single: true,
-        func: async() => {
-            await navigator.clipboard.writeText(qs('#save-text-area').value)
-        }
-    },
-    {
-        selector: '#lang-switch-button-l',
-        is_single: true,
-        func: async() => {
-            if (!game.language_display.is_moving) {
-                await game.language_display.start('left')
-                game.lang = game.language_display.get()
-                game.updateUIStrings()
-            }
-        }
-
-    },
-    {
-        selector: '#lang-switch-button-r',
-        is_single: true,
-        func: async() => {
-            if (!game.language_display.is_moving) {
-                await game.language_display.start('right')
-                game.lang = game.language_display.get()
-                game.updateUIStrings()
-            }
-        }
-
     }
+},
+{
+    selector: '#close-button',
+    is_single: true,
+    func: async () => {
+        if (!game.is_lifting &&
+            game.door.is_open &&
+            !game.door.is_moving) {
+            await game.door.start('close')
+            game.checkBeforeLift()
+        }
+    }
+},
+{
+    selector: '#open-button',
+    is_single: true,
+    func: async () => {
+        if (!game.is_lifting &&
+            !game.door.is_open &&
+            !game.door.is_moving) {
+            game.renderFloor()
+            await game.door.start('open')
+        }
+    }
+},
+{
+    selector: '#go-on-button-row',
+    is_single: true,
+    func: () => { }
+},
+{
+    selector: '#top-arch',
+    is_single: true,
+    func: async () => {
+        if (!game.save_panel.is_moving) {
+            if (game.save_panel.is_open) {
+                game.save_panel.start('close')
+            } else {
+                game.save_panel.start('open')
+            }
+        }
+    }
+},
+{
+    selector: '#save-export-button-warp',
+    is_single: true,
+    func: () => {
+        clearChildren(qs('#save-export-button'))
+        clearChildren(qs('#save-import-button'))
+        let res = game.serializate()
+        qs('#save-export-button').appendChild(game.getTFIcon(res.status))
+    }
+},
+{
+    selector: '#save-import-button-warp',
+    is_single: true,
+    func: () => {
+        clearChildren(qs('#save-export-button'))
+        clearChildren(qs('#save-import-button'))
+        qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate()))
+    }
+},
+{
+    selector: '#save-copy-button',
+    is_single: true,
+    func: async () => {
+        await navigator.clipboard.writeText(qs('#save-text-area').value)
+    }
+},
+{
+    selector: '#lang-switch-button-l',
+    is_single: true,
+    func: async () => {
+        if (!game.language_display.is_moving) {
+            await game.language_display.start('left')
+            game.lang = game.language_display.get()
+            game.updateUIStrings()
+        }
+    }
+
+},
+{
+    selector: '#lang-switch-button-r',
+    is_single: true,
+    func: async () => {
+        if (!game.language_display.is_moving) {
+            await game.language_display.start('right')
+            game.lang = game.language_display.get()
+            game.updateUIStrings()
+        }
+    }
+
+}
 ]
 
 class Game {
@@ -862,7 +862,7 @@ class Game {
             if (bind.is_single) {
                 qs(bind.selector).addEventListener('click', bind.func)
             } else {
-                for (let button of Array.from(qsAll(bind.selector))) {
+                for (let button of Array.from(qsa(bind.selector))) {
                     button.addEventListener('click', bind.func)
                 }
             }
@@ -881,7 +881,7 @@ class Game {
         return false
     }
     updateUIStrings() {
-        for (let e of Array.from(qsAll('.l10n-text-ui'))) {
+        for (let e of Array.from(qsa('.l10n-text-ui'))) {
             e.textContent = this.ui_string[e.getAttribute('lkey')][this.lang]
         }
     }
