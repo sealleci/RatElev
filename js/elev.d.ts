@@ -40,7 +40,21 @@ declare class Door {
     syncStart(direction: string): void;
     start(direction: string): Promise<void>;
 }
-declare const supported_langs: (string | symbol)[];
+interface NaturalLanguage {
+    key: string | symbol;
+    name: string;
+}
+declare class LanguageList {
+    private data;
+    constructor(data: NaturalLanguage[]);
+    length(): number;
+    isKeyIn(key: string | symbol): boolean;
+    indexOfKey(key: string | symbol): number;
+    getItemByIndex(index: number): NaturalLanguage;
+    getItemByKey(key: string | symbol): NaturalLanguage | null;
+    getNameByKey(key: string | symbol): string;
+}
+declare const supported_langs: LanguageList;
 interface L10NTextDict {
     [key: string | symbol]: string;
 }
@@ -115,7 +129,6 @@ declare class SavePanel {
     start(direction: string): Promise<void>;
 }
 declare class LanguageDisplay {
-    private language_list;
     private index;
     private next_index;
     is_moving: boolean;
@@ -128,16 +141,15 @@ declare class LanguageDisplay {
     private step;
     private counter;
     constructor();
-    getLanguageName(key: string): string;
     stop(): void;
     move(): void;
     syncStart(direction: string): void;
     start(direction: string): Promise<void>;
-    set(key: string): void;
-    get(): string;
+    set(key: string | symbol): void;
+    get(): string | symbol;
 }
 declare class Game {
-    lang: string;
+    lang: string | symbol;
     floor_buttons: FloorButton[][];
     cur_floor_id: number;
     max_floor: number;

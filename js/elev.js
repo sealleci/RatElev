@@ -215,7 +215,53 @@ class Door {
         });
     }
 }
-const supported_langs = ['zh_cn', 'en'];
+class LanguageList {
+    constructor(data) {
+        this.data = data;
+    }
+    length() {
+        return this.data.length;
+    }
+    isKeyIn(key) {
+        return key in this.data.map(value => value.key);
+    }
+    indexOfKey(key) {
+        if (!this.isKeyIn(key)) {
+            return -1;
+        }
+        for (let i of range(this.length())) {
+            if (this.data[i].key === key) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    getItemByIndex(index) {
+        if (index < 0) {
+            index = 0;
+        }
+        if (index >= this.length()) {
+            index = this.length() - 1;
+        }
+        return this.data[index];
+    }
+    getItemByKey(key) {
+        for (let item of this.data) {
+            if (key === item.key) {
+                return item;
+            }
+        }
+        return null;
+    }
+    getNameByKey(key) {
+        if (!this.isKeyIn(key)) {
+            return '';
+        }
+        let item = this.getItemByKey(key);
+        return item !== null ? item.name : '';
+    }
+}
+const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }]);
 class L10nText {
     constructor(data) {
         this.data = data;
@@ -227,6 +273,9 @@ class L10nText {
         return this.data['zh_cn'];
     }
     set(key, value) {
+        if (!supported_langs.isKeyIn(key)) {
+            return;
+        }
         this.data[key] = value;
     }
 }
@@ -425,7 +474,6 @@ class SavePanel {
 }
 class LanguageDisplay {
     constructor() {
-        this.language_list = ['zh_cn', 'en'];
         this.index = 0;
         this.next_index = 0;
         this.is_moving = false;
@@ -438,25 +486,13 @@ class LanguageDisplay {
         this.step = 0;
         this.counter = 0;
     }
-    getLanguageName(key) {
-        switch (key) {
-            case 'zh_cn':
-                return '中文';
-            case 'en':
-                return 'EN';
-            case 'ru':
-                return 'РУ';
-            default:
-                return '';
-        }
-    }
     stop() {
         this.is_moving = false;
         this.direction = '';
         this.counter = 0;
         this.index = this.next_index;
         qs('#lang-name-prev>.lang-name-text').textContent = '';
-        qs('#lang-name-cur>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.index]);
+        qs('#lang-name-cur>.lang-name-text').textContent = supported_langs.getItemByIndex(this.index).name;
         qs('#lang-name-next>.lang-name-text').textContent = '';
         this.spin.style.transform = `rotate(${this.ori_angle}deg)`;
     }
@@ -480,14 +516,14 @@ class LanguageDisplay {
         this.step = Math.ceil(this.angle / this.timer_count);
         switch (this.direction) {
             case 'right':
-                this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length;
-                qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index]);
+                this.next_index = (this.index - 1 + supported_langs.length()) % supported_langs.length();
+                qs('#lang-name-prev>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
                 qs('#lang-name-next>.lang-name-text').textContent = '';
                 break;
             case 'left':
-                this.next_index = (this.index + 1) % this.language_list.length;
+                this.next_index = (this.index + 1) % supported_langs.length();
                 qs('#lang-name-prev>.lang-name-text').textContent = '';
-                qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index]);
+                qs('#lang-name-next>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
                 break;
             default:
                 break;
@@ -505,14 +541,14 @@ class LanguageDisplay {
             this.step = Math.ceil(this.angle / this.timer_count);
             switch (this.direction) {
                 case 'right':
-                    this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length;
-                    qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index]);
+                    this.next_index = (this.index - 1 + supported_langs.length()) % supported_langs.length();
+                    qs('#lang-name-prev>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
                     qs('#lang-name-next>.lang-name-text').textContent = '';
                     break;
                 case 'left':
-                    this.next_index = (this.index + 1) % this.language_list.length;
+                    this.next_index = (this.index + 1) % supported_langs.length();
                     qs('#lang-name-prev>.lang-name-text').textContent = '';
-                    qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index]);
+                    qs('#lang-name-next>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
                     break;
                 default:
                     break;
@@ -525,17 +561,17 @@ class LanguageDisplay {
         });
     }
     set(key) {
-        let i = this.language_list.indexOf(key);
+        let i = supported_langs.indexOfKey(key);
         if (i === -1) {
             i = 0;
         }
         this.index = i;
         qs('#lang-name-prev>.lang-name-text').textContent = '';
-        qs('#lang-name-cur>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.index]);
+        qs('#lang-name-cur>.lang-name-text').textContent = supported_langs.getItemByIndex(this.index).name;
         qs('#lang-name-next>.lang-name-text').textContent = '';
     }
     get() {
-        return this.language_list[this.index];
+        return supported_langs.getItemByIndex(this.index).key;
     }
 }
 class Game {
