@@ -18,9 +18,9 @@ function checkSourceFilesIntegrity() {
 
 const lineReader = readln.createInterface({
     input: fs.createReadStream(main_html_file_name)
-})
+});
 
-function main() {
+(function main() {
     try {
         if (!checkSourceFilesIntegrity()) {
             console.log('file lost')
@@ -59,6 +59,4 @@ function main() {
     } catch (err) {
         console.log('exec fail')
     }
-}
-
-main()
+})()

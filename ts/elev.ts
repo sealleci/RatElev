@@ -2,26 +2,27 @@
  *存档功能
  *分支选项
  */
-function sleep(time: number) {
+
+function sleep(time: number): Promise<unknown> {
     return new Promise((resolve) => {
         setTimeout(resolve, time)
     })
 }
 
-function range(): number[] {
+function range(...args: number[]): number[] {
     let start = 0
     let end = 0
-    if (arguments.length <= 0) {
+    if (args.length <= 0) {
         return []
-    } else if (arguments.length === 1) {
-        if (arguments[0] <= 0) {
+    } else if (args.length === 1) {
+        if (args[0] <= 0) {
             return []
         }
         start = 0
-        end = arguments[0] - 1
+        end = args[0] - 1
     } else {
-        start = arguments[0]
-        end = arguments[1]
+        start = args[0]
+        end = args[1]
     }
     if (start > end) {
         let tmp = end
@@ -35,13 +36,13 @@ function range(): number[] {
     return arr
 }
 
-function clearChildren(elem) {
+function clearChildren(elem: HTMLElement) {
     for (let child of Array.from(elem.childNodes)) {
         elem.removeChild(child)
     }
 }
 
-function toggleElementClass(elem, class_name) {
+function toggleElementClass(elem: HTMLElement, class_name: string) {
     if (elem.classList.contains(class_name)) {
         elem.classList.remove(class_name)
     } else {
@@ -49,27 +50,33 @@ function toggleElementClass(elem, class_name) {
     }
 }
 
-function addElementClass(elem, class_name) {
+function addElementClass(elem: HTMLElement, class_name: string) {
     if (!elem.classList.contains(class_name)) {
         elem.classList.add(class_name)
     }
 }
 
-function removeElementClass(elem, class_name) {
+function removeElementClass(elem: HTMLElement, class_name: string) {
     if (elem.classList.contains(class_name)) {
         elem.classList.remove(class_name)
     }
 }
 
-const qs = function (v) {
-    return document.querySelector(v)
+const qs = function (selector: any): HTMLElement {
+    return document.querySelector(selector as string)!
 }
 
-const qsa = function (v) {
-    return document.querySelectorAll(v)
+const qsa = function (selector: any): NodeListOf<HTMLElement> {
+    return document.querySelectorAll(selector as string)
 }
 
 class WaitingDotsAnimation {
+    private dots: HTMLElement[]
+    private orders: number[][]
+    private step: number
+    private timer: number | undefined
+    private interval: number
+
     constructor() {
         this.dots = []
         this.orders = []
@@ -77,11 +84,11 @@ class WaitingDotsAnimation {
         this.timer = undefined
         this.interval = 250
     }
-    generateOrders(num) {
+    generateOrders(num: number): number[][] {
         if (num === 0) {
             return []
         }
-        let res = []
+        let res: number[][] = []
         for (let i of range(num * 2)) {
             if (i === 0) {
                 res.push(Array(num).fill(0))
@@ -106,7 +113,7 @@ class WaitingDotsAnimation {
         }
         return res
     }
-    toggle(dot, type) {
+    toggle(dot: HTMLElement, type: number) {
         switch (type) {
             case 0: //dark
                 removeElementClass(dot, 'light-dot')
@@ -137,23 +144,37 @@ class WaitingDotsAnimation {
 }
 
 class FloorButton {
-    constructor(index, text, available) {
-        this.index = index //number
-        this.text = text //string
-        this.available = available //bool
-        this.selected = false //bool
+    public index: number
+    public text: string
+    public available: boolean
+    public selected: boolean
+
+    constructor(index: number, text: string, available: boolean) {
+        this.index = index
+        this.text = text
+        this.available = available
+        this.selected = false
     }
 }
 
 class Door {
+    public is_moving: boolean
+    public is_open: boolean
+    private direction: string
+    private timer_count: number
+    private sleep_time: number
+    private l_part: HTMLElement
+    private r_part: HTMLElement
+    private step: number
+
     constructor() {
         this.is_moving = false
         this.is_open = false
         this.direction = 'open'
         this.timer_count = 20
         this.sleep_time = 6
-        this.l_part = undefined
-        this.r_part = undefined
+        this.l_part = {} as HTMLElement
+        this.r_part = {} as HTMLElement
         this.step = 0
     }
     stop() {
@@ -188,26 +209,26 @@ class Door {
                 break
         }
     }
-    syncStart(direction) {
+    syncStart(direction: string) {
         this.direction = direction
         this.is_moving = true
         this.l_part = qs('#elev-door>div:nth-child(1)')
         this.r_part = qs('#elev-door>div:nth-child(2)')
         qs('#elev-door').style.display = 'flex'
         this.step = Math.ceil(this.l_part.clientWidth / this.timer_count)
-        for (let i in range(this.timer_count)) {
+        for (let _ in range(this.timer_count)) {
             this.move()
         }
         this.stop()
     }
-    async start(direction) {
+    async start(direction: string) {
         this.direction = direction
         this.is_moving = true
         this.l_part = qs('#elev-door>div:nth-child(1)')
         this.r_part = qs('#elev-door>div:nth-child(2)')
         qs('#elev-door').style.display = 'flex'
         this.step = Math.ceil(this.l_part.clientWidth / this.timer_count)
-        for (let i in range(this.timer_count)) {
+        for (let _ in range(this.timer_count)) {
             this.move()
             await sleep(this.sleep_time)
         }
@@ -215,46 +236,61 @@ class Door {
     }
 }
 
-const supported_langs = ['zh_cn', 'en']
+const supported_langs: (string | symbol)[] = ['zh_cn', 'en']
+
+//TODO: replace any
+interface L10NTextDict {
+    [key: string | symbol]: string
+}
 
 class L10nText {
-    constructor(data) {
+    private data: L10NTextDict
+
+    constructor(data: L10NTextDict) {
         this.data = data
-        return new Proxy(this, {
-            get: (obj, key) => {
-                if (typeof (key) === 'string' && supported_langs.indexOf(key) !== -1) {
-                    return obj.data[key]
-                }
-                return ''
-            },
-            set: (obj, key, v) => {
-                if (typeof (key) === 'string' && supported_langs.indexOf(key) !== -1) {
-                    return obj.data[key] = v
-                }
-                return ''
-            }
-        })
+    }
+
+    get(key: string | symbol): string {
+        if (key in this.data) {
+            return this.data[key]
+        }
+        return this.data['zh_cn']
+    }
+
+    set(key: string | symbol, value: string) {
+        this.data[key] = value
     }
 }
 
 class Passenger {
-    constructor(id, name, color, font_color, avatar_text) {
+    public id: number
+    public name: L10nText
+    public avatar_color: string
+    public avatar_font_color: string
+    public avatar_text: L10nText
+
+    constructor(id: number, name: L10nText, avatar_color: string, avatar_font_color: string, avatar_text: L10nText) {
         this.id = id
         this.name = name
-        this.avatar_color = color
-        this.avatar_font_color = font_color
+        this.avatar_color = avatar_color
+        this.avatar_font_color = avatar_font_color
         this.avatar_text = avatar_text
     }
 }
 
 class Dialog {
-    constructor(id, text) {
-        this.person_id = id
+    public person_id: number
+    public text: string
+
+    constructor(person_id: number, text: string) {
+        this.person_id = person_id
         this.text = text
     }
 }
 
 class DialogBlock {
+    public data: Dialog[]
+
     constructor() {
         this.data = []
     }
@@ -265,17 +301,26 @@ class Task {
 }
 
 class Floor {
-    constructor() {
+    public id: number
+    public dialogs: { [index: number]: DialogBlock }
+
+    constructor(id: number) {
+        this.id = id
         this.dialogs = {}
-        for (let i of range(-2, 6)) {
-            if (i !== 0) {
-                this.dialogs[i] = `这里是${i}层`
-            }
-        }
+        // temp
+        this.dialogs[0] = new DialogBlock()
+        this.dialogs[0].data.push(new Dialog(-1, `there is the ${this.id}th floor.`))
     }
 }
 
+interface PendingFloor {
+    index: number
+    floor: number
+}
+
 class PendingQueue {
+    public data: PendingFloor[]
+
     constructor() {
         this.data = []
     }
@@ -287,7 +332,7 @@ class PendingQueue {
     length() {
         return this.data.length
     }
-    indexOf(value) {
+    indexOf(value: number) {
         for (let i = 0; i < this.data.length; i++) {
             if (this.data[i].floor === value) {
                 return i
@@ -295,20 +340,20 @@ class PendingQueue {
         }
         return -1
     }
-    add(value) {
+    add(value: number) {
         if (this.indexOf(value) === -1) {
             this.data.push({ floor: value, index: this.data.length })
             this.sort()
         }
     }
-    remove(value) {
+    remove(value: number) {
         let i = this.indexOf(value)
         if (i !== -1) {
             this.data.splice(i, 1)
             this.sort()
         }
     }
-    getMax() {
+    getMax(): PendingFloor {
         if (this.data.length <= 0) {
             return { floor: 0, index: -1 }
         }
@@ -320,7 +365,7 @@ class PendingQueue {
         }
         return this.data[k]
     }
-    getMin() {
+    getMin(): PendingFloor {
         if (this.data.length <= 0) {
             return { floor: 0, index: -1 }
         }
@@ -335,16 +380,20 @@ class PendingQueue {
 }
 
 class FloorDisplay {
+    private display_number: HTMLElement
+    private up_icon: HTMLElement
+    private down_icon: HTMLElement
+
     constructor() {
-        this.display_number = undefined
-        this.up_icon = undefined
-        this.down_icon = undefined
+        this.display_number = {} as HTMLElement
+        this.up_icon = {} as HTMLElement
+        this.down_icon = {} as HTMLElement
     }
-    updateIcon(state) { // up down none both
-        if (!this.up_icon) {
+    updateIcon(state: string) { // up down none both
+        if (this.up_icon !== {} as HTMLElement) {
             this.up_icon = qs('#up-icon')
         }
-        if (!this.down_icon) {
+        if (this.down_icon !== {} as HTMLElement) {
             this.down_icon = qs('#down-icon')
         }
         let class_name = 'invisible'
@@ -369,8 +418,8 @@ class FloorDisplay {
                 break
         }
     }
-    updateNumber(num) {
-        if (!this.display_number) {
+    updateNumber(num: number) {
+        if (this.display_number !== {} as HTMLElement) {
             this.display_number = qs('#display-number')
         }
         this.display_number.textContent = num.toString()
@@ -378,13 +427,21 @@ class FloorDisplay {
 }
 
 class SavePanel {
+    public is_moving: boolean
+    public is_open: boolean
+    private direction: string
+    private timer_count: number
+    private sleep_time: number
+    private cover: HTMLElement
+    private step: number
+
     constructor() {
         this.is_moving = false
         this.is_open = false
         this.direction = 'open'
         this.timer_count = 15
         this.sleep_time = 5
-        this.cover = undefined
+        this.cover = {} as HTMLElement
         this.step = 0
     }
     stop() {
@@ -415,22 +472,22 @@ class SavePanel {
                 break
         }
     }
-    syncStart(direction) {
+    syncStart(direction: string) {
         this.direction = direction
         this.is_moving = true
         this.cover = qs('#save-panel-cover')
         this.step = Math.ceil(this.cover.clientHeight / this.timer_count)
-        for (let i in range(this.timer_count)) {
+        for (let _ in range(this.timer_count)) {
             this.move()
         }
         this.stop()
     }
-    async start(direction) {
+    async start(direction: string) {
         this.direction = direction
         this.is_moving = true
         this.cover = qs('#save-panel-cover')
         this.step = Math.ceil(this.cover.clientHeight / this.timer_count)
-        for (let i in range(this.timer_count)) {
+        for (let _ in range(this.timer_count)) {
             this.move()
             await sleep(this.sleep_time)
         }
@@ -439,6 +496,19 @@ class SavePanel {
 }
 
 class LanguageDisplay {
+    private language_list: string[]
+    private index: number
+    private next_index: number
+    public is_moving: boolean
+    private direction: string
+    private angle: number
+    private ori_angle: number
+    private timer_count: number
+    private sleep_time: number
+    private spin: HTMLElement
+    private step: number
+    private counter: number
+
     constructor() {
         this.language_list = ['zh_cn', 'en']
         this.index = 0
@@ -449,11 +519,11 @@ class LanguageDisplay {
         this.ori_angle = -45
         this.timer_count = 15
         this.sleep_time = 8
-        this.spin = undefined
+        this.spin = {} as HTMLElement
         this.step = 0
         this.counter = 0
     }
-    getLanguageName(key) {
+    getLanguageName(key: string): string {
         switch (key) {
             case 'zh_cn':
                 return '中文'
@@ -488,7 +558,7 @@ class LanguageDisplay {
                 break
         }
     }
-    syncStart(direction) {
+    syncStart(direction: string) {
         this.direction = direction
         this.is_moving = true
         this.spin = qs('#lang-name-body')
@@ -507,19 +577,19 @@ class LanguageDisplay {
             default:
                 break
         }
-        for (let i in range(this.timer_count)) {
+        for (let _ in range(this.timer_count)) {
             this.move()
         }
         this.stop()
     }
-    async start(direction) {
+    async start(direction: string) {
         this.direction = direction
         this.is_moving = true
         this.spin = qs('#lang-name-body')
         this.step = Math.ceil(this.angle / this.timer_count)
         switch (this.direction) {
             case 'right':
-                this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length
+                this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length;
                 qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-next>.lang-name-text').textContent = ''
                 break
@@ -531,13 +601,13 @@ class LanguageDisplay {
             default:
                 break
         }
-        for (let i in range(this.timer_count)) {
+        for (let _ in range(this.timer_count)) {
             this.move()
             await sleep(this.sleep_time)
         }
         this.stop()
     }
-    set(key) {
+    set(key: string) {
         let i = this.language_list.indexOf(key)
         if (i === -1) {
             i = 0
@@ -552,129 +622,30 @@ class LanguageDisplay {
     }
 }
 
-const binding_buttons = [{
-    selector: '.number-button',
-    is_single: false,
-    func: (event) => {
-        let class_name = 'button-selected'
-        let index = parseInt(event.target.getAttribute('index'))
-        if (!game.is_lifting && index === game.cur_floor) {
-            return
-        }
-        if (event.target.classList.contains(class_name)) {
-            event.target.classList.remove(class_name)
-            game.pending_queue.remove(index)
-            if (index === game.cur_dest) {
-                game.calcLiftDirection()
-            }
-        } else {
-            event.target.classList.add(class_name)
-            game.pending_queue.add(index)
-        }
-        if (!game.is_lifting && !game.door.is_open) {
-            game.checkBeforeLift()
-        }
-    }
-},
-{
-    selector: '#close-button',
-    is_single: true,
-    func: async () => {
-        if (!game.is_lifting &&
-            game.door.is_open &&
-            !game.door.is_moving) {
-            await game.door.start('close')
-            game.checkBeforeLift()
-        }
-    }
-},
-{
-    selector: '#open-button',
-    is_single: true,
-    func: async () => {
-        if (!game.is_lifting &&
-            !game.door.is_open &&
-            !game.door.is_moving) {
-            game.renderFloor()
-            await game.door.start('open')
-        }
-    }
-},
-{
-    selector: '#go-on-button-row',
-    is_single: true,
-    func: () => { }
-},
-{
-    selector: '#top-arch',
-    is_single: true,
-    func: async () => {
-        if (!game.save_panel.is_moving) {
-            if (game.save_panel.is_open) {
-                game.save_panel.start('close')
-            } else {
-                game.save_panel.start('open')
-            }
-        }
-    }
-},
-{
-    selector: '#save-export-button-warp',
-    is_single: true,
-    func: () => {
-        clearChildren(qs('#save-export-button'))
-        clearChildren(qs('#save-import-button'))
-        let res = game.serializate()
-        qs('#save-export-button').appendChild(game.getTFIcon(res.status))
-    }
-},
-{
-    selector: '#save-import-button-warp',
-    is_single: true,
-    func: () => {
-        clearChildren(qs('#save-export-button'))
-        clearChildren(qs('#save-import-button'))
-        qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate()))
-    }
-},
-{
-    selector: '#save-copy-button',
-    is_single: true,
-    func: async () => {
-        await navigator.clipboard.writeText(qs('#save-text-area').value)
-    }
-},
-{
-    selector: '#lang-switch-button-l',
-    is_single: true,
-    func: async () => {
-        if (!game.language_display.is_moving) {
-            await game.language_display.start('left')
-            game.lang = game.language_display.get()
-            game.updateUIStrings()
-        }
-    }
-
-},
-{
-    selector: '#lang-switch-button-r',
-    is_single: true,
-    func: async () => {
-        if (!game.language_display.is_moving) {
-            await game.language_display.start('right')
-            game.lang = game.language_display.get()
-            game.updateUIStrings()
-        }
-    }
-
-}
-]
-
 class Game {
+    public lang: string
+    public floor_buttons: FloorButton[][]
+    public cur_floor_id: number
+    public max_floor: number
+    public min_floor: number
+    public is_lifting: boolean
+    private lift_interval: number
+    private lift_direction: string
+    public cur_dest: number
+    public pending_queue: PendingQueue
+    public door: Door
+    public floors: Floor[]
+    public dots_animation: WaitingDotsAnimation
+    public floor_display: FloorDisplay
+    public save_panel: SavePanel
+    public language_display: LanguageDisplay
+    public characters: Passenger[]
+    public ui_string: { [key: string]: L10nText }
+
     constructor() {
         this.lang = 'zh_cn'
         this.floor_buttons = []
-        this.cur_floor = 1
+        this.cur_floor_id = 1
         this.max_floor = 6
         this.min_floor = -2
         this.is_lifting = false
@@ -683,7 +654,12 @@ class Game {
         this.cur_dest = 0
         this.pending_queue = new PendingQueue()
         this.door = new Door()
-        this.floors = new Floor()
+        this.floors = []
+        for (let i of range(-2, 6)) {
+            if (i !== 0) {
+                this.floors.push(new Floor(i))
+            }
+        }
         this.dots_animation = new WaitingDotsAnimation()
         this.floor_display = new FloorDisplay()
         this.save_panel = new SavePanel()
@@ -698,56 +674,65 @@ class Game {
             'EXPORT': new L10nText({ zh_cn: '导出', en: 'EXP' }),
         }
     }
-    getTFIcon(type) {
-        switch (type) {
-            case true:
-                let icon_t = document.createElement('div')
-                icon_t.classList.add('save-opration-succ')
-                for (let i in range(2)) {
-                    icon_t.appendChild(document.createElement('div'))
-                }
-                return icon_t
-            case false:
-                let icon_f = document.createElement('div')
-                icon_f.classList.add('save-opration-fail')
-                for (let i in range(2)) {
-                    icon_f.appendChild(document.createElement('div'))
-                }
-                return icon_f
-            default:
-                return undefined
+    getTFIcon(type: boolean): HTMLElement {
+        if (type) {
+            let icon_t = document.createElement('div')
+            icon_t.classList.add('save-opration-succ')
+            for (let _ in range(2)) {
+                icon_t.appendChild(document.createElement('div'))
+            }
+            return icon_t
         }
+        else {
+            let icon_f = document.createElement('div')
+            icon_f.classList.add('save-opration-fail')
+            for (let _ in range(2)) {
+                icon_f.appendChild(document.createElement('div'))
+            }
+            return icon_f
+        }
+    }
+    getFloorById(id: number): Floor | null {
+        for (let floor of this.floors) {
+            if (floor.id === id) {
+                return floor
+            }
+        }
+        return null
     }
     renderFloor() {
         let dialog_container = qs('#dialog-container')
-        let dialog_item = document.createElement('div')
-        let dialog_text = document.createElement('div')
+        let floor = this.getFloorById(this.cur_floor_id)
         clearChildren(dialog_container)
-        dialog_item.classList.add('dialog-row', 'mid-dialog-row')
-        dialog_text.classList.add('dialog-box', 'mid-dialog-box')
-        dialog_text.textContent = this.floors.dialogs[this.cur_floor]
-        dialog_item.appendChild(dialog_text)
-        dialog_container.appendChild(dialog_item)
+        if (floor !== null) {
+            let dialog_item = document.createElement('div')
+            let dialog_text = document.createElement('div')
+            dialog_item.classList.add('dialog-row', 'mid-dialog-row')
+            dialog_text.classList.add('dialog-box', 'mid-dialog-box')
+            dialog_text.textContent = floor.dialogs[0].data[0].text
+            dialog_item.appendChild(dialog_text)
+            dialog_container.appendChild(dialog_item)
+        }
     }
-    isLiftable() {
+    isLiftable(): boolean {
         return !(this.pending_queue.length() <= 0 ||
             this.lift_direction !== 'up' && this.lift_direction !== 'down' ||
             this.cur_dest > this.max_floor ||
             this.cur_dest < this.min_floor ||
             this.cur_dest === 0 ||
-            this.cur_dest === this.cur_floor)
+            this.cur_dest === this.cur_floor_id)
     }
     calcLiftDirection() {
         if (this.pending_queue.length() > 0) {
             if (this.pending_queue.length() === 1) {
                 let dest = this.pending_queue.getMax().floor
-                this.lift_direction = dest > this.cur_floor ? 'up' : (dest < this.cur_floor ? 'down' : '')
+                this.lift_direction = dest > this.cur_floor_id ? 'up' : (dest < this.cur_floor_id ? 'down' : '')
                 this.cur_dest = dest
             } else {
                 let top = this.pending_queue.getMax()
                 let bottom = this.pending_queue.getMin()
-                if (top.floor >= this.cur_floor &&
-                    this.cur_floor >= bottom.floor) {
+                if (top.floor >= this.cur_floor_id &&
+                    this.cur_floor_id >= bottom.floor) {
                     if (top.index <= bottom.index) {
                         this.lift_direction = 'up'
                         this.cur_dest = top.floor
@@ -755,10 +740,10 @@ class Game {
                         this.lift_direction = 'down'
                         this.cur_dest = bottom.floor
                     }
-                } else if (bottom.floor >= this.cur_floor) {
+                } else if (bottom.floor >= this.cur_floor_id) {
                     this.lift_direction = 'up'
                     this.cur_dest = top.floor
-                } else if (top.floor <= this.cur_floor) {
+                } else if (top.floor <= this.cur_floor_id) {
                     this.lift_direction = 'down'
                     this.cur_dest = bottom.floor
                 } else {
@@ -771,8 +756,8 @@ class Game {
             this.cur_dest = 0
         }
     }
-    checkPassingFloor() {
-        return this.pending_queue.indexOf(this.cur_floor) !== -1
+    checkPassingFloor(): boolean {
+        return this.pending_queue.indexOf(this.cur_floor_id) !== -1
     }
     async lift() {
         if (this.lift_direction !== 'up' && this.lift_direction !== 'down') {
@@ -783,30 +768,30 @@ class Game {
         lift_loop: do {
             switch (this.lift_direction) {
                 case 'up':
-                    this.cur_floor = Math.min(this.cur_floor + 1 === 0 ? 1 : this.cur_floor + 1, this.max_floor)
+                    this.cur_floor_id = Math.min(this.cur_floor_id + 1 === 0 ? 1 : this.cur_floor_id + 1, this.max_floor)
                     break
                 case 'down':
-                    this.cur_floor = Math.max(this.cur_floor - 1 === 0 ? -1 : this.cur_floor - 1, this.min_floor)
+                    this.cur_floor_id = Math.max(this.cur_floor_id - 1 === 0 ? -1 : this.cur_floor_id - 1, this.min_floor)
                     break
                 default:
                     break lift_loop
             }
-            this.floor_display.updateNumber(this.cur_floor)
-            if (this.cur_floor === this.dest) {
+            this.floor_display.updateNumber(this.cur_floor_id)
+            if (this.cur_floor_id === this.cur_dest) {
                 break
             }
-            if (this.cur_floor >= this.max_floor || this.cur_floor <= this.min_floor) {
+            if (this.cur_floor_id >= this.max_floor || this.cur_floor_id <= this.min_floor) {
                 break
             }
             await sleep(this.lift_interval)
         } while (!this.checkPassingFloor())
-        this.pending_queue.remove(this.cur_floor)
-        removeElementClass(qs(`.number-button[index="${this.cur_floor}"]`), 'button-selected')
+        this.pending_queue.remove(this.cur_floor_id)
+        removeElementClass(qs(`.number-button[index="${this.cur_floor_id}"]`), 'button-selected')
         this.is_lifting = false
         this.floor_display.updateIcon('none')
     }
     checkBeforeLift() {
-        this.pending_queue.remove(this.cur_floor)
+        this.pending_queue.remove(this.cur_floor_id)
         this.calcLiftDirection()
         if (this.isLiftable()) {
             this.lift()
@@ -815,7 +800,7 @@ class Game {
     createFloorButtons() {
         let func_button_row = qs('#func-buttons')
         let button_container = qs('#floor-buttons')
-        for (let child of Array.from(button_container.childNodes)) {
+        for (let child of Array.from(button_container.children)) {
             if (child.id !== 'func-buttons') {
                 button_container.removeChild(child)
             }
@@ -851,22 +836,11 @@ class Game {
                     col.classList.add('invisible')
                 }
                 col.textContent = button.text
-                col.setAttribute('index', button.index)
+                col.setAttribute('index', button.index.toString())
                 row.appendChild(col)
             }
             button_container.insertBefore(row, func_button_row)
-        });
-    }
-    bindFunctionToButtons() {
-        for (let bind of binding_buttons) {
-            if (bind.is_single) {
-                qs(bind.selector).addEventListener('click', bind.func)
-            } else {
-                for (let button of Array.from(qsa(bind.selector))) {
-                    button.addEventListener('click', bind.func)
-                }
-            }
-        }
+        })
     }
     encrypt() {
 
@@ -882,12 +856,11 @@ class Game {
     }
     updateUIStrings() {
         for (let e of Array.from(qsa('.l10n-text-ui'))) {
-            e.textContent = this.ui_string[e.getAttribute('lkey')][this.lang]
+            e.textContent = this.ui_string[e.getAttribute('lkey')!].get(this.lang)
         }
     }
     initialize() {
         this.createFloorButtons()
-        this.bindFunctionToButtons()
         this.renderFloor()
         this.language_display.set(this.lang)
         this.updateUIStrings()
@@ -898,15 +871,153 @@ class Game {
         // qs('.number-button[index="5"]').click()
         qs('#sheng-lue-dots').style.display = 'none'
         qs('#go-on-button-row').style.display = 'none'
-        qs('#options-row').style.display = 'none'
-        qs('#save-text-area').value = ''
+        qs('#options-row').style.display = 'none';
+        (qs('#save-text-area') as HTMLTextAreaElement).value = ''
         this.dots_animation.start()
     }
 }
 
 const game = new Game()
 
-document.addEventListener("DOMContentLoaded", () => {
+interface BindingButton {
+    selector: string
+    is_single: boolean
+    func(this: HTMLElement, event: MouseEvent): void
+}
+
+const binding_buttons: BindingButton[] = [
+    {
+        selector: '.number-button',
+        is_single: false,
+        func: (event) => {
+            let class_name = 'button-selected'
+            let index = parseInt((event.target as HTMLElement).getAttribute('index')!)
+            if (!game.is_lifting && index === game.cur_floor_id) {
+                return
+            }
+            if ((event.target as HTMLElement).classList.contains(class_name)) {
+                (event.target as HTMLElement).classList.remove(class_name)
+                game.pending_queue.remove(index)
+                if (index === game.cur_dest) {
+                    game.calcLiftDirection()
+                }
+            } else {
+                (event.target as HTMLElement).classList.add(class_name)
+                game.pending_queue.add(index)
+            }
+            if (!game.is_lifting && !game.door.is_open) {
+                game.checkBeforeLift()
+            }
+        }
+    },
+    {
+        selector: '#close-button',
+        is_single: true,
+        func: async () => {
+            if (!game.is_lifting &&
+                game.door.is_open &&
+                !game.door.is_moving) {
+                await game.door.start('close')
+                game.checkBeforeLift()
+            }
+        }
+    },
+    {
+        selector: '#open-button',
+        is_single: true,
+        func: async () => {
+            if (!game.is_lifting &&
+                !game.door.is_open &&
+                !game.door.is_moving) {
+                game.renderFloor()
+                await game.door.start('open')
+            }
+        }
+    },
+    {
+        selector: '#go-on-button-row',
+        is_single: true,
+        func: () => { }
+    },
+    {
+        selector: '#top-arch',
+        is_single: true,
+        func: async () => {
+            if (!game.save_panel.is_moving) {
+                if (game.save_panel.is_open) {
+                    game.save_panel.start('close')
+                } else {
+                    game.save_panel.start('open')
+                }
+            }
+        }
+    },
+    {
+        selector: '#save-export-button-warp',
+        is_single: true,
+        func: () => {
+            clearChildren(qs('#save-export-button'))
+            clearChildren(qs('#save-import-button'))
+            let res = game.serializate()
+            qs('#save-export-button').appendChild(game.getTFIcon(res.status))
+        }
+    },
+    {
+        selector: '#save-import-button-warp',
+        is_single: true,
+        func: () => {
+            clearChildren(qs('#save-export-button'))
+            clearChildren(qs('#save-import-button'))
+            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate()))
+        }
+    },
+    {
+        selector: '#save-copy-button',
+        is_single: true,
+        func: async () => {
+            await navigator.clipboard.writeText((qs('#save-text-area') as HTMLTextAreaElement).value)
+        }
+    },
+    {
+        selector: '#lang-switch-button-l',
+        is_single: true,
+        func: async () => {
+            if (!game.language_display.is_moving) {
+                await game.language_display.start('left')
+                game.lang = game.language_display.get()
+                game.updateUIStrings()
+            }
+        }
+
+    },
+    {
+        selector: '#lang-switch-button-r',
+        is_single: true,
+        func: async () => {
+            if (!game.language_display.is_moving) {
+                await game.language_display.start('right')
+                game.lang = game.language_display.get()
+                game.updateUIStrings()
+            }
+        }
+
+    }
+]
+
+function bindFunctionToButtons() {
+    for (let bind of binding_buttons) {
+        if (bind.is_single) {
+            qs(bind.selector).addEventListener('click', bind.func)
+        } else {
+            for (let button of Array.from(qsa(bind.selector)) as HTMLElement[]) {
+                button.addEventListener('click', bind.func)
+            }
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     game.initialize()
+    bindFunctionToButtons()
     game.debug()
 })
