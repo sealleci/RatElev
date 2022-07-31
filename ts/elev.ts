@@ -1054,7 +1054,8 @@ const binding_buttons: BindingButton[] = [
         func: () => {
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
-            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate("")))
+            let text = (qs('#save-text-area') as HTMLTextAreaElement).value
+            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate(text)))
         }
     },
     {
