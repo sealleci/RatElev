@@ -296,6 +296,7 @@ class LanguageList {
     }
 }
 
+const default_lang = 'zh_cn'
 const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }])
 
 //TODO: replace any
@@ -314,7 +315,7 @@ class L10nText {
         if (key in this.data) {
             return this.data[key]
         }
-        return this.data['zh_cn']
+        return this.data[default_lang]
     }
 
     set(key: string | symbol, value: string) {
@@ -392,10 +393,10 @@ class PendingQueue {
             this.data[i].index = i
         }
     }
-    length() {
+    length(): number {
         return this.data.length
     }
-    indexOf(value: number) {
+    indexOf(value: number): number {
         for (let i = 0; i < this.data.length; i++) {
             if (this.data[i].floor === value) {
                 return i
@@ -697,6 +698,15 @@ class LanguageDisplay {
     }
 }
 
+interface SaveDataType {
+
+}
+
+interface SaveRootType {
+    status: boolean
+    data: SaveDataType
+}
+
 class Game {
     public lang: string | symbol
     public floor_buttons: FloorButton[][]
@@ -718,7 +728,7 @@ class Game {
     public ui_string: { [key: string]: L10nText }
 
     constructor() {
-        this.lang = 'zh_cn'
+        this.lang = default_lang
         this.floor_buttons = []
         this.cur_floor_id = 1
         this.max_floor = 6
@@ -923,10 +933,11 @@ class Game {
     decipher() {
 
     }
-    serializate() {
-        return { status: true, data: {} }
+    serializate(): string {
+        return JSON.stringify({ status: true, data: {} })
     }
-    deserializate() {
+    deserializate(data: string): boolean {
+        data = data
         return false
     }
     updateUIStrings() {
@@ -1033,7 +1044,7 @@ const binding_buttons: BindingButton[] = [
         func: () => {
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
-            let res = game.serializate()
+            let res = <SaveRootType>JSON.parse(game.serializate())
             qs('#save-export-button').appendChild(game.getTFIcon(res.status))
         }
     },
@@ -1043,7 +1054,7 @@ const binding_buttons: BindingButton[] = [
         func: () => {
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
-            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate()))
+            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate("")))
         }
     },
     {

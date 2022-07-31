@@ -54,6 +54,7 @@ declare class LanguageList {
     getItemByKey(key: string | symbol): NaturalLanguage | null;
     getNameByKey(key: string | symbol): string;
 }
+declare const default_lang = "zh_cn";
 declare const supported_langs: LanguageList;
 interface L10NTextDict {
     [key: string | symbol]: string;
@@ -148,6 +149,12 @@ declare class LanguageDisplay {
     set(key: string | symbol): void;
     get(): string | symbol;
 }
+interface SaveDataType {
+}
+interface SaveRootType {
+    status: boolean;
+    data: SaveDataType;
+}
 declare class Game {
     lang: string | symbol;
     floor_buttons: FloorButton[][];
@@ -181,11 +188,8 @@ declare class Game {
     createFloorButtons(): void;
     encrypt(): void;
     decipher(): void;
-    serializate(): {
-        status: boolean;
-        data: {};
-    };
-    deserializate(): boolean;
+    serializate(): string;
+    deserializate(data: string): boolean;
     updateUIStrings(): void;
     initialize(): void;
     debug(): Promise<void>;

@@ -261,6 +261,7 @@ class LanguageList {
         return item !== null ? item.name : '';
     }
 }
+const default_lang = 'zh_cn';
 const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }]);
 class L10nText {
     constructor(data) {
@@ -270,7 +271,7 @@ class L10nText {
         if (key in this.data) {
             return this.data[key];
         }
-        return this.data['zh_cn'];
+        return this.data[default_lang];
     }
     set(key, value) {
         if (!supported_langs.isKeyIn(key)) {
@@ -576,7 +577,7 @@ class LanguageDisplay {
 }
 class Game {
     constructor() {
-        this.lang = 'zh_cn';
+        this.lang = default_lang;
         this.floor_buttons = [];
         this.cur_floor_id = 1;
         this.max_floor = 6;
@@ -780,9 +781,10 @@ class Game {
     decipher() {
     }
     serializate() {
-        return { status: true, data: {} };
+        return JSON.stringify({ status: true, data: {} });
     }
-    deserializate() {
+    deserializate(data) {
+        data = data;
         return false;
     }
     updateUIStrings() {
@@ -883,7 +885,7 @@ const binding_buttons = [
         func: () => {
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
-            let res = game.serializate();
+            let res = JSON.parse(game.serializate());
             qs('#save-export-button').appendChild(game.getTFIcon(res.status));
         }
     },
@@ -893,7 +895,7 @@ const binding_buttons = [
         func: () => {
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
-            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate()));
+            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate("")));
         }
     },
     {
