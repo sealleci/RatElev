@@ -70,6 +70,333 @@ const qsa = function (selector: any): NodeListOf<HTMLElement> {
     return document.querySelectorAll(selector as string)
 }
 
+interface NaturalLanguage {
+    key: string | symbol
+    name: string
+}
+
+class LanguageList {
+    private data: NaturalLanguage[]
+
+    constructor(data: NaturalLanguage[]) {
+        this.data = data
+    }
+
+    length(): number {
+        return this.data.length
+    }
+
+    isKeyIn(key: string | symbol): boolean {
+        return key in this.data.map(value => value.key)
+    }
+
+    indexOfKey(key: string | symbol): number {
+        if (!this.isKeyIn(key)) {
+            return -1
+        }
+        for (let i of range(this.length())) {
+            if (this.data[i].key === key) {
+                return i
+            }
+        }
+        return -1
+    }
+
+    getItemByIndex(index: number): NaturalLanguage {
+        if (index < 0) {
+            index = 0
+        }
+        if (index >= this.length()) {
+            index = this.length() - 1
+        }
+        return this.data[index]
+    }
+
+    getItemByKey(key: string | symbol): NaturalLanguage | null {
+        for (let item of this.data) {
+            if (key === item.key) {
+                return item
+            }
+        }
+        return null
+    }
+
+    getNameByKey(key: string | symbol): string {
+        if (!this.isKeyIn(key)) {
+            return ''
+        }
+        let item = this.getItemByKey(key)
+        return item !== null ? item.name : ''
+    }
+}
+
+const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }])
+const default_lang = 'zh_cn'
+
+//TODO: replace any
+interface L10NTextDict {
+    [key: string | symbol]: string
+}
+
+class L10nText {
+    private data: L10NTextDict
+
+    constructor(data: L10NTextDict) {
+        this.data = data
+    }
+
+    get(key: string | symbol): string {
+        if (key in this.data) {
+            return this.data[key]
+        }
+        return this.data[default_lang]
+    }
+
+    set(key: string | symbol, value: string) {
+        if (!supported_langs.isKeyIn(key)) {
+            return
+        }
+        this.data[key] = value
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+enum SignatureStatus {
+    DEACTIVE = 'deactive',
+    ACTIVE = 'active'
+}
+
+class Signature {
+    public id: string
+    public status: SignatureStatus
+
+    constructor(id: string, status: SignatureStatus = SignatureStatus.DEACTIVE) {
+        this.id = id
+        this.status = status
+    }
+
+    activiate() {
+        this.status = SignatureStatus.ACTIVE
+    }
+
+    deactiviate() {
+        this.status = SignatureStatus.DEACTIVE
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+enum TaskStatus {
+    DEACTIVE = 'deactive',
+    ACTIVE = 'active',
+    FINISHED = 'finished'
+}
+
+class GameTask {
+    public id: string
+    public description: L10nText
+    public status: TaskStatus
+
+    constructor(id: string, description: L10nText) {
+        this.id = id
+        this.description = description
+        this.status = TaskStatus.DEACTIVE
+    }
+
+    activiate() {
+        this.status = TaskStatus.ACTIVE
+    }
+
+    finish() {
+        this.status = TaskStatus.FINISHED
+    }
+
+    deactiviate() {
+        this.status = TaskStatus.DEACTIVE
+    }
+}
+
+class GameAction {
+    public id: string
+    public action: () => void
+
+    constructor(id: string, f: () => void = () => { }) {
+        this.id = id
+        this.action = f
+    }
+
+    do() {
+        this.action()
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+class GameActionList {
+    public actions: GameAction[]
+
+    constructor(action_dict: { [key: string]: () => void }) {
+        this.actions = []
+        for (let key of Object.keys(action_dict)) {
+            this.actions.push(new GameAction(key, action_dict[key]))
+        }
+    }
+
+    get(id: string): GameAction | null {
+        for (let action of this.actions) {
+            if (action.id === id) {
+                return action
+            }
+        }
+        return null
+    }
+}
+
+const game_actions = new GameActionList({})
+
+class Passenger {
+    public id: number
+    public name: L10nText
+    public avatar_color: string
+    public avatar_font_color: string
+    public avatar_text: L10nText
+    public is_diaplay: boolean
+
+    constructor(id: number, name: L10nText, avatar_color: string, avatar_font_color: string, avatar_text: L10nText, is_display: boolean = true) {
+        this.id = id
+        this.name = name
+        this.avatar_color = avatar_color
+        this.avatar_font_color = avatar_font_color
+        this.avatar_text = avatar_text
+        this.is_diaplay = is_display
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+enum DialogBlockItemType {
+    DIALOG = 'dialog',
+    SELECT = 'select'
+}
+
+abstract class DialogBlockItem {
+    public id: string
+    public type: DialogBlockItemType
+
+    constructor(id: string, type: DialogBlockItemType = DialogBlockItemType.DIALOG) {
+        this.id = id
+        this.type = type
+    }
+
+    isSelect(): boolean {
+        return this.type === DialogBlockItemType.SELECT
+    }
+}
+
+enum DialogLayout {
+    LEFT = 'left',
+    MIDDLE = 'middle',
+    RIGHT = 'right'
+}
+
+class Dialog extends DialogBlockItem {
+    public person_id: number
+    public text: L10nText
+    public layout: DialogLayout
+    public is_having_action: boolean
+    public action_id: string
+
+    constructor(id: string, person_id: number, text: L10nText, layout: DialogLayout, action_id: string = '') {
+        super(id)
+        this.person_id = person_id
+        this.text = text
+        this.layout = layout
+        this.action_id = action_id
+        this.is_having_action = action_id === '' ? false : true
+    }
+
+    doAction() {
+        if (this.is_having_action) {
+            game_actions.get(this.action_id)?.do()
+        }
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+class SelectOption {
+    public next_dialog_block_id: string
+    public text: L10nText
+
+    constructor(next_id: string, text: L10nText) {
+        this.next_dialog_block_id = next_id
+        this.text = text
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+class BranchSelect extends DialogBlockItem {
+    public options: SelectOption[]
+
+    constructor(id: string, options: SelectOption[] = []) {
+        super(id, DialogBlockItemType.SELECT)
+        this.options = options
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+class DialogBlock {
+    public data: Dialog[]
+
+    constructor() {
+        this.data = []
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+class DialogScene {
+    constructor() {
+    }
+
+    toString(): string {
+        return `{}`
+    }
+}
+
+class Floor {
+    public id: number
+    public dialogs: { [index: string]: DialogBlock }
+
+    constructor(id: number) {
+        this.id = id
+        this.dialogs = {}
+    }
+}
+
+class PlotThread {
+    constructor() { }
+}
+
 class WaitingDotsAnimation {
     private dots: HTMLElement[]
     private orders: number[][]
@@ -233,147 +560,6 @@ class Door {
             await sleep(this.sleep_time)
         }
         this.stop()
-    }
-}
-
-interface NaturalLanguage {
-    key: string | symbol
-    name: string
-}
-
-class LanguageList {
-    private data: NaturalLanguage[]
-
-    constructor(data: NaturalLanguage[]) {
-        this.data = data
-    }
-
-    length(): number {
-        return this.data.length
-    }
-
-    isKeyIn(key: string | symbol): boolean {
-        return key in this.data.map(value => value.key)
-    }
-
-    indexOfKey(key: string | symbol): number {
-        if (!this.isKeyIn(key)) {
-            return -1
-        }
-        for (let i of range(this.length())) {
-            if (this.data[i].key === key) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    getItemByIndex(index: number): NaturalLanguage {
-        if (index < 0) {
-            index = 0
-        }
-        if (index >= this.length()) {
-            index = this.length() - 1
-        }
-        return this.data[index]
-    }
-
-    getItemByKey(key: string | symbol): NaturalLanguage | null {
-        for (let item of this.data) {
-            if (key === item.key) {
-                return item
-            }
-        }
-        return null
-    }
-
-    getNameByKey(key: string | symbol): string {
-        if (!this.isKeyIn(key)) {
-            return ''
-        }
-        let item = this.getItemByKey(key)
-        return item !== null ? item.name : ''
-    }
-}
-
-const default_lang = 'zh_cn'
-const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }])
-
-//TODO: replace any
-interface L10NTextDict {
-    [key: string | symbol]: string
-}
-
-class L10nText {
-    private data: L10NTextDict
-
-    constructor(data: L10NTextDict) {
-        this.data = data
-    }
-
-    get(key: string | symbol): string {
-        if (key in this.data) {
-            return this.data[key]
-        }
-        return this.data[default_lang]
-    }
-
-    set(key: string | symbol, value: string) {
-        if (!supported_langs.isKeyIn(key)) {
-            return
-        }
-        this.data[key] = value
-    }
-}
-
-class Passenger {
-    public id: number
-    public name: L10nText
-    public avatar_color: string
-    public avatar_font_color: string
-    public avatar_text: L10nText
-
-    constructor(id: number, name: L10nText, avatar_color: string, avatar_font_color: string, avatar_text: L10nText) {
-        this.id = id
-        this.name = name
-        this.avatar_color = avatar_color
-        this.avatar_font_color = avatar_font_color
-        this.avatar_text = avatar_text
-    }
-}
-
-class Dialog {
-    public person_id: number
-    public text: string
-
-    constructor(person_id: number, text: string) {
-        this.person_id = person_id
-        this.text = text
-    }
-}
-
-class DialogBlock {
-    public data: Dialog[]
-
-    constructor() {
-        this.data = []
-    }
-}
-
-class Task {
-    constructor() { }
-}
-
-class Floor {
-    public id: number
-    public dialogs: { [index: number]: DialogBlock }
-
-    constructor(id: number) {
-        this.id = id
-        this.dialogs = {}
-        // temp
-        this.dialogs[0] = new DialogBlock()
-        this.dialogs[0].data.push(new Dialog(-1, `there is the ${this.id}th floor.`))
     }
 }
 
@@ -794,7 +980,9 @@ class Game {
             let dialog_text = document.createElement('div')
             dialog_item.classList.add('dialog-row', 'mid-dialog-row')
             dialog_text.classList.add('dialog-box', 'mid-dialog-box')
-            dialog_text.textContent = floor.dialogs[0].data[0].text
+            // TODO: redener dialog
+            // dialog_text.textContent = floor.dialogs[0].data[0].text.get(this.lang)
+            dialog_text.textContent = ''
             dialog_item.appendChild(dialog_text)
             dialog_container.appendChild(dialog_item)
         }

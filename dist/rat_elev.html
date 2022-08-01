@@ -743,26 +743,37 @@ body {
     justify-content: space-around;
     align-items: center;
     z-index: 11;
+    overflow-y: hidden;
 }
 
 .option-button {
     width: 18%;
     height: 80%;
+    max-height: 80%;
     display: flex;
     align-items: center;
     justify-content: space-around;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: .8rem;
     font-family: "Palatino Linotype";
     word-wrap: break-word;
     word-break: break-all;
     outline: 2px solid rgba(255, 255, 255, .6);
     color: rgba(255, 255, 255, .8);
-    padding: 0 4px;
+    padding: 4px 5px;
     transition: background-color .2s, color .2s, outline .2s;
-    border-radius: 18px 18px 18px 0;
+    border-radius: 10px 10px 10px 0;
     text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
-    overflow: hidden;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+.option-button>div {
+    margin: auto;
+}
+
+.option-button::-webkit-scrollbar {
+    width: 0;
 }
 
 .option-button:hover {
@@ -1313,10 +1324,18 @@ body {
                     </div>
                 </div>
                 <div id="options-row">
-                    <div class="option-button unselectable">说点好听的吧</div>
-                    <div class="option-button unselectable">感觉不如</div>
-                    <div class="option-button unselectable">还可以ABCDILsdd</div>
-                    <div class="option-button unselectable">可是说这么多不也无济于事吗？</div>
+                    <div class="option-button unselectable">
+                        <div>说点好听的吧</div>
+                    </div>
+                    <div class="option-button unselectable">
+                        <div>感觉不如</div>
+                    </div>
+                    <div class="option-button unselectable">
+                        <div>还可以ABCDILsdd</div>
+                    </div>
+                    <div class="option-button unselectable">
+                        <div>可是说这么多不也无济于事吗？1111111111111111111111111111111111111111111</div>
+                    </div>
                 </div>
                 <div id="background"></div>
             </div>
@@ -1423,6 +1442,239 @@ const qs = function (selector) {
 const qsa = function (selector) {
     return document.querySelectorAll(selector);
 };
+class LanguageList {
+    constructor(data) {
+        this.data = data;
+    }
+    length() {
+        return this.data.length;
+    }
+    isKeyIn(key) {
+        return key in this.data.map(value => value.key);
+    }
+    indexOfKey(key) {
+        if (!this.isKeyIn(key)) {
+            return -1;
+        }
+        for (let i of range(this.length())) {
+            if (this.data[i].key === key) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    getItemByIndex(index) {
+        if (index < 0) {
+            index = 0;
+        }
+        if (index >= this.length()) {
+            index = this.length() - 1;
+        }
+        return this.data[index];
+    }
+    getItemByKey(key) {
+        for (let item of this.data) {
+            if (key === item.key) {
+                return item;
+            }
+        }
+        return null;
+    }
+    getNameByKey(key) {
+        if (!this.isKeyIn(key)) {
+            return '';
+        }
+        let item = this.getItemByKey(key);
+        return item !== null ? item.name : '';
+    }
+}
+const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }]);
+const default_lang = 'zh_cn';
+class L10nText {
+    constructor(data) {
+        this.data = data;
+    }
+    get(key) {
+        if (key in this.data) {
+            return this.data[key];
+        }
+        return this.data[default_lang];
+    }
+    set(key, value) {
+        if (!supported_langs.isKeyIn(key)) {
+            return;
+        }
+        this.data[key] = value;
+    }
+    toString() {
+        return `{}`;
+    }
+}
+var SignatureStatus;
+(function (SignatureStatus) {
+    SignatureStatus["DEACTIVE"] = "deactive";
+    SignatureStatus["ACTIVE"] = "active";
+})(SignatureStatus || (SignatureStatus = {}));
+class Signature {
+    constructor(id, status = SignatureStatus.DEACTIVE) {
+        this.id = id;
+        this.status = status;
+    }
+    activiate() {
+        this.status = SignatureStatus.ACTIVE;
+    }
+    deactiviate() {
+        this.status = SignatureStatus.DEACTIVE;
+    }
+    toString() {
+        return `{}`;
+    }
+}
+var TaskStatus;
+(function (TaskStatus) {
+    TaskStatus["DEACTIVE"] = "deactive";
+    TaskStatus["ACTIVE"] = "active";
+    TaskStatus["FINISHED"] = "finished";
+})(TaskStatus || (TaskStatus = {}));
+class GameTask {
+    constructor(id, description) {
+        this.id = id;
+        this.description = description;
+        this.status = TaskStatus.DEACTIVE;
+    }
+    activiate() {
+        this.status = TaskStatus.ACTIVE;
+    }
+    finish() {
+        this.status = TaskStatus.FINISHED;
+    }
+    deactiviate() {
+        this.status = TaskStatus.DEACTIVE;
+    }
+}
+class GameAction {
+    constructor(id, f = () => { }) {
+        this.id = id;
+        this.action = f;
+    }
+    do() {
+        this.action();
+    }
+    toString() {
+        return `{}`;
+    }
+}
+class GameActionList {
+    constructor(action_dict) {
+        this.actions = [];
+        for (let key of Object.keys(action_dict)) {
+            this.actions.push(new GameAction(key, action_dict[key]));
+        }
+    }
+    get(id) {
+        for (let action of this.actions) {
+            if (action.id === id) {
+                return action;
+            }
+        }
+        return null;
+    }
+}
+const game_actions = new GameActionList({});
+class Passenger {
+    constructor(id, name, avatar_color, avatar_font_color, avatar_text, is_display = true) {
+        this.id = id;
+        this.name = name;
+        this.avatar_color = avatar_color;
+        this.avatar_font_color = avatar_font_color;
+        this.avatar_text = avatar_text;
+        this.is_diaplay = is_display;
+    }
+    toString() {
+        return `{}`;
+    }
+}
+var DialogBlockItemType;
+(function (DialogBlockItemType) {
+    DialogBlockItemType["DIALOG"] = "dialog";
+    DialogBlockItemType["SELECT"] = "select";
+})(DialogBlockItemType || (DialogBlockItemType = {}));
+class DialogBlockItem {
+    constructor(id, type = DialogBlockItemType.DIALOG) {
+        this.id = id;
+        this.type = type;
+    }
+    isSelect() {
+        return this.type === DialogBlockItemType.SELECT;
+    }
+}
+var DialogLayout;
+(function (DialogLayout) {
+    DialogLayout["LEFT"] = "left";
+    DialogLayout["MIDDLE"] = "middle";
+    DialogLayout["RIGHT"] = "right";
+})(DialogLayout || (DialogLayout = {}));
+class Dialog extends DialogBlockItem {
+    constructor(id, person_id, text, layout, action_id = '') {
+        super(id);
+        this.person_id = person_id;
+        this.text = text;
+        this.layout = layout;
+        this.action_id = action_id;
+        this.is_having_action = action_id === '' ? false : true;
+    }
+    doAction() {
+        var _a;
+        if (this.is_having_action) {
+            (_a = game_actions.get(this.action_id)) === null || _a === void 0 ? void 0 : _a.do();
+        }
+    }
+    toString() {
+        return `{}`;
+    }
+}
+class SelectOption {
+    constructor(next_id, text) {
+        this.next_dialog_block_id = next_id;
+        this.text = text;
+    }
+    toString() {
+        return `{}`;
+    }
+}
+class BranchSelect extends DialogBlockItem {
+    constructor(id, options = []) {
+        super(id, DialogBlockItemType.SELECT);
+        this.options = options;
+    }
+    toString() {
+        return `{}`;
+    }
+}
+class DialogBlock {
+    constructor() {
+        this.data = [];
+    }
+    toString() {
+        return `{}`;
+    }
+}
+class DialogScene {
+    constructor() {
+    }
+    toString() {
+        return `{}`;
+    }
+}
+class Floor {
+    constructor(id) {
+        this.id = id;
+        this.dialogs = {};
+    }
+}
+class PlotThread {
+    constructor() { }
+}
 class WaitingDotsAnimation {
     constructor() {
         this.dots = [];
@@ -1566,102 +1818,6 @@ class Door {
             }
             this.stop();
         });
-    }
-}
-class LanguageList {
-    constructor(data) {
-        this.data = data;
-    }
-    length() {
-        return this.data.length;
-    }
-    isKeyIn(key) {
-        return key in this.data.map(value => value.key);
-    }
-    indexOfKey(key) {
-        if (!this.isKeyIn(key)) {
-            return -1;
-        }
-        for (let i of range(this.length())) {
-            if (this.data[i].key === key) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    getItemByIndex(index) {
-        if (index < 0) {
-            index = 0;
-        }
-        if (index >= this.length()) {
-            index = this.length() - 1;
-        }
-        return this.data[index];
-    }
-    getItemByKey(key) {
-        for (let item of this.data) {
-            if (key === item.key) {
-                return item;
-            }
-        }
-        return null;
-    }
-    getNameByKey(key) {
-        if (!this.isKeyIn(key)) {
-            return '';
-        }
-        let item = this.getItemByKey(key);
-        return item !== null ? item.name : '';
-    }
-}
-const default_lang = 'zh_cn';
-const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }]);
-class L10nText {
-    constructor(data) {
-        this.data = data;
-    }
-    get(key) {
-        if (key in this.data) {
-            return this.data[key];
-        }
-        return this.data[default_lang];
-    }
-    set(key, value) {
-        if (!supported_langs.isKeyIn(key)) {
-            return;
-        }
-        this.data[key] = value;
-    }
-}
-class Passenger {
-    constructor(id, name, avatar_color, avatar_font_color, avatar_text) {
-        this.id = id;
-        this.name = name;
-        this.avatar_color = avatar_color;
-        this.avatar_font_color = avatar_font_color;
-        this.avatar_text = avatar_text;
-    }
-}
-class Dialog {
-    constructor(person_id, text) {
-        this.person_id = person_id;
-        this.text = text;
-    }
-}
-class DialogBlock {
-    constructor() {
-        this.data = [];
-    }
-}
-class Task {
-    constructor() { }
-}
-class Floor {
-    constructor(id) {
-        this.id = id;
-        this.dialogs = {};
-        this.dialogs[0] = new DialogBlock();
-        this.dialogs[0].data.push(new Dialog(-1, `there is the ${this.id}th floor.`));
     }
 }
 class PendingQueue {
@@ -1996,7 +2152,7 @@ class Game {
             let dialog_text = document.createElement('div');
             dialog_item.classList.add('dialog-row', 'mid-dialog-row');
             dialog_text.classList.add('dialog-box', 'mid-dialog-box');
-            dialog_text.textContent = floor.dialogs[0].data[0].text;
+            dialog_text.textContent = '';
             dialog_item.appendChild(dialog_text);
             dialog_container.appendChild(dialog_item);
         }
