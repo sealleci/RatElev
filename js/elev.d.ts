@@ -20,14 +20,12 @@ declare class LanguageList {
     getItemByKey(key: string | symbol): NaturalLanguage | null;
     getNameByKey(key: string | symbol): string;
 }
-declare const supported_langs: LanguageList;
-declare const default_lang = "zh_cn";
-interface L10NTextDict {
+interface L10nTextDict {
     [key: string | symbol]: string;
 }
 declare class L10nText {
     private data;
-    constructor(data: L10NTextDict);
+    constructor(data: L10nTextDict);
     get(key: string | symbol): string;
     set(key: string | symbol, value: string): void;
     toString(): string;
@@ -42,7 +40,21 @@ declare class Signature {
     constructor(id: string, status?: SignatureStatus);
     activiate(): void;
     deactiviate(): void;
+    isActive(): boolean;
     toString(): string;
+}
+interface SignatureObject {
+    id: string;
+    status: SignatureStatus;
+}
+declare class SignatureList {
+    private data;
+    constructor(signatures: SignatureObject[]);
+    isIncluding(id: string): boolean;
+    getById(id: string): Signature | null;
+    isActive(id: string): boolean;
+    activate(id: string): boolean;
+    deactivate(id: string): boolean;
 }
 declare enum TaskStatus {
     DEACTIVE = "deactive",
@@ -65,23 +77,37 @@ declare class GameAction {
     do(): void;
     toString(): string;
 }
-declare class GameActionList {
-    actions: GameAction[];
-    constructor(action_dict: {
-        [key: string]: () => void;
-    });
-    get(id: string): GameAction | null;
+interface GameActionObject {
+    id: string;
+    action: () => void;
 }
-declare const game_actions: GameActionList;
+declare class GameActionList {
+    data: GameAction[];
+    constructor(actions: GameActionObject[]);
+    getById(id: string): GameAction | null;
+}
 declare class Passenger {
-    id: number;
+    id: string;
     name: L10nText;
     avatar_color: string;
     avatar_font_color: string;
     avatar_text: L10nText;
     is_diaplay: boolean;
-    constructor(id: number, name: L10nText, avatar_color: string, avatar_font_color: string, avatar_text: L10nText, is_display?: boolean);
+    constructor(id: string, name: L10nText, avatar_color: string, avatar_font_color: string, avatar_text: L10nText, is_display?: boolean);
     toString(): string;
+}
+interface PassengerObject {
+    id: string;
+    name: L10nTextDict;
+    avatar_color: string;
+    avatar_font_color: string;
+    avatar_text: L10nTextDict;
+    is_display?: boolean;
+}
+declare class PassengerList {
+    data: Passenger[];
+    constructor(passengers: PassengerObject[]);
+    getById(id: string): Passenger | null;
 }
 declare enum DialogBlockItemType {
     DIALOG = "dialog",
@@ -92,6 +118,21 @@ declare abstract class DialogBlockItem {
     type: DialogBlockItemType;
     constructor(id: string, type?: DialogBlockItemType);
     isSelect(): boolean;
+}
+declare class SelectOption {
+    next_dialog_block_id: string;
+    text: L10nText;
+    constructor(next_id: string, text: L10nText);
+    toString(): string;
+}
+interface OptionObject {
+    next: string;
+    text: L10nTextDict;
+}
+declare class BranchSelect extends DialogBlockItem {
+    options: SelectOption[];
+    constructor(id: string, options?: OptionObject[]);
+    toString(): string;
 }
 declare enum DialogLayout {
     LEFT = "left",
@@ -108,35 +149,78 @@ declare class Dialog extends DialogBlockItem {
     doAction(): void;
     toString(): string;
 }
-declare class SelectOption {
-    next_dialog_block_id: string;
-    text: L10nText;
-    constructor(next_id: string, text: L10nText);
-    toString(): string;
+interface DialogObject {
+    person_id: number;
+    text: L10nTextDict;
+    layout: DialogLayout;
+    action_id?: string;
 }
-declare class BranchSelect extends DialogBlockItem {
-    options: SelectOption[];
-    constructor(id: string, options?: SelectOption[]);
-    toString(): string;
+interface SelectObject {
+    options: OptionObject[];
 }
 declare class DialogBlock {
-    data: Dialog[];
-    constructor();
+    id: string;
+    cur_dialog_index: number;
+    data: DialogBlockItem[];
+    constructor(id: string, dialogs: DialogObject[], select?: SelectObject | null);
     toString(): string;
 }
+interface DialogBlockObject {
+    id: string;
+    dialogs: DialogObject[];
+    select?: SelectObject;
+}
 declare class DialogScene {
-    constructor();
+    id: string;
+    dialog_blocks: DialogBlock[];
+    cur_block_id: string;
+    visited_blocks: string[];
+    constructor(id: string, blocks: DialogBlockObject[]);
+    getDialogBlock(id: string): DialogBlock | null;
     toString(): string;
+}
+interface DialogSceneObject {
+    id: string;
+    blocks: DialogBlockObject[];
+}
+interface Background {
+    bg_color: string;
+    inner_html: string;
 }
 declare class Floor {
     id: number;
-    dialogs: {
-        [index: string]: DialogBlock;
-    };
-    constructor(id: number);
+    dialog_scene: DialogScene;
+    plot_id_list: string[];
+    background: Background;
+    constructor(id: number, scene: DialogSceneObject, background?: Background | null);
+}
+interface FloorObject {
+    id: number;
+    dialog_scene: DialogSceneObject;
+    background?: Background;
+}
+declare class FloorList {
+    data: Floor[];
+    constructor(floors: FloorObject[]);
+    getById(id: number): Floor | null;
 }
 declare class PlotThread {
-    constructor();
+    id: string;
+    priority: number;
+    signatures: string[];
+    passengers: string[];
+    floors: number[];
+    in_signatures: string[];
+    cur_signature_index: number;
+    constructor(id: string, priority: number, signatures: string[], passengers: string[], floors: number[], in_signatures?: string[]);
+    step(): void;
+    isUnlocked(): boolean;
+    isFinished(): boolean;
+}
+declare class PlotThreadList {
+    data: PlotThread[];
+    constructor(data: PlotThread[]);
+    getById(id: string): PlotThread | null;
 }
 declare class WaitingDotsAnimation {
     private dots;
@@ -229,6 +313,16 @@ declare class LanguageDisplay {
     set(key: string | symbol): void;
     get(): string | symbol;
 }
+declare class PassengerDisplay {
+}
+declare class TaskDisplay {
+}
+interface UiStringDictRaw {
+    [key: string]: L10nTextDict;
+}
+interface UiStringDict {
+    [key: string]: L10nText;
+}
 interface SaveDataType {
 }
 interface SaveRootType {
@@ -247,18 +341,15 @@ declare class Game {
     cur_dest: number;
     pending_queue: PendingQueue;
     door: Door;
-    floors: Floor[];
     dots_animation: WaitingDotsAnimation;
     floor_display: FloorDisplay;
     save_panel: SavePanel;
     language_display: LanguageDisplay;
-    characters: Passenger[];
-    ui_string: {
-        [key: string]: L10nText;
-    };
+    ui_string: UiStringDict;
+    passenger_display: PassengerDisplay;
+    task_display: TaskDisplay;
     constructor();
     getTFIcon(type: boolean): HTMLElement;
-    getFloorById(id: number): Floor | null;
     renderFloor(): void;
     isLiftable(): boolean;
     calcLiftDirection(): void;
@@ -274,11 +365,19 @@ declare class Game {
     initialize(): void;
     debug(): Promise<void>;
 }
-declare const game: Game;
 interface BindingButton {
     selector: string;
     is_single: boolean;
     func(this: HTMLElement, event: MouseEvent): void;
 }
 declare const binding_buttons: BindingButton[];
-declare function bindFunctionToButtons(): void;
+declare function bindButtonFunctions(): void;
+declare const game_lang_list: LanguageList;
+declare const game_default_lang = "zh_cn";
+declare const game_signature_list: SignatureList;
+declare const game_action_list: GameActionList;
+declare const game_passenger_list: PassengerList;
+declare const game_plot_thread_list: PlotThreadList;
+declare const game_floor_list: FloorList;
+declare const game_ui_string_raw: UiStringDictRaw;
+declare const game: Game;

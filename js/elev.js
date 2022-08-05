@@ -116,8 +116,6 @@ class LanguageList {
         return item !== null ? item.name : '';
     }
 }
-const supported_langs = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }]);
-const default_lang = 'zh_cn';
 class L10nText {
     constructor(data) {
         this.data = data;
@@ -126,10 +124,10 @@ class L10nText {
         if (key in this.data) {
             return this.data[key];
         }
-        return this.data[default_lang];
+        return this.data[game_default_lang];
     }
     set(key, value) {
-        if (!supported_langs.isKeyIn(key)) {
+        if (!game_lang_list.isKeyIn(key)) {
             return;
         }
         this.data[key] = value;
@@ -154,8 +152,55 @@ class Signature {
     deactiviate() {
         this.status = SignatureStatus.DEACTIVE;
     }
+    isActive() {
+        return this.status === SignatureStatus.ACTIVE;
+    }
     toString() {
         return `{}`;
+    }
+}
+class SignatureList {
+    constructor(signatures) {
+        this.data = [];
+        for (let signature of signatures) {
+            this.data.push(new Signature(signature.id, signature.status));
+        }
+    }
+    isIncluding(id) {
+        for (let i = 0; i < this.data.length; ++i) {
+            if (this.data[i].id === id) {
+                return true;
+            }
+        }
+        return false;
+    }
+    getById(id) {
+        for (let signature of this.data) {
+            if (signature.id === id) {
+                return signature;
+            }
+        }
+        return null;
+    }
+    isActive(id) {
+        let signature = this.getById(id);
+        return signature !== null && signature.status === SignatureStatus.ACTIVE;
+    }
+    activate(id) {
+        let signature = this.getById(id);
+        if (signature !== null) {
+            signature.activiate();
+            return true;
+        }
+        return false;
+    }
+    deactivate(id) {
+        let signature = this.getById(id);
+        if (signature !== null) {
+            signature.deactiviate();
+            return true;
+        }
+        return false;
     }
 }
 var TaskStatus;
@@ -193,14 +238,14 @@ class GameAction {
     }
 }
 class GameActionList {
-    constructor(action_dict) {
-        this.actions = [];
-        for (let key of Object.keys(action_dict)) {
-            this.actions.push(new GameAction(key, action_dict[key]));
+    constructor(actions) {
+        this.data = [];
+        for (let action of actions) {
+            this.data.push(new GameAction(action.id, action.action));
         }
     }
-    get(id) {
-        for (let action of this.actions) {
+    getById(id) {
+        for (let action of this.data) {
             if (action.id === id) {
                 return action;
             }
@@ -208,7 +253,6 @@ class GameActionList {
         return null;
     }
 }
-const game_actions = new GameActionList({});
 class Passenger {
     constructor(id, name, avatar_color, avatar_font_color, avatar_text, is_display = true) {
         this.id = id;
@@ -220,6 +264,23 @@ class Passenger {
     }
     toString() {
         return `{}`;
+    }
+}
+class PassengerList {
+    constructor(passengers) {
+        var _a;
+        this.data = [];
+        for (let passenger of passengers) {
+            this.data.push(new Passenger(passenger.id, new L10nText(passenger.name), passenger.avatar_color, passenger.avatar_font_color, new L10nText(passenger.avatar_text), (_a = passenger.is_display) !== null && _a !== void 0 ? _a : true));
+        }
+    }
+    getById(id) {
+        for (let passenger of this.data) {
+            if (passenger.id === id) {
+                return passenger;
+            }
+        }
+        return null;
     }
 }
 var DialogBlockItemType;
@@ -234,6 +295,27 @@ class DialogBlockItem {
     }
     isSelect() {
         return this.type === DialogBlockItemType.SELECT;
+    }
+}
+class SelectOption {
+    constructor(next_id, text) {
+        this.next_dialog_block_id = next_id;
+        this.text = text;
+    }
+    toString() {
+        return `{}`;
+    }
+}
+class BranchSelect extends DialogBlockItem {
+    constructor(id, options = []) {
+        super(id, DialogBlockItemType.SELECT);
+        this.options = [];
+        for (let option of options) {
+            this.options.push(new SelectOption(option.next, new L10nText(option.text)));
+        }
+    }
+    toString() {
+        return `{}`;
     }
 }
 var DialogLayout;
@@ -254,54 +336,132 @@ class Dialog extends DialogBlockItem {
     doAction() {
         var _a;
         if (this.is_having_action) {
-            (_a = game_actions.get(this.action_id)) === null || _a === void 0 ? void 0 : _a.do();
+            (_a = game_action_list.getById(this.action_id)) === null || _a === void 0 ? void 0 : _a.do();
         }
     }
     toString() {
         return `{}`;
     }
 }
-class SelectOption {
-    constructor(next_id, text) {
-        this.next_dialog_block_id = next_id;
-        this.text = text;
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class BranchSelect extends DialogBlockItem {
-    constructor(id, options = []) {
-        super(id, DialogBlockItemType.SELECT);
-        this.options = options;
-    }
-    toString() {
-        return `{}`;
-    }
-}
 class DialogBlock {
-    constructor() {
+    constructor(id, dialogs, select = null) {
+        var _a;
+        this.id = id;
+        this.cur_dialog_index = 0;
         this.data = [];
+        for (let i = 0; i < dialogs.length; ++i) {
+            this.data.push(new Dialog(this.id + i.toString(), dialogs[i].person_id, new L10nText(dialogs[i].text), dialogs[i].layout, (_a = dialogs[i].action_id) !== null && _a !== void 0 ? _a : ''));
+        }
+        if (select !== null) {
+            this.data.push(new BranchSelect(this.id, select.options));
+        }
     }
     toString() {
         return `{}`;
     }
 }
 class DialogScene {
-    constructor() {
+    constructor(id, blocks) {
+        var _a;
+        this.id = id;
+        this.dialog_blocks = [];
+        for (let i = 0; i < blocks.length; ++i) {
+            this.dialog_blocks.push(new DialogBlock(blocks[i].id, blocks[i].dialogs, (_a = blocks[i].select) !== null && _a !== void 0 ? _a : null));
+        }
+        this.cur_block_id = '';
+        this.visited_blocks = [];
+    }
+    getDialogBlock(id) {
+        for (let block of this.dialog_blocks) {
+            if (block.id === id) {
+                return block;
+            }
+        }
+        return null;
     }
     toString() {
         return `{}`;
     }
 }
 class Floor {
-    constructor(id) {
+    constructor(id, scene, background = null) {
         this.id = id;
-        this.dialogs = {};
+        this.dialog_scene = new DialogScene(scene.id, scene.blocks);
+        this.plot_id_list = [];
+        this.background = background !== null && background !== void 0 ? background : { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' };
+    }
+}
+class FloorList {
+    constructor(floors) {
+        var _a;
+        this.data = [];
+        for (let floor of floors) {
+            this.data.push(new Floor(floor.id, floor.dialog_scene, (_a = floor.background) !== null && _a !== void 0 ? _a : null));
+        }
+    }
+    getById(id) {
+        for (let thread of this.data) {
+            if (thread.id === id) {
+                return thread;
+            }
+        }
+        return null;
     }
 }
 class PlotThread {
-    constructor() { }
+    constructor(id, priority, signatures, passengers, floors, in_signatures = []) {
+        this.id = id;
+        this.priority = priority;
+        this.signatures = signatures;
+        this.passengers = passengers;
+        this.floors = floors;
+        this.in_signatures = in_signatures;
+        this.cur_signature_index = 0;
+    }
+    step() {
+        this.cur_signature_index += 1;
+    }
+    isUnlocked() {
+        if (this.in_signatures.length <= 0) {
+            return true;
+        }
+        for (let id of this.in_signatures) {
+            let signature = game_signature_list.getById(id);
+            if (signature !== null) {
+                if (!signature.isActive()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    isFinished() {
+        if (this.signatures.length <= 0) {
+            return true;
+        }
+        for (let id of this.signatures) {
+            let signature = game_signature_list.getById(id);
+            if (signature !== null) {
+                if (!signature.isActive()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+class PlotThreadList {
+    constructor(data) {
+        this.data = data;
+    }
+    getById(id) {
+        for (let thread of this.data) {
+            if (thread.id === id) {
+                return thread;
+            }
+        }
+        return null;
+    }
 }
 class WaitingDotsAnimation {
     constructor() {
@@ -630,7 +790,7 @@ class LanguageDisplay {
         this.counter = 0;
         this.index = this.next_index;
         qs('#lang-name-prev>.lang-name-text').textContent = '';
-        qs('#lang-name-cur>.lang-name-text').textContent = supported_langs.getItemByIndex(this.index).name;
+        qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name;
         qs('#lang-name-next>.lang-name-text').textContent = '';
         this.spin.style.transform = `rotate(${this.ori_angle}deg)`;
     }
@@ -654,14 +814,14 @@ class LanguageDisplay {
         this.step = Math.ceil(this.angle / this.timer_count);
         switch (this.direction) {
             case 'right':
-                this.next_index = (this.index - 1 + supported_langs.length()) % supported_langs.length();
-                qs('#lang-name-prev>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
+                this.next_index = (this.index - 1 + game_lang_list.length()) % game_lang_list.length();
+                qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                 qs('#lang-name-next>.lang-name-text').textContent = '';
                 break;
             case 'left':
-                this.next_index = (this.index + 1) % supported_langs.length();
+                this.next_index = (this.index + 1) % game_lang_list.length();
                 qs('#lang-name-prev>.lang-name-text').textContent = '';
-                qs('#lang-name-next>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
+                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                 break;
             default:
                 break;
@@ -679,14 +839,14 @@ class LanguageDisplay {
             this.step = Math.ceil(this.angle / this.timer_count);
             switch (this.direction) {
                 case 'right':
-                    this.next_index = (this.index - 1 + supported_langs.length()) % supported_langs.length();
-                    qs('#lang-name-prev>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
+                    this.next_index = (this.index - 1 + game_lang_list.length()) % game_lang_list.length();
+                    qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                     qs('#lang-name-next>.lang-name-text').textContent = '';
                     break;
                 case 'left':
-                    this.next_index = (this.index + 1) % supported_langs.length();
+                    this.next_index = (this.index + 1) % game_lang_list.length();
                     qs('#lang-name-prev>.lang-name-text').textContent = '';
-                    qs('#lang-name-next>.lang-name-text').textContent = supported_langs.getItemByIndex(this.next_index).name;
+                    qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                     break;
                 default:
                     break;
@@ -699,22 +859,26 @@ class LanguageDisplay {
         });
     }
     set(key) {
-        let i = supported_langs.indexOfKey(key);
+        let i = game_lang_list.indexOfKey(key);
         if (i === -1) {
             i = 0;
         }
         this.index = i;
         qs('#lang-name-prev>.lang-name-text').textContent = '';
-        qs('#lang-name-cur>.lang-name-text').textContent = supported_langs.getItemByIndex(this.index).name;
+        qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name;
         qs('#lang-name-next>.lang-name-text').textContent = '';
     }
     get() {
-        return supported_langs.getItemByIndex(this.index).key;
+        return game_lang_list.getItemByIndex(this.index).key;
     }
+}
+class PassengerDisplay {
+}
+class TaskDisplay {
 }
 class Game {
     constructor() {
-        this.lang = default_lang;
+        this.lang = game_default_lang;
         this.floor_buttons = [];
         this.cur_floor_id = 1;
         this.max_floor = 6;
@@ -725,25 +889,16 @@ class Game {
         this.cur_dest = 0;
         this.pending_queue = new PendingQueue();
         this.door = new Door();
-        this.floors = [];
-        for (let i of range(-2, 6)) {
-            if (i !== 0) {
-                this.floors.push(new Floor(i));
-            }
-        }
         this.dots_animation = new WaitingDotsAnimation();
         this.floor_display = new FloorDisplay();
         this.save_panel = new SavePanel();
         this.language_display = new LanguageDisplay();
-        this.characters = [
-            new Passenger(0, new L10nText({ zh_cn: '我', en: 'Me' }), '', '', new L10nText({ zh_cn: '我', en: 'ME' }))
-        ];
-        this.ui_string = {
-            'PERSON_NUM': new L10nText({ zh_cn: '人数', en: 'Persons' }),
-            'COPY': new L10nText({ zh_cn: '复制', en: 'COPY' }),
-            'IMPORT': new L10nText({ zh_cn: '导入', en: 'IMP' }),
-            'EXPORT': new L10nText({ zh_cn: '导出', en: 'EXP' }),
-        };
+        this.ui_string = {};
+        for (let key of Object.keys(game_ui_string_raw)) {
+            this.ui_string[key] = new L10nText(game_ui_string_raw[key]);
+        }
+        this.passenger_display = new PassengerDisplay();
+        this.task_display = new TaskDisplay();
     }
     getTFIcon(type) {
         if (type) {
@@ -763,17 +918,9 @@ class Game {
             return icon_f;
         }
     }
-    getFloorById(id) {
-        for (let floor of this.floors) {
-            if (floor.id === id) {
-                return floor;
-            }
-        }
-        return null;
-    }
     renderFloor() {
         let dialog_container = qs('#dialog-container');
-        let floor = this.getFloorById(this.cur_floor_id);
+        let floor = game_floor_list.getById(this.cur_floor_id);
         clearChildren(dialog_container);
         if (floor !== null) {
             let dialog_item = document.createElement('div');
@@ -946,7 +1093,6 @@ class Game {
         });
     }
 }
-const game = new Game();
 const binding_buttons = [
     {
         selector: '.number-button',
@@ -1066,7 +1212,7 @@ const binding_buttons = [
         })
     }
 ];
-function bindFunctionToButtons() {
+function bindButtonFunctions() {
     for (let bind of binding_buttons) {
         if (bind.is_single) {
             qs(bind.selector).addEventListener('click', bind.func);
@@ -1080,7 +1226,21 @@ function bindFunctionToButtons() {
 }
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize();
-    bindFunctionToButtons();
+    bindButtonFunctions();
     game.debug();
 });
+const game_lang_list = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }]);
+const game_default_lang = 'zh_cn';
+const game_signature_list = new SignatureList([]);
+const game_action_list = new GameActionList([]);
+const game_passenger_list = new PassengerList([]);
+const game_plot_thread_list = new PlotThreadList([]);
+const game_floor_list = new FloorList([]);
+const game_ui_string_raw = {
+    'PERSON_NUM': { zh_cn: '人数', en: 'Persons' },
+    'COPY': { zh_cn: '复制', en: 'COPY' },
+    'IMPORT': { zh_cn: '导入', en: 'IMP' },
+    'EXPORT': { zh_cn: '导出', en: 'EXP' },
+};
+const game = new Game();
 //# sourceMappingURL=elev.js.map
