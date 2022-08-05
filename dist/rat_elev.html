@@ -1442,22 +1442,44 @@ const qs = function (selector) {
 const qsa = function (selector) {
     return document.querySelectorAll(selector);
 };
-class LanguageList {
-    constructor(data) {
-        this.data = data;
+class AbstractList {
+    constructor() {
+        this.data = [];
     }
-    length() {
+    getLength() {
         return this.data.length;
     }
-    isKeyIn(key) {
-        return key in this.data.map(value => value.key);
+    isIncluding(id) {
+        for (let i = 0; i < this.data.length; ++i) {
+            if (this.data[i].id === id) {
+                return true;
+            }
+        }
+        return false;
     }
-    indexOfKey(key) {
-        if (!this.isKeyIn(key)) {
+    getById(id) {
+        for (let item of this.data) {
+            if (item.id === id) {
+                return item;
+            }
+        }
+        return null;
+    }
+}
+class LanguageList extends AbstractList {
+    constructor(data) {
+        super();
+        this.data = data;
+    }
+    isKeyIn(id) {
+        return id in this.data.map(value => value.id);
+    }
+    indexOfKey(id) {
+        if (!this.isKeyIn(id)) {
             return -1;
         }
-        for (let i of range(this.length())) {
-            if (this.data[i].key === key) {
+        for (let i of range(this.getLength())) {
+            if (this.data[i].id === id) {
                 return i;
             }
         }
@@ -1467,24 +1489,24 @@ class LanguageList {
         if (index < 0) {
             index = 0;
         }
-        if (index >= this.length()) {
-            index = this.length() - 1;
+        if (index >= this.getLength()) {
+            index = this.getLength() - 1;
         }
         return this.data[index];
     }
-    getItemByKey(key) {
+    getItemByKey(id) {
         for (let item of this.data) {
-            if (key === item.key) {
+            if (id === item.id) {
                 return item;
             }
         }
         return null;
     }
-    getNameByKey(key) {
-        if (!this.isKeyIn(key)) {
+    getNameByKey(id) {
+        if (!this.isKeyIn(id)) {
             return '';
         }
-        let item = this.getItemByKey(key);
+        let item = this.getItemByKey(id);
         return item !== null ? item.name : '';
     }
 }
@@ -1531,34 +1553,18 @@ class Signature {
         return `{}`;
     }
 }
-class SignatureList {
+class SignatureList extends AbstractList {
     constructor(signatures) {
-        this.data = [];
+        super();
         for (let signature of signatures) {
             this.data.push(new Signature(signature.id, signature.status));
         }
     }
-    isIncluding(id) {
-        for (let i = 0; i < this.data.length; ++i) {
-            if (this.data[i].id === id) {
-                return true;
-            }
-        }
-        return false;
-    }
-    getById(id) {
-        for (let signature of this.data) {
-            if (signature.id === id) {
-                return signature;
-            }
-        }
-        return null;
-    }
-    isActive(id) {
+    isActiveById(id) {
         let signature = this.getById(id);
         return signature !== null && signature.status === SignatureStatus.ACTIVE;
     }
-    activate(id) {
+    activateById(id) {
         let signature = this.getById(id);
         if (signature !== null) {
             signature.activiate();
@@ -1566,7 +1572,7 @@ class SignatureList {
         }
         return false;
     }
-    deactivate(id) {
+    deactivateById(id) {
         let signature = this.getById(id);
         if (signature !== null) {
             signature.deactiviate();
@@ -1582,10 +1588,10 @@ var TaskStatus;
     TaskStatus["FINISHED"] = "finished";
 })(TaskStatus || (TaskStatus = {}));
 class GameTask {
-    constructor(id, description) {
+    constructor(id, description, status = TaskStatus.DEACTIVE) {
         this.id = id;
         this.description = description;
-        this.status = TaskStatus.DEACTIVE;
+        this.status = status !== null && status !== void 0 ? status : TaskStatus.DEACTIVE;
     }
     activiate() {
         this.status = TaskStatus.ACTIVE;
@@ -1595,6 +1601,38 @@ class GameTask {
     }
     deactiviate() {
         this.status = TaskStatus.DEACTIVE;
+    }
+}
+class GameTaskList extends AbstractList {
+    constructor(tasks) {
+        super();
+        for (let task of tasks) {
+            this.data.push(new GameTask(task.id, new L10nText(task.description), task.status));
+        }
+    }
+    isActiveById(id) {
+        let task = this.getById(id);
+        return task !== null && task.status === TaskStatus.ACTIVE;
+    }
+    isFinishedById(id) {
+        let task = this.getById(id);
+        return task !== null && task.status === TaskStatus.FINISHED;
+    }
+    activateById(id) {
+        let task = this.getById(id);
+        if (task !== null) {
+            task.activiate();
+            return true;
+        }
+        return false;
+    }
+    deactivateById(id) {
+        let task = this.getById(id);
+        if (task !== null) {
+            task.deactiviate();
+            return true;
+        }
+        return false;
     }
 }
 class GameAction {
@@ -1609,20 +1647,12 @@ class GameAction {
         return `{}`;
     }
 }
-class GameActionList {
+class GameActionList extends AbstractList {
     constructor(actions) {
-        this.data = [];
+        super();
         for (let action of actions) {
             this.data.push(new GameAction(action.id, action.action));
         }
-    }
-    getById(id) {
-        for (let action of this.data) {
-            if (action.id === id) {
-                return action;
-            }
-        }
-        return null;
     }
 }
 class Passenger {
@@ -1638,21 +1668,13 @@ class Passenger {
         return `{}`;
     }
 }
-class PassengerList {
+class PassengerList extends AbstractList {
     constructor(passengers) {
         var _a;
-        this.data = [];
+        super();
         for (let passenger of passengers) {
             this.data.push(new Passenger(passenger.id, new L10nText(passenger.name), passenger.avatar_color, passenger.avatar_font_color, new L10nText(passenger.avatar_text), (_a = passenger.is_display) !== null && _a !== void 0 ? _a : true));
         }
-    }
-    getById(id) {
-        for (let passenger of this.data) {
-            if (passenger.id === id) {
-                return passenger;
-            }
-        }
-        return null;
     }
 }
 var DialogBlockItemType;
@@ -1763,21 +1785,13 @@ class Floor {
         this.background = background !== null && background !== void 0 ? background : { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' };
     }
 }
-class FloorList {
+class FloorList extends AbstractList {
     constructor(floors) {
         var _a;
-        this.data = [];
+        super();
         for (let floor of floors) {
             this.data.push(new Floor(floor.id, floor.dialog_scene, (_a = floor.background) !== null && _a !== void 0 ? _a : null));
         }
-    }
-    getById(id) {
-        for (let thread of this.data) {
-            if (thread.id === id) {
-                return thread;
-            }
-        }
-        return null;
     }
 }
 class PlotThread {
@@ -1822,8 +1836,9 @@ class PlotThread {
         return true;
     }
 }
-class PlotThreadList {
+class PlotThreadList extends AbstractList {
     constructor(data) {
+        super();
         this.data = data;
     }
     getById(id) {
@@ -2186,12 +2201,12 @@ class LanguageDisplay {
         this.step = Math.ceil(this.angle / this.timer_count);
         switch (this.direction) {
             case 'right':
-                this.next_index = (this.index - 1 + game_lang_list.length()) % game_lang_list.length();
+                this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                 qs('#lang-name-next>.lang-name-text').textContent = '';
                 break;
             case 'left':
-                this.next_index = (this.index + 1) % game_lang_list.length();
+                this.next_index = (this.index + 1) % game_lang_list.getLength();
                 qs('#lang-name-prev>.lang-name-text').textContent = '';
                 qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                 break;
@@ -2211,12 +2226,12 @@ class LanguageDisplay {
             this.step = Math.ceil(this.angle / this.timer_count);
             switch (this.direction) {
                 case 'right':
-                    this.next_index = (this.index - 1 + game_lang_list.length()) % game_lang_list.length();
+                    this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
                     qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                     qs('#lang-name-next>.lang-name-text').textContent = '';
                     break;
                 case 'left':
-                    this.next_index = (this.index + 1) % game_lang_list.length();
+                    this.next_index = (this.index + 1) % game_lang_list.getLength();
                     qs('#lang-name-prev>.lang-name-text').textContent = '';
                     qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                     break;
@@ -2230,8 +2245,8 @@ class LanguageDisplay {
             this.stop();
         });
     }
-    set(key) {
-        let i = game_lang_list.indexOfKey(key);
+    set(id) {
+        let i = game_lang_list.indexOfKey(id);
         if (i === -1) {
             i = 0;
         }
@@ -2241,18 +2256,58 @@ class LanguageDisplay {
         qs('#lang-name-next>.lang-name-text').textContent = '';
     }
     get() {
-        return game_lang_list.getItemByIndex(this.index).key;
+        return game_lang_list.getItemByIndex(this.index).id;
     }
 }
-class PassengerDisplay {
+class ListDisplay {
+    constructor(id_list = []) {
+        this.data = id_list;
+    }
+    add(id) {
+        if (this.data.indexOf(id) !== -1) {
+            return;
+        }
+        this.data.push(id);
+    }
+    remove(id) {
+        let index = this.data.indexOf(id);
+        if (index !== -1) {
+            return;
+        }
+        this.data.splice(index, 1);
+    }
 }
-class TaskDisplay {
+class PassengerDisplay extends ListDisplay {
+    constructor(id_list = []) {
+        super(id_list);
+    }
+    getByIndex(index) {
+        if (index < 0 || index >= this.data.length) {
+            return null;
+        }
+        return game_passenger_list.getById(this.data[index]);
+    }
+    render() {
+    }
+}
+class TaskDisplay extends ListDisplay {
+    constructor(id_list = []) {
+        super(id_list);
+    }
+    getByIndex(index) {
+        if (index < 0 || index >= this.data.length) {
+            return null;
+        }
+        return game_task_list.getById(this.data[index]);
+    }
+    render() {
+    }
 }
 class Game {
     constructor() {
         this.lang = game_default_lang;
         this.floor_buttons = [];
-        this.cur_floor_id = 1;
+        this.cur_floor = 1;
         this.max_floor = 6;
         this.min_floor = -2;
         this.is_lifting = false;
@@ -2292,7 +2347,7 @@ class Game {
     }
     renderFloor() {
         let dialog_container = qs('#dialog-container');
-        let floor = game_floor_list.getById(this.cur_floor_id);
+        let floor = game_floor_list.getById(this.cur_floor.toString());
         clearChildren(dialog_container);
         if (floor !== null) {
             let dialog_item = document.createElement('div');
@@ -2310,20 +2365,20 @@ class Game {
             this.cur_dest > this.max_floor ||
             this.cur_dest < this.min_floor ||
             this.cur_dest === 0 ||
-            this.cur_dest === this.cur_floor_id);
+            this.cur_dest === this.cur_floor);
     }
     calcLiftDirection() {
         if (this.pending_queue.length() > 0) {
             if (this.pending_queue.length() === 1) {
                 let dest = this.pending_queue.getMax().floor;
-                this.lift_direction = dest > this.cur_floor_id ? 'up' : (dest < this.cur_floor_id ? 'down' : '');
+                this.lift_direction = dest > this.cur_floor ? 'up' : (dest < this.cur_floor ? 'down' : '');
                 this.cur_dest = dest;
             }
             else {
                 let top = this.pending_queue.getMax();
                 let bottom = this.pending_queue.getMin();
-                if (top.floor >= this.cur_floor_id &&
-                    this.cur_floor_id >= bottom.floor) {
+                if (top.floor >= this.cur_floor &&
+                    this.cur_floor >= bottom.floor) {
                     if (top.index <= bottom.index) {
                         this.lift_direction = 'up';
                         this.cur_dest = top.floor;
@@ -2333,11 +2388,11 @@ class Game {
                         this.cur_dest = bottom.floor;
                     }
                 }
-                else if (bottom.floor >= this.cur_floor_id) {
+                else if (bottom.floor >= this.cur_floor) {
                     this.lift_direction = 'up';
                     this.cur_dest = top.floor;
                 }
-                else if (top.floor <= this.cur_floor_id) {
+                else if (top.floor <= this.cur_floor) {
                     this.lift_direction = 'down';
                     this.cur_dest = bottom.floor;
                 }
@@ -2353,7 +2408,7 @@ class Game {
         }
     }
     checkPassingFloor() {
-        return this.pending_queue.indexOf(this.cur_floor_id) !== -1;
+        return this.pending_queue.indexOf(this.cur_floor) !== -1;
     }
     lift() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2365,31 +2420,31 @@ class Game {
             lift_loop: do {
                 switch (this.lift_direction) {
                     case 'up':
-                        this.cur_floor_id = Math.min(this.cur_floor_id + 1 === 0 ? 1 : this.cur_floor_id + 1, this.max_floor);
+                        this.cur_floor = Math.min(this.cur_floor + 1 === 0 ? 1 : this.cur_floor + 1, this.max_floor);
                         break;
                     case 'down':
-                        this.cur_floor_id = Math.max(this.cur_floor_id - 1 === 0 ? -1 : this.cur_floor_id - 1, this.min_floor);
+                        this.cur_floor = Math.max(this.cur_floor - 1 === 0 ? -1 : this.cur_floor - 1, this.min_floor);
                         break;
                     default:
                         break lift_loop;
                 }
-                this.floor_display.updateNumber(this.cur_floor_id);
-                if (this.cur_floor_id === this.cur_dest) {
+                this.floor_display.updateNumber(this.cur_floor);
+                if (this.cur_floor === this.cur_dest) {
                     break;
                 }
-                if (this.cur_floor_id >= this.max_floor || this.cur_floor_id <= this.min_floor) {
+                if (this.cur_floor >= this.max_floor || this.cur_floor <= this.min_floor) {
                     break;
                 }
                 yield sleep(this.lift_interval);
             } while (!this.checkPassingFloor());
-            this.pending_queue.remove(this.cur_floor_id);
-            removeElementClass(qs(`.number-button[index="${this.cur_floor_id}"]`), 'button-selected');
+            this.pending_queue.remove(this.cur_floor);
+            removeElementClass(qs(`.number-button[index="${this.cur_floor}"]`), 'button-selected');
             this.is_lifting = false;
             this.floor_display.updateIcon('none');
         });
     }
     checkBeforeLift() {
-        this.pending_queue.remove(this.cur_floor_id);
+        this.pending_queue.remove(this.cur_floor);
         this.calcLiftDirection();
         if (this.isLiftable()) {
             this.lift();
@@ -2472,7 +2527,7 @@ const binding_buttons = [
         func: (event) => {
             let class_name = 'button-selected';
             let index = parseInt(event.target.getAttribute('index'));
-            if (!game.is_lifting && index === game.cur_floor_id) {
+            if (!game.is_lifting && index === game.cur_floor) {
                 return;
             }
             if (event.target.classList.contains(class_name)) {
@@ -2601,10 +2656,14 @@ document.addEventListener('DOMContentLoaded', () => {
     bindButtonFunctions();
     game.debug();
 });
-const game_lang_list = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }]);
+const game_lang_list = new LanguageList([
+    { id: 'zh_cn', name: '中文' },
+    { id: 'en', name: 'EN' }
+]);
 const game_default_lang = 'zh_cn';
 const game_signature_list = new SignatureList([]);
 const game_action_list = new GameActionList([]);
+const game_task_list = new GameTaskList([]);
 const game_passenger_list = new PassengerList([]);
 const game_plot_thread_list = new PlotThreadList([]);
 const game_floor_list = new FloorList([]);

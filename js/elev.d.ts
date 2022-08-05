@@ -6,28 +6,36 @@ declare function addElementClass(elem: HTMLElement, class_name: string): void;
 declare function removeElementClass(elem: HTMLElement, class_name: string): void;
 declare const qs: (selector: any) => HTMLElement;
 declare const qsa: (selector: any) => NodeListOf<HTMLElement>;
+interface IdClass {
+    id: string;
+}
+declare abstract class AbstractList<T extends IdClass> {
+    protected data: T[];
+    constructor();
+    getLength(): number;
+    isIncluding(id: string): boolean;
+    getById(id: string): T | null;
+}
 interface NaturalLanguage {
-    key: string | symbol;
+    id: string;
     name: string;
 }
-declare class LanguageList {
-    private data;
+declare class LanguageList extends AbstractList<NaturalLanguage> {
     constructor(data: NaturalLanguage[]);
-    length(): number;
-    isKeyIn(key: string | symbol): boolean;
-    indexOfKey(key: string | symbol): number;
+    isKeyIn(id: string): boolean;
+    indexOfKey(id: string): number;
     getItemByIndex(index: number): NaturalLanguage;
-    getItemByKey(key: string | symbol): NaturalLanguage | null;
-    getNameByKey(key: string | symbol): string;
+    getItemByKey(id: string): NaturalLanguage | null;
+    getNameByKey(id: string): string;
 }
 interface L10nTextDict {
-    [key: string | symbol]: string;
+    [key: string]: string;
 }
 declare class L10nText {
     private data;
     constructor(data: L10nTextDict);
-    get(key: string | symbol): string;
-    set(key: string | symbol, value: string): void;
+    get(key: string): string;
+    set(key: string, value: string): void;
     toString(): string;
 }
 declare enum SignatureStatus {
@@ -47,14 +55,11 @@ interface SignatureObject {
     id: string;
     status: SignatureStatus;
 }
-declare class SignatureList {
-    private data;
+declare class SignatureList extends AbstractList<Signature> {
     constructor(signatures: SignatureObject[]);
-    isIncluding(id: string): boolean;
-    getById(id: string): Signature | null;
-    isActive(id: string): boolean;
-    activate(id: string): boolean;
-    deactivate(id: string): boolean;
+    isActiveById(id: string): boolean;
+    activateById(id: string): boolean;
+    deactivateById(id: string): boolean;
 }
 declare enum TaskStatus {
     DEACTIVE = "deactive",
@@ -65,10 +70,22 @@ declare class GameTask {
     id: string;
     description: L10nText;
     status: TaskStatus;
-    constructor(id: string, description: L10nText);
+    constructor(id: string, description: L10nText, status?: TaskStatus | undefined);
     activiate(): void;
     finish(): void;
     deactiviate(): void;
+}
+interface GameTaskObject {
+    id: string;
+    description: L10nTextDict;
+    status?: TaskStatus;
+}
+declare class GameTaskList extends AbstractList<GameTask> {
+    constructor(tasks: GameTaskObject[]);
+    isActiveById(id: string): boolean;
+    isFinishedById(id: string): boolean;
+    activateById(id: string): boolean;
+    deactivateById(id: string): boolean;
 }
 declare class GameAction {
     id: string;
@@ -81,10 +98,8 @@ interface GameActionObject {
     id: string;
     action: () => void;
 }
-declare class GameActionList {
-    data: GameAction[];
+declare class GameActionList extends AbstractList<GameAction> {
     constructor(actions: GameActionObject[]);
-    getById(id: string): GameAction | null;
 }
 declare class Passenger {
     id: string;
@@ -104,10 +119,8 @@ interface PassengerObject {
     avatar_text: L10nTextDict;
     is_display?: boolean;
 }
-declare class PassengerList {
-    data: Passenger[];
+declare class PassengerList extends AbstractList<Passenger> {
     constructor(passengers: PassengerObject[]);
-    getById(id: string): Passenger | null;
 }
 declare enum DialogBlockItemType {
     DIALOG = "dialog",
@@ -188,21 +201,19 @@ interface Background {
     inner_html: string;
 }
 declare class Floor {
-    id: number;
+    id: string;
     dialog_scene: DialogScene;
     plot_id_list: string[];
     background: Background;
-    constructor(id: number, scene: DialogSceneObject, background?: Background | null);
+    constructor(id: string, scene: DialogSceneObject, background?: Background | null);
 }
 interface FloorObject {
-    id: number;
+    id: string;
     dialog_scene: DialogSceneObject;
     background?: Background;
 }
-declare class FloorList {
-    data: Floor[];
+declare class FloorList extends AbstractList<Floor> {
     constructor(floors: FloorObject[]);
-    getById(id: number): Floor | null;
 }
 declare class PlotThread {
     id: string;
@@ -217,8 +228,9 @@ declare class PlotThread {
     isUnlocked(): boolean;
     isFinished(): boolean;
 }
-declare class PlotThreadList {
-    data: PlotThread[];
+interface PlotThreadObject {
+}
+declare class PlotThreadList extends AbstractList<PlotThread> {
     constructor(data: PlotThread[]);
     getById(id: string): PlotThread | null;
 }
@@ -310,12 +322,26 @@ declare class LanguageDisplay {
     move(): void;
     syncStart(direction: string): void;
     start(direction: string): Promise<void>;
-    set(key: string | symbol): void;
-    get(): string | symbol;
+    set(id: string): void;
+    get(): string;
 }
-declare class PassengerDisplay {
+declare abstract class ListDisplay<T> {
+    data: string[];
+    constructor(id_list?: string[]);
+    add(id: string): void;
+    remove(id: string): void;
+    abstract getByIndex(index: number): T | null;
+    abstract render(): void;
 }
-declare class TaskDisplay {
+declare class PassengerDisplay extends ListDisplay<Passenger> {
+    constructor(id_list?: string[]);
+    getByIndex(index: number): Passenger | null;
+    render(): void;
+}
+declare class TaskDisplay extends ListDisplay<GameTask> {
+    constructor(id_list?: string[]);
+    getByIndex(index: number): GameTask | null;
+    render(): void;
 }
 interface UiStringDictRaw {
     [key: string]: L10nTextDict;
@@ -330,9 +356,9 @@ interface SaveRootType {
     data: SaveDataType;
 }
 declare class Game {
-    lang: string | symbol;
+    lang: string;
     floor_buttons: FloorButton[][];
-    cur_floor_id: number;
+    cur_floor: number;
     max_floor: number;
     min_floor: number;
     is_lifting: boolean;
@@ -376,6 +402,7 @@ declare const game_lang_list: LanguageList;
 declare const game_default_lang = "zh_cn";
 declare const game_signature_list: SignatureList;
 declare const game_action_list: GameActionList;
+declare const game_task_list: GameTaskList;
 declare const game_passenger_list: PassengerList;
 declare const game_plot_thread_list: PlotThreadList;
 declare const game_floor_list: FloorList;

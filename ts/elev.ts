@@ -70,32 +70,61 @@ const qsa = function (selector: any): NodeListOf<HTMLElement> {
     return document.querySelectorAll(selector as string)
 }
 
-interface NaturalLanguage {
-    key: string | symbol
-    name: string
+interface IdClass {
+    id: string
 }
 
-class LanguageList {
-    private data: NaturalLanguage[]
+abstract class AbstractList<T extends IdClass>{
+    protected data: T[]
 
-    constructor(data: NaturalLanguage[]) {
-        this.data = data
+    constructor() {
+        this.data = []
     }
 
-    length(): number {
+    getLength(): number {
         return this.data.length
     }
 
-    isKeyIn(key: string | symbol): boolean {
-        return key in this.data.map(value => value.key)
+    isIncluding(id: string): boolean {
+        for (let i = 0; i < this.data.length; ++i) {
+            if (this.data[i].id === id) {
+                return true
+            }
+        }
+        return false
     }
 
-    indexOfKey(key: string | symbol): number {
-        if (!this.isKeyIn(key)) {
+    getById(id: string): T | null {
+        for (let item of this.data) {
+            if (item.id === id) {
+                return item
+            }
+        }
+        return null
+    }
+}
+
+interface NaturalLanguage {
+    id: string
+    name: string
+}
+
+class LanguageList extends AbstractList<NaturalLanguage>{
+    constructor(data: NaturalLanguage[]) {
+        super()
+        this.data = data
+    }
+
+    isKeyIn(id: string): boolean {
+        return id in this.data.map(value => value.id)
+    }
+
+    indexOfKey(id: string): number {
+        if (!this.isKeyIn(id)) {
             return -1
         }
-        for (let i of range(this.length())) {
-            if (this.data[i].key === key) {
+        for (let i of range(this.getLength())) {
+            if (this.data[i].id === id) {
                 return i
             }
         }
@@ -106,26 +135,26 @@ class LanguageList {
         if (index < 0) {
             index = 0
         }
-        if (index >= this.length()) {
-            index = this.length() - 1
+        if (index >= this.getLength()) {
+            index = this.getLength() - 1
         }
         return this.data[index]
     }
 
-    getItemByKey(key: string | symbol): NaturalLanguage | null {
+    getItemByKey(id: string): NaturalLanguage | null {
         for (let item of this.data) {
-            if (key === item.key) {
+            if (id === item.id) {
                 return item
             }
         }
         return null
     }
 
-    getNameByKey(key: string | symbol): string {
-        if (!this.isKeyIn(key)) {
+    getNameByKey(id: string): string {
+        if (!this.isKeyIn(id)) {
             return ''
         }
-        let item = this.getItemByKey(key)
+        let item = this.getItemByKey(id)
         return item !== null ? item.name : ''
     }
 }
@@ -134,7 +163,7 @@ class LanguageList {
 
 //TODO: replace any
 interface L10nTextDict {
-    [key: string | symbol]: string
+    [key: string]: string
 }
 
 class L10nText {
@@ -144,14 +173,14 @@ class L10nText {
         this.data = data
     }
 
-    get(key: string | symbol): string {
+    get(key: string): string {
         if (key in this.data) {
             return this.data[key]
         }
         return this.data[game_default_lang]
     }
 
-    set(key: string | symbol, value: string) {
+    set(key: string, value: string) {
         if (!game_lang_list.isKeyIn(key)) {
             return
         }
@@ -199,11 +228,9 @@ interface SignatureObject {
     status: SignatureStatus
 }
 
-class SignatureList {
-    private data: Signature[]
-
+class SignatureList extends AbstractList<Signature>{
     constructor(signatures: SignatureObject[]) {
-        this.data = []
+        super()
         for (let signature of signatures) {
             this.data.push(new Signature(
                 signature.id,
@@ -212,30 +239,12 @@ class SignatureList {
         }
     }
 
-    isIncluding(id: string): boolean {
-        for (let i = 0; i < this.data.length; ++i) {
-            if (this.data[i].id === id) {
-                return true
-            }
-        }
-        return false
-    }
-
-    getById(id: string): Signature | null {
-        for (let signature of this.data) {
-            if (signature.id === id) {
-                return signature
-            }
-        }
-        return null
-    }
-
-    isActive(id: string): boolean {
+    isActiveById(id: string): boolean {
         let signature = this.getById(id)
         return signature !== null && signature.status === SignatureStatus.ACTIVE
     }
 
-    activate(id: string): boolean {
+    activateById(id: string): boolean {
         let signature = this.getById(id)
         if (signature !== null) {
             signature.activiate()
@@ -244,7 +253,7 @@ class SignatureList {
         return false
     }
 
-    deactivate(id: string): boolean {
+    deactivateById(id: string): boolean {
         let signature = this.getById(id)
         if (signature !== null) {
             signature.deactiviate()
@@ -265,10 +274,10 @@ class GameTask {
     public description: L10nText
     public status: TaskStatus
 
-    constructor(id: string, description: L10nText) {
+    constructor(id: string, description: L10nText, status: TaskStatus | undefined = TaskStatus.DEACTIVE) {
         this.id = id
         this.description = description
-        this.status = TaskStatus.DEACTIVE
+        this.status = status ?? TaskStatus.DEACTIVE
     }
 
     activiate() {
@@ -281,6 +290,53 @@ class GameTask {
 
     deactiviate() {
         this.status = TaskStatus.DEACTIVE
+    }
+}
+
+interface GameTaskObject {
+    id: string
+    description: L10nTextDict
+    status?: TaskStatus
+}
+
+class GameTaskList extends AbstractList<GameTask>{
+    constructor(tasks: GameTaskObject[]) {
+        super()
+        for (let task of tasks) {
+            this.data.push(new GameTask(
+                task.id,
+                new L10nText(task.description),
+                task.status
+            ))
+        }
+    }
+
+    isActiveById(id: string): boolean {
+        let task = this.getById(id)
+        return task !== null && task.status === TaskStatus.ACTIVE
+    }
+
+    isFinishedById(id: string): boolean {
+        let task = this.getById(id)
+        return task !== null && task.status === TaskStatus.FINISHED
+    }
+
+    activateById(id: string): boolean {
+        let task = this.getById(id)
+        if (task !== null) {
+            task.activiate()
+            return true
+        }
+        return false
+    }
+
+    deactivateById(id: string): boolean {
+        let task = this.getById(id)
+        if (task !== null) {
+            task.deactiviate()
+            return true
+        }
+        return false
     }
 }
 
@@ -307,23 +363,12 @@ interface GameActionObject {
     action: () => void
 }
 
-class GameActionList {
-    public data: GameAction[]
-
+class GameActionList extends AbstractList<GameAction>{
     constructor(actions: GameActionObject[]) {
-        this.data = []
+        super()
         for (let action of actions) {
             this.data.push(new GameAction(action.id, action.action))
         }
-    }
-
-    getById(id: string): GameAction | null {
-        for (let action of this.data) {
-            if (action.id === id) {
-                return action
-            }
-        }
-        return null
     }
 }
 
@@ -358,11 +403,9 @@ interface PassengerObject {
     is_display?: boolean
 }
 
-class PassengerList {
-    public data: Passenger[]
-
+class PassengerList extends AbstractList<Passenger>{
     constructor(passengers: PassengerObject[]) {
-        this.data = []
+        super()
         for (let passenger of passengers) {
             this.data.push(new Passenger(
                 passenger.id,
@@ -373,15 +416,6 @@ class PassengerList {
                 passenger.is_display ?? true
             ))
         }
-    }
-
-    getById(id: string): Passenger | null {
-        for (let passenger of this.data) {
-            if (passenger.id === id) {
-                return passenger
-            }
-        }
-        return null
     }
 }
 
@@ -565,12 +599,12 @@ interface Background {
 }
 
 class Floor {
-    public id: number
+    public id: string
     public dialog_scene: DialogScene
     public plot_id_list: string[]
     public background: Background
 
-    constructor(id: number, scene: DialogSceneObject, background: Background | null = null) {
+    constructor(id: string, scene: DialogSceneObject, background: Background | null = null) {
         this.id = id
         this.dialog_scene = new DialogScene(scene.id, scene.blocks)
         this.plot_id_list = []
@@ -579,16 +613,15 @@ class Floor {
 }
 
 interface FloorObject {
-    id: number
+    id: string
     dialog_scene: DialogSceneObject
     background?: Background
 }
 
-class FloorList {
-    public data: Floor[]
+class FloorList extends AbstractList<Floor>{
 
     constructor(floors: FloorObject[]) {
-        this.data = []
+        super()
         for (let floor of floors) {
             this.data.push(new Floor(
                 floor.id,
@@ -596,15 +629,6 @@ class FloorList {
                 floor.background ?? null
             ))
         }
-    }
-
-    getById(id: number): Floor | null {
-        for (let thread of this.data) {
-            if (thread.id === id) {
-                return thread
-            }
-        }
-        return null
     }
 }
 
@@ -662,10 +686,15 @@ class PlotThread {
     }
 }
 
-class PlotThreadList {
-    public data: PlotThread[]
+interface PlotThreadObject {
+
+}
+
+class PlotThreadList extends AbstractList<PlotThread>{
 
     constructor(data: PlotThread[]) {
+        // TODO: PlotThreadObject
+        super()
         this.data = data
     }
 
@@ -1099,14 +1128,14 @@ class LanguageDisplay {
         switch (this.direction) {
             case 'right':
                 // this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length
-                this.next_index = (this.index - 1 + game_lang_list.length()) % game_lang_list.length()
+                this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength()
                 // qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 qs('#lang-name-next>.lang-name-text').textContent = ''
                 break
             case 'left':
                 // this.next_index = (this.index + 1) % this.language_list.length
-                this.next_index = (this.index + 1) % game_lang_list.length()
+                this.next_index = (this.index + 1) % game_lang_list.getLength()
                 qs('#lang-name-prev>.lang-name-text').textContent = ''
                 // qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
@@ -1127,14 +1156,14 @@ class LanguageDisplay {
         switch (this.direction) {
             case 'right':
                 // this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length
-                this.next_index = (this.index - 1 + game_lang_list.length()) % game_lang_list.length()
+                this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength()
                 // qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 qs('#lang-name-next>.lang-name-text').textContent = ''
                 break
             case 'left':
                 // this.next_index = (this.index + 1) % this.language_list.length
-                this.next_index = (this.index + 1) % game_lang_list.length()
+                this.next_index = (this.index + 1) % game_lang_list.getLength()
                 qs('#lang-name-prev>.lang-name-text').textContent = ''
                 // qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
@@ -1148,9 +1177,9 @@ class LanguageDisplay {
         }
         this.stop()
     }
-    set(key: string | symbol) {
+    set(id: string) {
         // let i = this.language_list.indexOf(key)
-        let i = game_lang_list.indexOfKey(key)
+        let i = game_lang_list.indexOfKey(id)
         if (i === -1) {
             i = 0
         }
@@ -1160,18 +1189,72 @@ class LanguageDisplay {
         qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name
         qs('#lang-name-next>.lang-name-text').textContent = ''
     }
-    get(): string | symbol {
+    get(): string {
         // return this.language_list[this.index]
-        return game_lang_list.getItemByIndex(this.index).key
+        return game_lang_list.getItemByIndex(this.index).id
     }
 }
 
-class PassengerDisplay {
+abstract class ListDisplay<T> {
+    public data: string[]
 
+    constructor(id_list: string[] = []) {
+        this.data = id_list
+    }
+
+    add(id: string) {
+        if (this.data.indexOf(id) !== -1) {
+            return
+        }
+        this.data.push(id)
+    }
+
+    remove(id: string) {
+        let index = this.data.indexOf(id)
+        if (index !== -1) {
+            return
+        }
+        this.data.splice(index, 1)
+    }
+
+    abstract getByIndex(index: number): T | null
+
+    abstract render(): void
 }
 
-class TaskDisplay {
+// TODO: render
+class PassengerDisplay extends ListDisplay<Passenger> {
+    constructor(id_list: string[] = []) {
+        super(id_list)
+    }
 
+    getByIndex(index: number): Passenger | null {
+        if (index < 0 || index >= this.data.length) {
+            return null
+        }
+        return game_passenger_list.getById(this.data[index])
+    }
+
+    render() {
+
+    }
+}
+
+class TaskDisplay extends ListDisplay<GameTask> {
+    constructor(id_list: string[] = []) {
+        super(id_list)
+    }
+
+    getByIndex(index: number): GameTask | null {
+        if (index < 0 || index >= this.data.length) {
+            return null
+        }
+        return game_task_list.getById(this.data[index])
+    }
+
+    render() {
+
+    }
 }
 
 interface UiStringDictRaw {
@@ -1192,9 +1275,9 @@ interface SaveRootType {
 }
 
 class Game {
-    public lang: string | symbol
+    public lang: string
     public floor_buttons: FloorButton[][]
-    public cur_floor_id: number
+    public cur_floor: number
     public max_floor: number
     public min_floor: number
     public is_lifting: boolean
@@ -1216,7 +1299,7 @@ class Game {
     constructor() {
         this.lang = game_default_lang
         this.floor_buttons = []
-        this.cur_floor_id = 1
+        this.cur_floor = 1
         this.max_floor = 6
         this.min_floor = -2
         this.is_lifting = false
@@ -1273,7 +1356,7 @@ class Game {
     // }
     renderFloor() {
         let dialog_container = qs('#dialog-container')
-        let floor = game_floor_list.getById(this.cur_floor_id)
+        let floor = game_floor_list.getById(this.cur_floor.toString())
         clearChildren(dialog_container)
         if (floor !== null) {
             let dialog_item = document.createElement('div')
@@ -1293,19 +1376,19 @@ class Game {
             this.cur_dest > this.max_floor ||
             this.cur_dest < this.min_floor ||
             this.cur_dest === 0 ||
-            this.cur_dest === this.cur_floor_id)
+            this.cur_dest === this.cur_floor)
     }
     calcLiftDirection() {
         if (this.pending_queue.length() > 0) {
             if (this.pending_queue.length() === 1) {
                 let dest = this.pending_queue.getMax().floor
-                this.lift_direction = dest > this.cur_floor_id ? 'up' : (dest < this.cur_floor_id ? 'down' : '')
+                this.lift_direction = dest > this.cur_floor ? 'up' : (dest < this.cur_floor ? 'down' : '')
                 this.cur_dest = dest
             } else {
                 let top = this.pending_queue.getMax()
                 let bottom = this.pending_queue.getMin()
-                if (top.floor >= this.cur_floor_id &&
-                    this.cur_floor_id >= bottom.floor) {
+                if (top.floor >= this.cur_floor &&
+                    this.cur_floor >= bottom.floor) {
                     if (top.index <= bottom.index) {
                         this.lift_direction = 'up'
                         this.cur_dest = top.floor
@@ -1313,10 +1396,10 @@ class Game {
                         this.lift_direction = 'down'
                         this.cur_dest = bottom.floor
                     }
-                } else if (bottom.floor >= this.cur_floor_id) {
+                } else if (bottom.floor >= this.cur_floor) {
                     this.lift_direction = 'up'
                     this.cur_dest = top.floor
-                } else if (top.floor <= this.cur_floor_id) {
+                } else if (top.floor <= this.cur_floor) {
                     this.lift_direction = 'down'
                     this.cur_dest = bottom.floor
                 } else {
@@ -1330,7 +1413,7 @@ class Game {
         }
     }
     checkPassingFloor(): boolean {
-        return this.pending_queue.indexOf(this.cur_floor_id) !== -1
+        return this.pending_queue.indexOf(this.cur_floor) !== -1
     }
     async lift() {
         if (this.lift_direction !== 'up' && this.lift_direction !== 'down') {
@@ -1341,30 +1424,30 @@ class Game {
         lift_loop: do {
             switch (this.lift_direction) {
                 case 'up':
-                    this.cur_floor_id = Math.min(this.cur_floor_id + 1 === 0 ? 1 : this.cur_floor_id + 1, this.max_floor)
+                    this.cur_floor = Math.min(this.cur_floor + 1 === 0 ? 1 : this.cur_floor + 1, this.max_floor)
                     break
                 case 'down':
-                    this.cur_floor_id = Math.max(this.cur_floor_id - 1 === 0 ? -1 : this.cur_floor_id - 1, this.min_floor)
+                    this.cur_floor = Math.max(this.cur_floor - 1 === 0 ? -1 : this.cur_floor - 1, this.min_floor)
                     break
                 default:
                     break lift_loop
             }
-            this.floor_display.updateNumber(this.cur_floor_id)
-            if (this.cur_floor_id === this.cur_dest) {
+            this.floor_display.updateNumber(this.cur_floor)
+            if (this.cur_floor === this.cur_dest) {
                 break
             }
-            if (this.cur_floor_id >= this.max_floor || this.cur_floor_id <= this.min_floor) {
+            if (this.cur_floor >= this.max_floor || this.cur_floor <= this.min_floor) {
                 break
             }
             await sleep(this.lift_interval)
         } while (!this.checkPassingFloor())
-        this.pending_queue.remove(this.cur_floor_id)
-        removeElementClass(qs(`.number-button[index="${this.cur_floor_id}"]`), 'button-selected')
+        this.pending_queue.remove(this.cur_floor)
+        removeElementClass(qs(`.number-button[index="${this.cur_floor}"]`), 'button-selected')
         this.is_lifting = false
         this.floor_display.updateIcon('none')
     }
     checkBeforeLift() {
-        this.pending_queue.remove(this.cur_floor_id)
+        this.pending_queue.remove(this.cur_floor)
         this.calcLiftDirection()
         if (this.isLiftable()) {
             this.lift()
@@ -1465,7 +1548,7 @@ const binding_buttons: BindingButton[] = [
         func: (event) => {
             let class_name = 'button-selected'
             let index = parseInt((event.target as HTMLElement).getAttribute('index')!)
-            if (!game.is_lifting && index === game.cur_floor_id) {
+            if (!game.is_lifting && index === game.cur_floor) {
                 return
             }
             if ((event.target as HTMLElement).classList.contains(class_name)) {
@@ -1597,10 +1680,14 @@ document.addEventListener('DOMContentLoaded', () => {
     game.debug()
 })
 
-const game_lang_list = new LanguageList([{ key: 'zh_cn', name: '中文' }, { key: 'en', name: 'EN' }])
+const game_lang_list = new LanguageList([
+    { id: 'zh_cn', name: '中文' },
+    { id: 'en', name: 'EN' }
+])
 const game_default_lang = 'zh_cn'
 const game_signature_list = new SignatureList([])
 const game_action_list = new GameActionList([])
+const game_task_list = new GameTaskList([])
 const game_passenger_list = new PassengerList([])
 const game_plot_thread_list = new PlotThreadList([])
 const game_floor_list = new FloorList([])
