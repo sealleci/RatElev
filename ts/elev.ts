@@ -3,7 +3,7 @@
  * branch select
  */
 
-function sleep(time: number): Promise<unknown> {
+function sleep(time: number) {
     return new Promise((resolve) => {
         setTimeout(resolve, time)
     })
@@ -441,15 +441,15 @@ enum DialogBlockItemType {
 
 abstract class DialogBlockItem {
     public id: string
-    public type: DialogBlockItemType
+    public item_type: DialogBlockItemType
 
     constructor(id: string, type: DialogBlockItemType = DialogBlockItemType.DIALOG) {
         this.id = id
-        this.type = type
+        this.item_type = type
     }
 
     isSelect(): boolean {
-        return this.type === DialogBlockItemType.SELECT
+        return this.item_type === DialogBlockItemType.SELECT
     }
 }
 
@@ -723,9 +723,14 @@ class PlotThreadList extends AbstractList<PlotThread>{
     }
 }
 
+enum DotColor {
+    DARK = 'dark',
+    LIGHT = 'light'
+}
+
 class WaitingDotsAnimation {
     private dots: HTMLElement[]
-    private orders: number[][]
+    private orders: DotColor[][]
     private step: number
     private timer: number | undefined
     private interval: number
@@ -737,7 +742,7 @@ class WaitingDotsAnimation {
         this.timer = undefined
         this.interval = 250
     }
-    generateOrders(num: number): number[][] {
+    generateOrders(num: number): DotColor[][] {
         if (num === 0) {
             return []
         }
@@ -758,21 +763,20 @@ class WaitingDotsAnimation {
                     }
                 }
                 if (is_all_same) {
-                    // order[0] = order[0] === 0 ? 1 : 0
                     order[0] ^= 1
                 }
                 res.push(order)
             }
         }
-        return res
+        return res.map(i => i.map(j => j === 0 ? DotColor.DARK : DotColor.LIGHT))
     }
-    toggle(dot: HTMLElement, type: number) {
-        switch (type) {
-            case 0: // dark
+    toggle(dot: HTMLElement, color_type: DotColor) {
+        switch (color_type) {
+            case DotColor.DARK:
                 removeElementClass(dot, 'light-dot')
                 addElementClass(dot, 'dark-dot')
                 break
-            case 1: // light
+            case DotColor.LIGHT:
                 removeElementClass(dot, 'dark-dot')
                 addElementClass(dot, 'light-dot')
                 break
@@ -810,10 +814,15 @@ class FloorButton {
     }
 }
 
+enum DoorDir {
+    OPEN = 'open',
+    CLOSE = 'close'
+}
+
 class Door {
     public is_moving: boolean
     public is_open: boolean
-    private direction: string
+    private direction: DoorDir
     private timer_count: number
     private sleep_time: number
     private l_part: HTMLElement
@@ -823,7 +832,7 @@ class Door {
     constructor() {
         this.is_moving = false
         this.is_open = false
-        this.direction = 'open'
+        this.direction = DoorDir.OPEN
         this.timer_count = 20
         this.sleep_time = 6
         this.l_part = {} as HTMLElement
@@ -833,14 +842,14 @@ class Door {
     stop() {
         this.is_moving = false
         switch (this.direction) {
-            case 'open':
+            case DoorDir.OPEN:
                 this.is_open = true
-                this.direction = 'close'
+                this.direction = DoorDir.CLOSE
                 qs('#elev-door').style.display = 'none'
                 break
-            case 'close':
+            case DoorDir.CLOSE:
                 this.is_open = false
-                this.direction = 'open'
+                this.direction = DoorDir.OPEN
                 break
             default:
                 break
@@ -850,11 +859,11 @@ class Door {
         const l_part_left = parseInt(this.l_part.style.left)
         const r_part_left = parseInt(this.r_part.style.left)
         switch (this.direction) {
-            case 'open':
+            case DoorDir.OPEN:
                 this.l_part.style.left = `${l_part_left - this.step}px`
                 this.r_part.style.left = `${r_part_left + this.step}px`
                 break
-            case 'close':
+            case DoorDir.CLOSE:
                 this.l_part.style.left = `${l_part_left + this.step}px`
                 this.r_part.style.left = `${r_part_left - this.step}px`
                 break
@@ -862,7 +871,7 @@ class Door {
                 break
         }
     }
-    syncStart(direction: string) {
+    syncStart(direction: DoorDir) {
         this.direction = direction
         this.is_moving = true
         this.l_part = qs('#elev-door>div:nth-child(1)')
@@ -874,7 +883,7 @@ class Door {
         }
         this.stop()
     }
-    async start(direction: string) {
+    async start(direction: DoorDir) {
         this.direction = direction
         this.is_moving = true
         this.l_part = qs('#elev-door>div:nth-child(1)')
@@ -968,9 +977,9 @@ class FloorDisplay {
     /**
      * 
      * @param state 
-     * string, including: "up", "down", "none" and "both".
+     * string
      */
-    updateIcon(state: string) {
+    updateIcon(state: "up" | "down" | "none" | "both") {
         if (this.up_icon !== {} as HTMLElement) {
             this.up_icon = qs('#up-icon')
         }
@@ -1007,10 +1016,15 @@ class FloorDisplay {
     }
 }
 
+enum SavePanelDir {
+    OPEN = 'open',
+    CLOSE = 'close'
+}
+
 class SavePanel {
     public is_moving: boolean
     public is_open: boolean
-    private direction: string
+    private direction: SavePanelDir
     private timer_count: number
     private sleep_time: number
     private cover: HTMLElement
@@ -1019,7 +1033,7 @@ class SavePanel {
     constructor() {
         this.is_moving = false
         this.is_open = false
-        this.direction = 'open'
+        this.direction = SavePanelDir.OPEN
         this.timer_count = 15
         this.sleep_time = 5
         this.cover = {} as HTMLElement
@@ -1028,13 +1042,13 @@ class SavePanel {
     stop() {
         this.is_moving = false
         switch (this.direction) {
-            case 'open':
+            case SavePanelDir.OPEN:
                 this.is_open = true
-                this.direction = 'close'
+                this.direction = SavePanelDir.CLOSE
                 break
-            case 'close':
+            case SavePanelDir.CLOSE:
                 this.is_open = false
-                this.direction = 'open'
+                this.direction = SavePanelDir.OPEN
                 break
             default:
                 break
@@ -1043,17 +1057,17 @@ class SavePanel {
     move() {
         const cover_top = parseInt(this.cover.style.top)
         switch (this.direction) {
-            case 'open':
+            case SavePanelDir.OPEN:
                 this.cover.style.top = `${cover_top - this.step}px`
                 break
-            case 'close':
+            case SavePanelDir.CLOSE:
                 this.cover.style.top = `${cover_top + this.step}px`
                 break
             default:
                 break
         }
     }
-    syncStart(direction: string) {
+    syncStart(direction: SavePanelDir) {
         this.direction = direction
         this.is_moving = true
         this.cover = qs('#save-panel-cover')
@@ -1063,7 +1077,7 @@ class SavePanel {
         }
         this.stop()
     }
-    async start(direction: string) {
+    async start(direction: SavePanelDir) {
         this.direction = direction
         this.is_moving = true
         this.cover = qs('#save-panel-cover')
@@ -1076,11 +1090,17 @@ class SavePanel {
     }
 }
 
+enum LangBtnDir {
+    LEFT = 'left',
+    RIGHT = 'right',
+    NONE = 'none'
+}
+
 class LanguageDisplay {
     private index: number
     private next_index: number
     public is_moving: boolean
-    private direction: string
+    private direction: LangBtnDir
     private angle: number
     private ori_angle: number
     private timer_count: number
@@ -1093,7 +1113,7 @@ class LanguageDisplay {
         this.index = 0
         this.next_index = 0
         this.is_moving = false
-        this.direction = ''
+        this.direction = LangBtnDir.NONE
         this.angle = 90
         this.ori_angle = -45
         this.timer_count = 15
@@ -1104,7 +1124,7 @@ class LanguageDisplay {
     }
     stop() {
         this.is_moving = false
-        this.direction = ''
+        this.direction = LangBtnDir.NONE
         this.counter = 0
         this.index = this.next_index
         qs('#lang-name-prev>.lang-name-text').textContent = ''
@@ -1115,31 +1135,35 @@ class LanguageDisplay {
     move() {
         this.counter += 1
         switch (this.direction) {
-            case 'left':
+            case LangBtnDir.LEFT:
                 this.spin.style.transform = `rotate(${this.ori_angle - this.step * this.counter}deg)`
                 break
-            case 'right':
+            case LangBtnDir.RIGHT:
                 this.spin.style.transform = `rotate(${this.ori_angle + this.step * this.counter}deg)`
+                break
+            case LangBtnDir.NONE:
                 break
             default:
                 break
         }
     }
-    syncStart(direction: string) {
+    syncStart(direction: LangBtnDir) {
         this.direction = direction
         this.is_moving = true
         this.spin = qs('#lang-name-body')
         this.step = Math.ceil(this.angle / this.timer_count)
         switch (this.direction) {
-            case 'right':
+            case LangBtnDir.LEFT:
+                this.next_index = (this.index + 1) % game_lang_list.getLength()
+                qs('#lang-name-prev>.lang-name-text').textContent = ''
+                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
+                break
+            case LangBtnDir.RIGHT:
                 this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength()
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 qs('#lang-name-next>.lang-name-text').textContent = ''
                 break
-            case 'left':
-                this.next_index = (this.index + 1) % game_lang_list.getLength()
-                qs('#lang-name-prev>.lang-name-text').textContent = ''
-                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
+            case LangBtnDir.NONE:
                 break
             default:
                 break
@@ -1149,21 +1173,23 @@ class LanguageDisplay {
         }
         this.stop()
     }
-    async start(direction: string) {
+    async start(direction: LangBtnDir) {
         this.direction = direction
         this.is_moving = true
         this.spin = qs('#lang-name-body')
         this.step = Math.ceil(this.angle / this.timer_count)
         switch (this.direction) {
-            case 'right':
+            case LangBtnDir.LEFT:
+                this.next_index = (this.index + 1) % game_lang_list.getLength()
+                qs('#lang-name-prev>.lang-name-text').textContent = ''
+                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
+                break
+            case LangBtnDir.RIGHT:
                 this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength()
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 qs('#lang-name-next>.lang-name-text').textContent = ''
                 break
-            case 'left':
-                this.next_index = (this.index + 1) % game_lang_list.getLength()
-                qs('#lang-name-prev>.lang-name-text').textContent = ''
-                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
+            case LangBtnDir.NONE:
                 break
             default:
                 break
@@ -1362,8 +1388,8 @@ class Game {
         this.passenger_display = new PassengerDisplay([])
         this.task_display = new TaskDisplay([])
     }
-    getTFIcon(type: boolean): HTMLElement {
-        if (type) {
+    getTFIcon(icon_type: boolean): HTMLElement {
+        if (icon_type) {
             let icon_t = document.createElement('div')
             icon_t.classList.add('save-opration-succ')
             for (let _ in range(2)) {
@@ -1537,20 +1563,23 @@ class Game {
         data = data
         return false
     }
-    updateUIStrings() {
+    switchUiLanguge() {
         for (let e of Array.from(qsa('.l10n-text-ui'))) {
             e.textContent = this.ui_string[e.getAttribute('lkey')!].get(this.lang)
         }
+    }
+    switchTextLanguage() {
+
     }
     initialize() {
         this.createFloorButtons()
         // this.renderFloor()
         this.language_display.set(this.lang)
-        this.updateUIStrings()
+        this.switchUiLanguge()
     }
     async debug() {
         this.renderFloor()
-        this.door.syncStart('open');
+        this.door.syncStart(DoorDir.OPEN);
         // this.save_panel.syncStart('open')
         // qs('.number-button[index="5"]').click()
         qs('#sheng-lue-dots').style.display = 'none'
@@ -1561,11 +1590,19 @@ class Game {
     }
 }
 
-
 interface BindingButton {
     selector: string
     is_single: boolean
     func(this: HTMLElement, event: MouseEvent): void
+}
+
+async function clickSwitchLangButton(dir: LangBtnDir) {
+    if (!game.language_display.is_moving) {
+        await game.language_display.start(dir)
+        game.lang = game.language_display.get()
+        game.switchUiLanguge()
+        game.switchTextLanguage()
+    }
 }
 
 const binding_buttons: BindingButton[] = [
@@ -1600,7 +1637,7 @@ const binding_buttons: BindingButton[] = [
             if (!game.is_lifting &&
                 game.door.is_open &&
                 !game.door.is_moving) {
-                await game.door.start('close')
+                await game.door.start(DoorDir.CLOSE)
                 game.checkBeforeLift()
             }
         }
@@ -1613,7 +1650,7 @@ const binding_buttons: BindingButton[] = [
                 !game.door.is_open &&
                 !game.door.is_moving) {
                 game.renderFloor()
-                await game.door.start('open')
+                await game.door.start(DoorDir.OPEN)
             }
         }
     },
@@ -1628,9 +1665,9 @@ const binding_buttons: BindingButton[] = [
         func: async () => {
             if (!game.save_panel.is_moving) {
                 if (game.save_panel.is_open) {
-                    game.save_panel.start('close')
+                    game.save_panel.start(SavePanelDir.CLOSE)
                 } else {
-                    game.save_panel.start('open')
+                    game.save_panel.start(SavePanelDir.OPEN)
                 }
             }
         }
@@ -1643,6 +1680,9 @@ const binding_buttons: BindingButton[] = [
             clearChildren(qs('#save-import-button'))
             const res = <SaveRootType>JSON.parse(game.serializate())
             qs('#save-export-button').appendChild(game.getTFIcon(res.status))
+            if (res.status) {
+                (qs('#save-text-area') as HTMLTextAreaElement).value = JSON.stringify(res.data)
+            }
         }
     },
     {
@@ -1666,11 +1706,14 @@ const binding_buttons: BindingButton[] = [
         selector: '#lang-switch-button-l',
         is_single: true,
         func: async () => {
-            if (!game.language_display.is_moving) {
-                await game.language_display.start('left')
-                game.lang = game.language_display.get()
-                game.updateUIStrings()
-            }
+            await clickSwitchLangButton(LangBtnDir.LEFT)
+            // if (!game.language_display.is_moving) {
+            //     await game.language_display.start('left')
+            //     game.lang = game.language_display.get()
+            //     game.switchUiLanguge()
+            //     game.switchTextLanguage()
+
+            // }
         }
 
     },
@@ -1678,11 +1721,13 @@ const binding_buttons: BindingButton[] = [
         selector: '#lang-switch-button-r',
         is_single: true,
         func: async () => {
-            if (!game.language_display.is_moving) {
-                await game.language_display.start('right')
-                game.lang = game.language_display.get()
-                game.updateUIStrings()
-            }
+            await clickSwitchLangButton(LangBtnDir.RIGHT)
+            // if (!game.language_display.is_moving) {
+            //     await game.language_display.start('right')
+            //     game.lang = game.language_display.get()
+            //     game.switchUiLanguge()
+            //     game.switchTextLanguage()
+            // }
         }
 
     }

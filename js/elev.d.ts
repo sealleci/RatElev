@@ -131,7 +131,7 @@ declare enum DialogBlockItemType {
 }
 declare abstract class DialogBlockItem {
     id: string;
-    type: DialogBlockItemType;
+    item_type: DialogBlockItemType;
     constructor(id: string, type?: DialogBlockItemType);
     isSelect(): boolean;
 }
@@ -237,6 +237,10 @@ declare class PlotThreadList extends AbstractList<PlotThread> {
     constructor(data: PlotThread[]);
     getById(id: string): PlotThread | null;
 }
+declare enum DotColor {
+    DARK = "dark",
+    LIGHT = "light"
+}
 declare class WaitingDotsAnimation {
     private dots;
     private orders;
@@ -244,8 +248,8 @@ declare class WaitingDotsAnimation {
     private timer;
     private interval;
     constructor();
-    generateOrders(num: number): number[][];
-    toggle(dot: HTMLElement, type: number): void;
+    generateOrders(num: number): DotColor[][];
+    toggle(dot: HTMLElement, color_type: DotColor): void;
     start(): void;
     stop(): void;
 }
@@ -255,6 +259,10 @@ declare class FloorButton {
     available: boolean;
     selected: boolean;
     constructor(index: number, text: string, available: boolean);
+}
+declare enum DoorDir {
+    OPEN = "open",
+    CLOSE = "close"
 }
 declare class Door {
     is_moving: boolean;
@@ -268,8 +276,8 @@ declare class Door {
     constructor();
     stop(): void;
     move(): void;
-    syncStart(direction: string): void;
-    start(direction: string): Promise<void>;
+    syncStart(direction: DoorDir): void;
+    start(direction: DoorDir): Promise<void>;
 }
 interface PendingFloor {
     index: number;
@@ -291,8 +299,12 @@ declare class FloorDisplay {
     private up_icon;
     private down_icon;
     constructor();
-    updateIcon(state: string): void;
+    updateIcon(state: "up" | "down" | "none" | "both"): void;
     updateNumber(num: number): void;
+}
+declare enum SavePanelDir {
+    OPEN = "open",
+    CLOSE = "close"
 }
 declare class SavePanel {
     is_moving: boolean;
@@ -305,8 +317,13 @@ declare class SavePanel {
     constructor();
     stop(): void;
     move(): void;
-    syncStart(direction: string): void;
-    start(direction: string): Promise<void>;
+    syncStart(direction: SavePanelDir): void;
+    start(direction: SavePanelDir): Promise<void>;
+}
+declare enum LangBtnDir {
+    LEFT = "left",
+    RIGHT = "right",
+    NONE = "none"
 }
 declare class LanguageDisplay {
     private index;
@@ -323,8 +340,8 @@ declare class LanguageDisplay {
     constructor();
     stop(): void;
     move(): void;
-    syncStart(direction: string): void;
-    start(direction: string): Promise<void>;
+    syncStart(direction: LangBtnDir): void;
+    start(direction: LangBtnDir): Promise<void>;
     set(id: string): void;
     get(): string;
 }
@@ -381,7 +398,7 @@ declare class Game {
     passenger_display: PassengerDisplay;
     task_display: TaskDisplay;
     constructor();
-    getTFIcon(type: boolean): HTMLElement;
+    getTFIcon(icon_type: boolean): HTMLElement;
     renderFloor(): void;
     isLiftable(): boolean;
     calcLiftDirection(): void;
@@ -393,7 +410,8 @@ declare class Game {
     decipher(): void;
     serializate(): string;
     deserializate(data: string): boolean;
-    updateUIStrings(): void;
+    switchUiLanguge(): void;
+    switchTextLanguage(): void;
     initialize(): void;
     debug(): Promise<void>;
 }
@@ -402,6 +420,7 @@ interface BindingButton {
     is_single: boolean;
     func(this: HTMLElement, event: MouseEvent): void;
 }
+declare function clickSwitchLangButton(dir: LangBtnDir): Promise<void>;
 declare const binding_buttons: BindingButton[];
 declare function bindButtonFunctions(): void;
 declare const game_lang_list: LanguageList;

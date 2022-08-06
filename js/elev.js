@@ -324,10 +324,10 @@ var DialogBlockItemType;
 class DialogBlockItem {
     constructor(id, type = DialogBlockItemType.DIALOG) {
         this.id = id;
-        this.type = type;
+        this.item_type = type;
     }
     isSelect() {
-        return this.type === DialogBlockItemType.SELECT;
+        return this.item_type === DialogBlockItemType.SELECT;
     }
 }
 class SelectOption {
@@ -489,6 +489,11 @@ class PlotThreadList extends AbstractList {
         return null;
     }
 }
+var DotColor;
+(function (DotColor) {
+    DotColor["DARK"] = "dark";
+    DotColor["LIGHT"] = "light";
+})(DotColor || (DotColor = {}));
 class WaitingDotsAnimation {
     constructor() {
         this.dots = [];
@@ -524,15 +529,15 @@ class WaitingDotsAnimation {
                 res.push(order);
             }
         }
-        return res;
+        return res.map(i => i.map(j => j === 0 ? DotColor.DARK : DotColor.LIGHT));
     }
-    toggle(dot, type) {
-        switch (type) {
-            case 0:
+    toggle(dot, color_type) {
+        switch (color_type) {
+            case DotColor.DARK:
                 removeElementClass(dot, 'light-dot');
                 addElementClass(dot, 'dark-dot');
                 break;
-            case 1:
+            case DotColor.LIGHT:
                 removeElementClass(dot, 'dark-dot');
                 addElementClass(dot, 'light-dot');
                 break;
@@ -563,11 +568,16 @@ class FloorButton {
         this.selected = false;
     }
 }
+var DoorDir;
+(function (DoorDir) {
+    DoorDir["OPEN"] = "open";
+    DoorDir["CLOSE"] = "close";
+})(DoorDir || (DoorDir = {}));
 class Door {
     constructor() {
         this.is_moving = false;
         this.is_open = false;
-        this.direction = 'open';
+        this.direction = DoorDir.OPEN;
         this.timer_count = 20;
         this.sleep_time = 6;
         this.l_part = {};
@@ -577,14 +587,14 @@ class Door {
     stop() {
         this.is_moving = false;
         switch (this.direction) {
-            case 'open':
+            case DoorDir.OPEN:
                 this.is_open = true;
-                this.direction = 'close';
+                this.direction = DoorDir.CLOSE;
                 qs('#elev-door').style.display = 'none';
                 break;
-            case 'close':
+            case DoorDir.CLOSE:
                 this.is_open = false;
-                this.direction = 'open';
+                this.direction = DoorDir.OPEN;
                 break;
             default:
                 break;
@@ -594,11 +604,11 @@ class Door {
         const l_part_left = parseInt(this.l_part.style.left);
         const r_part_left = parseInt(this.r_part.style.left);
         switch (this.direction) {
-            case 'open':
+            case DoorDir.OPEN:
                 this.l_part.style.left = `${l_part_left - this.step}px`;
                 this.r_part.style.left = `${r_part_left + this.step}px`;
                 break;
-            case 'close':
+            case DoorDir.CLOSE:
                 this.l_part.style.left = `${l_part_left + this.step}px`;
                 this.r_part.style.left = `${r_part_left - this.step}px`;
                 break;
@@ -734,11 +744,16 @@ class FloorDisplay {
         this.display_number.textContent = num.toString();
     }
 }
+var SavePanelDir;
+(function (SavePanelDir) {
+    SavePanelDir["OPEN"] = "open";
+    SavePanelDir["CLOSE"] = "close";
+})(SavePanelDir || (SavePanelDir = {}));
 class SavePanel {
     constructor() {
         this.is_moving = false;
         this.is_open = false;
-        this.direction = 'open';
+        this.direction = SavePanelDir.OPEN;
         this.timer_count = 15;
         this.sleep_time = 5;
         this.cover = {};
@@ -747,13 +762,13 @@ class SavePanel {
     stop() {
         this.is_moving = false;
         switch (this.direction) {
-            case 'open':
+            case SavePanelDir.OPEN:
                 this.is_open = true;
-                this.direction = 'close';
+                this.direction = SavePanelDir.CLOSE;
                 break;
-            case 'close':
+            case SavePanelDir.CLOSE:
                 this.is_open = false;
-                this.direction = 'open';
+                this.direction = SavePanelDir.OPEN;
                 break;
             default:
                 break;
@@ -762,10 +777,10 @@ class SavePanel {
     move() {
         const cover_top = parseInt(this.cover.style.top);
         switch (this.direction) {
-            case 'open':
+            case SavePanelDir.OPEN:
                 this.cover.style.top = `${cover_top - this.step}px`;
                 break;
-            case 'close':
+            case SavePanelDir.CLOSE:
                 this.cover.style.top = `${cover_top + this.step}px`;
                 break;
             default:
@@ -796,12 +811,18 @@ class SavePanel {
         });
     }
 }
+var LangBtnDir;
+(function (LangBtnDir) {
+    LangBtnDir["LEFT"] = "left";
+    LangBtnDir["RIGHT"] = "right";
+    LangBtnDir["NONE"] = "none";
+})(LangBtnDir || (LangBtnDir = {}));
 class LanguageDisplay {
     constructor() {
         this.index = 0;
         this.next_index = 0;
         this.is_moving = false;
-        this.direction = '';
+        this.direction = LangBtnDir.NONE;
         this.angle = 90;
         this.ori_angle = -45;
         this.timer_count = 15;
@@ -812,7 +833,7 @@ class LanguageDisplay {
     }
     stop() {
         this.is_moving = false;
-        this.direction = '';
+        this.direction = LangBtnDir.NONE;
         this.counter = 0;
         this.index = this.next_index;
         qs('#lang-name-prev>.lang-name-text').textContent = '';
@@ -823,11 +844,13 @@ class LanguageDisplay {
     move() {
         this.counter += 1;
         switch (this.direction) {
-            case 'left':
+            case LangBtnDir.LEFT:
                 this.spin.style.transform = `rotate(${this.ori_angle - this.step * this.counter}deg)`;
                 break;
-            case 'right':
+            case LangBtnDir.RIGHT:
                 this.spin.style.transform = `rotate(${this.ori_angle + this.step * this.counter}deg)`;
+                break;
+            case LangBtnDir.NONE:
                 break;
             default:
                 break;
@@ -839,15 +862,17 @@ class LanguageDisplay {
         this.spin = qs('#lang-name-body');
         this.step = Math.ceil(this.angle / this.timer_count);
         switch (this.direction) {
-            case 'right':
+            case LangBtnDir.LEFT:
+                this.next_index = (this.index + 1) % game_lang_list.getLength();
+                qs('#lang-name-prev>.lang-name-text').textContent = '';
+                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
+                break;
+            case LangBtnDir.RIGHT:
                 this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                 qs('#lang-name-next>.lang-name-text').textContent = '';
                 break;
-            case 'left':
-                this.next_index = (this.index + 1) % game_lang_list.getLength();
-                qs('#lang-name-prev>.lang-name-text').textContent = '';
-                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
+            case LangBtnDir.NONE:
                 break;
             default:
                 break;
@@ -864,15 +889,17 @@ class LanguageDisplay {
             this.spin = qs('#lang-name-body');
             this.step = Math.ceil(this.angle / this.timer_count);
             switch (this.direction) {
-                case 'right':
+                case LangBtnDir.LEFT:
+                    this.next_index = (this.index + 1) % game_lang_list.getLength();
+                    qs('#lang-name-prev>.lang-name-text').textContent = '';
+                    qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
+                    break;
+                case LangBtnDir.RIGHT:
                     this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
                     qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                     qs('#lang-name-next>.lang-name-text').textContent = '';
                     break;
-                case 'left':
-                    this.next_index = (this.index + 1) % game_lang_list.getLength();
-                    qs('#lang-name-prev>.lang-name-text').textContent = '';
-                    qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
+                case LangBtnDir.NONE:
                     break;
                 default:
                     break;
@@ -1013,8 +1040,8 @@ class Game {
         this.passenger_display = new PassengerDisplay([]);
         this.task_display = new TaskDisplay([]);
     }
-    getTFIcon(type) {
-        if (type) {
+    getTFIcon(icon_type) {
+        if (icon_type) {
             let icon_t = document.createElement('div');
             icon_t.classList.add('save-opration-succ');
             for (let _ in range(2)) {
@@ -1184,20 +1211,22 @@ class Game {
         data = data;
         return false;
     }
-    updateUIStrings() {
+    switchUiLanguge() {
         for (let e of Array.from(qsa('.l10n-text-ui'))) {
             e.textContent = this.ui_string[e.getAttribute('lkey')].get(this.lang);
         }
     }
+    switchTextLanguage() {
+    }
     initialize() {
         this.createFloorButtons();
         this.language_display.set(this.lang);
-        this.updateUIStrings();
+        this.switchUiLanguge();
     }
     debug() {
         return __awaiter(this, void 0, void 0, function* () {
             this.renderFloor();
-            this.door.syncStart('open');
+            this.door.syncStart(DoorDir.OPEN);
             qs('#sheng-lue-dots').style.display = 'none';
             qs('#go-on-button-row').style.display = 'none';
             qs('#options-row').style.display = 'none';
@@ -1205,6 +1234,16 @@ class Game {
             this.dots_animation.start();
         });
     }
+}
+function clickSwitchLangButton(dir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!game.language_display.is_moving) {
+            yield game.language_display.start(dir);
+            game.lang = game.language_display.get();
+            game.switchUiLanguge();
+            game.switchTextLanguage();
+        }
+    });
 }
 const binding_buttons = [
     {
@@ -1239,7 +1278,7 @@ const binding_buttons = [
             if (!game.is_lifting &&
                 game.door.is_open &&
                 !game.door.is_moving) {
-                yield game.door.start('close');
+                yield game.door.start(DoorDir.CLOSE);
                 game.checkBeforeLift();
             }
         })
@@ -1252,7 +1291,7 @@ const binding_buttons = [
                 !game.door.is_open &&
                 !game.door.is_moving) {
                 game.renderFloor();
-                yield game.door.start('open');
+                yield game.door.start(DoorDir.OPEN);
             }
         })
     },
@@ -1267,10 +1306,10 @@ const binding_buttons = [
         func: () => __awaiter(void 0, void 0, void 0, function* () {
             if (!game.save_panel.is_moving) {
                 if (game.save_panel.is_open) {
-                    game.save_panel.start('close');
+                    game.save_panel.start(SavePanelDir.CLOSE);
                 }
                 else {
-                    game.save_panel.start('open');
+                    game.save_panel.start(SavePanelDir.OPEN);
                 }
             }
         })
@@ -1283,6 +1322,9 @@ const binding_buttons = [
             clearChildren(qs('#save-import-button'));
             const res = JSON.parse(game.serializate());
             qs('#save-export-button').appendChild(game.getTFIcon(res.status));
+            if (res.status) {
+                qs('#save-text-area').value = JSON.stringify(res.data);
+            }
         }
     },
     {
@@ -1306,22 +1348,14 @@ const binding_buttons = [
         selector: '#lang-switch-button-l',
         is_single: true,
         func: () => __awaiter(void 0, void 0, void 0, function* () {
-            if (!game.language_display.is_moving) {
-                yield game.language_display.start('left');
-                game.lang = game.language_display.get();
-                game.updateUIStrings();
-            }
+            yield clickSwitchLangButton(LangBtnDir.LEFT);
         })
     },
     {
         selector: '#lang-switch-button-r',
         is_single: true,
         func: () => __awaiter(void 0, void 0, void 0, function* () {
-            if (!game.language_display.is_moving) {
-                yield game.language_display.start('right');
-                game.lang = game.language_display.get();
-                game.updateUIStrings();
-            }
+            yield clickSwitchLangButton(LangBtnDir.RIGHT);
         })
     }
 ];
