@@ -134,7 +134,7 @@ class LanguageList extends AbstractList {
         if (!this.isKeyIn(id)) {
             return '';
         }
-        let item = this.getItemByKey(id);
+        const item = this.getItemByKey(id);
         return item !== null ? item.name : '';
     }
 }
@@ -188,12 +188,17 @@ class SignatureList extends AbstractList {
             this.data.push(new Signature(signature.id, signature.status));
         }
     }
+    initialize() {
+        for (let signarue of this.data) {
+            signarue.deactiviate();
+        }
+    }
     isActiveById(id) {
-        let signature = this.getById(id);
+        const signature = this.getById(id);
         return signature !== null && signature.status === SignatureStatus.ACTIVE;
     }
     activateById(id) {
-        let signature = this.getById(id);
+        const signature = this.getById(id);
         if (signature !== null) {
             signature.activiate();
             return true;
@@ -201,7 +206,7 @@ class SignatureList extends AbstractList {
         return false;
     }
     deactivateById(id) {
-        let signature = this.getById(id);
+        const signature = this.getById(id);
         if (signature !== null) {
             signature.deactiviate();
             return true;
@@ -245,15 +250,15 @@ class GameTaskList extends AbstractList {
         }
     }
     isActiveById(id) {
-        let task = this.getById(id);
+        const task = this.getById(id);
         return task !== null && task.status === TaskStatus.ACTIVE;
     }
     isFinishedById(id) {
-        let task = this.getById(id);
+        const task = this.getById(id);
         return task !== null && task.status === TaskStatus.FINISHED;
     }
     activateById(id) {
-        let task = this.getById(id);
+        const task = this.getById(id);
         if (task !== null) {
             task.activiate();
             return true;
@@ -261,7 +266,7 @@ class GameTaskList extends AbstractList {
         return false;
     }
     deactivateById(id) {
-        let task = this.getById(id);
+        const task = this.getById(id);
         if (task !== null) {
             task.deactiviate();
             return true;
@@ -446,7 +451,7 @@ class PlotThread {
             return true;
         }
         for (let id of this.in_signatures) {
-            let signature = game_signature_list.getById(id);
+            const signature = game_signature_list.getById(id);
             if (signature !== null) {
                 if (!signature.isActive()) {
                     return false;
@@ -460,7 +465,7 @@ class PlotThread {
             return true;
         }
         for (let id of this.signatures) {
-            let signature = game_signature_list.getById(id);
+            const signature = game_signature_list.getById(id);
             if (signature !== null) {
                 if (!signature.isActive()) {
                     return false;
@@ -586,8 +591,8 @@ class Door {
         }
     }
     move() {
-        let l_part_left = parseInt(this.l_part.style.left);
-        let r_part_left = parseInt(this.r_part.style.left);
+        const l_part_left = parseInt(this.l_part.style.left);
+        const r_part_left = parseInt(this.r_part.style.left);
         switch (this.direction) {
             case 'open':
                 this.l_part.style.left = `${l_part_left - this.step}px`;
@@ -656,7 +661,7 @@ class PendingQueue {
         }
     }
     remove(value) {
-        let i = this.indexOf(value);
+        const i = this.indexOf(value);
         if (i !== -1) {
             this.data.splice(i, 1);
             this.sort();
@@ -700,7 +705,7 @@ class FloorDisplay {
         if (this.down_icon !== {}) {
             this.down_icon = qs('#down-icon');
         }
-        let class_name = 'invisible';
+        const class_name = 'invisible';
         switch (state) {
             case 'up':
                 removeElementClass(this.up_icon, class_name);
@@ -755,7 +760,7 @@ class SavePanel {
         }
     }
     move() {
-        let cover_top = parseInt(this.cover.style.top);
+        const cover_top = parseInt(this.cover.style.top);
         switch (this.direction) {
             case 'open':
                 this.cover.style.top = `${cover_top - this.step}px`;
@@ -904,7 +909,7 @@ class ListDisplay {
         this.data.push(id);
     }
     remove(id) {
-        let index = this.data.indexOf(id);
+        const index = this.data.indexOf(id);
         if (index !== -1) {
             return;
         }
@@ -918,7 +923,7 @@ class PassengerDisplay extends ListDisplay {
     getValidCount() {
         let count = 0;
         for (let id of this.data) {
-            let psg = game_passenger_list.getById(id);
+            const psg = game_passenger_list.getById(id);
             if (psg !== null && psg.is_diaplay) {
                 count += 1;
             }
@@ -937,7 +942,7 @@ class PassengerDisplay extends ListDisplay {
         psg_count.innerHTML = this.getValidCount().toString();
         clearChildren(psg_list);
         for (let id of this.data) {
-            let psg = game_passenger_list.getById(id);
+            const psg = game_passenger_list.getById(id);
             if (psg !== null && psg.is_diaplay) {
                 let div = document.createElement('div');
                 div.classList.add('passenger-item');
@@ -954,7 +959,7 @@ class TaskDisplay extends ListDisplay {
     getValidCount() {
         let count = 0;
         for (let id of this.data) {
-            let tsk = game_task_list.getById(id);
+            const tsk = game_task_list.getById(id);
             if (tsk !== null && (tsk.isActive() || tsk.isFinished())) {
                 count += 1;
             }
@@ -971,7 +976,7 @@ class TaskDisplay extends ListDisplay {
         const tsk_container = qs('#task-container');
         clearChildren(tsk_container);
         for (let id of this.data) {
-            let tsk = game_task_list.getById(id);
+            const tsk = game_task_list.getById(id);
             if (tsk !== null && (tsk.isActive() || tsk.isFinished)) {
                 let div = document.createElement('div');
                 div.classList.add('task-item');
@@ -1027,8 +1032,8 @@ class Game {
         }
     }
     renderFloor() {
-        let dialog_container = qs('#dialog-container');
-        let floor = game_floor_list.getById(this.cur_floor.toString());
+        const dialog_container = qs('#dialog-container');
+        const floor = game_floor_list.getById(this.cur_floor.toString());
         clearChildren(dialog_container);
         if (floor !== null) {
             let dialog_item = document.createElement('div');
@@ -1051,13 +1056,13 @@ class Game {
     calcLiftDirection() {
         if (this.pending_queue.length() > 0) {
             if (this.pending_queue.length() === 1) {
-                let dest = this.pending_queue.getMax().floor;
+                const dest = this.pending_queue.getMax().floor;
                 this.lift_direction = dest > this.cur_floor ? 'up' : (dest < this.cur_floor ? 'down' : '');
                 this.cur_dest = dest;
             }
             else {
-                let top = this.pending_queue.getMax();
-                let bottom = this.pending_queue.getMin();
+                const top = this.pending_queue.getMax();
+                const bottom = this.pending_queue.getMin();
                 if (top.floor >= this.cur_floor &&
                     this.cur_floor >= bottom.floor) {
                     if (top.index <= bottom.index) {
@@ -1132,8 +1137,8 @@ class Game {
         }
     }
     createFloorButtons() {
-        let func_button_row = qs('#func-buttons');
-        let button_container = qs('#floor-buttons');
+        const func_button_row = qs('#func-buttons');
+        const button_container = qs('#floor-buttons');
         for (let child of Array.from(button_container.children)) {
             if (child.id !== 'func-buttons') {
                 button_container.removeChild(child);
@@ -1186,12 +1191,12 @@ class Game {
     }
     initialize() {
         this.createFloorButtons();
-        this.renderFloor();
         this.language_display.set(this.lang);
         this.updateUIStrings();
     }
     debug() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.renderFloor();
             this.door.syncStart('open');
             qs('#sheng-lue-dots').style.display = 'none';
             qs('#go-on-button-row').style.display = 'none';
@@ -1206,8 +1211,8 @@ const binding_buttons = [
         selector: '.number-button',
         is_single: false,
         func: (event) => {
-            let class_name = 'button-selected';
-            let index = parseInt(event.target.getAttribute('index'));
+            const class_name = 'button-selected';
+            const index = parseInt(event.target.getAttribute('index'));
             if (!game.is_lifting && index === game.cur_floor) {
                 return;
             }
@@ -1276,7 +1281,7 @@ const binding_buttons = [
         func: () => {
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
-            let res = JSON.parse(game.serializate());
+            const res = JSON.parse(game.serializate());
             qs('#save-export-button').appendChild(game.getTFIcon(res.status));
         }
     },
@@ -1286,7 +1291,7 @@ const binding_buttons = [
         func: () => {
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
-            let text = qs('#save-text-area').value;
+            const text = qs('#save-text-area').value;
             qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate(text)));
         }
     },
@@ -1352,7 +1357,7 @@ const game_ui_string_raw = {
     'PERSON_NUM': { zh_cn: '人数', en: 'Persons' },
     'COPY': { zh_cn: '复制', en: 'COPY' },
     'IMPORT': { zh_cn: '导入', en: 'IMP' },
-    'EXPORT': { zh_cn: '导出', en: 'EXP' },
+    'EXPORT': { zh_cn: '导出', en: 'EXP' }
 };
 const game = new Game();
 //# sourceMappingURL=elev.js.map

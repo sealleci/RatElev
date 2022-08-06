@@ -57,6 +57,7 @@ interface SignatureObject {
 }
 declare class SignatureList extends AbstractList<Signature> {
     constructor(signatures: SignatureObject[]);
+    initialize(): void;
     isActiveById(id: string): boolean;
     activateById(id: string): boolean;
     deactivateById(id: string): boolean;

@@ -1,6 +1,6 @@
-/*TODO: main
- *存档功能
- *分支选项
+/* TODO: main
+ * save function
+ * branch select
  */
 
 function sleep(time: number): Promise<unknown> {
@@ -154,7 +154,7 @@ class LanguageList extends AbstractList<NaturalLanguage>{
         if (!this.isKeyIn(id)) {
             return ''
         }
-        let item = this.getItemByKey(id)
+        const item = this.getItemByKey(id)
         return item !== null ? item.name : ''
     }
 }
@@ -207,6 +207,9 @@ class Signature {
         this.status = SignatureStatus.ACTIVE
     }
 
+    /**
+     * Set the status of this signature to deactive.
+     */
     deactiviate() {
         this.status = SignatureStatus.DEACTIVE
     }
@@ -236,13 +239,19 @@ class SignatureList extends AbstractList<Signature>{
         }
     }
 
+    initialize() {
+        for (let signarue of this.data) {
+            signarue.deactiviate()
+        }
+    }
+
     isActiveById(id: string): boolean {
-        let signature = this.getById(id)
+        const signature = this.getById(id)
         return signature !== null && signature.status === SignatureStatus.ACTIVE
     }
 
     activateById(id: string): boolean {
-        let signature = this.getById(id)
+        const signature = this.getById(id)
         if (signature !== null) {
             signature.activiate()
             return true
@@ -251,7 +260,7 @@ class SignatureList extends AbstractList<Signature>{
     }
 
     deactivateById(id: string): boolean {
-        let signature = this.getById(id)
+        const signature = this.getById(id)
         if (signature !== null) {
             signature.deactiviate()
             return true
@@ -318,17 +327,17 @@ class GameTaskList extends AbstractList<GameTask>{
     }
 
     isActiveById(id: string): boolean {
-        let task = this.getById(id)
+        const task = this.getById(id)
         return task !== null && task.status === TaskStatus.ACTIVE
     }
 
     isFinishedById(id: string): boolean {
-        let task = this.getById(id)
+        const task = this.getById(id)
         return task !== null && task.status === TaskStatus.FINISHED
     }
 
     activateById(id: string): boolean {
-        let task = this.getById(id)
+        const task = this.getById(id)
         if (task !== null) {
             task.activiate()
             return true
@@ -337,7 +346,7 @@ class GameTaskList extends AbstractList<GameTask>{
     }
 
     deactivateById(id: string): boolean {
-        let task = this.getById(id)
+        const task = this.getById(id)
         if (task !== null) {
             task.deactiviate()
             return true
@@ -666,7 +675,7 @@ class PlotThread {
             return true
         }
         for (let id of this.in_signatures) {
-            let signature = game_signature_list.getById(id)
+            const signature = game_signature_list.getById(id)
             if (signature !== null) {
                 if (!signature.isActive()) {
                     return false
@@ -681,7 +690,7 @@ class PlotThread {
             return true
         }
         for (let id of this.signatures) {
-            let signature = game_signature_list.getById(id)
+            const signature = game_signature_list.getById(id)
             if (signature !== null) {
                 if (!signature.isActive()) {
                     return false
@@ -759,11 +768,11 @@ class WaitingDotsAnimation {
     }
     toggle(dot: HTMLElement, type: number) {
         switch (type) {
-            case 0: //dark
+            case 0: // dark
                 removeElementClass(dot, 'light-dot')
                 addElementClass(dot, 'dark-dot')
                 break
-            case 1: //light
+            case 1: // light
                 removeElementClass(dot, 'dark-dot')
                 addElementClass(dot, 'light-dot')
                 break
@@ -838,8 +847,8 @@ class Door {
         }
     }
     move() {
-        let l_part_left = parseInt(this.l_part.style.left)
-        let r_part_left = parseInt(this.r_part.style.left)
+        const l_part_left = parseInt(this.l_part.style.left)
+        const r_part_left = parseInt(this.r_part.style.left)
         switch (this.direction) {
             case 'open':
                 this.l_part.style.left = `${l_part_left - this.step}px`
@@ -914,7 +923,7 @@ class PendingQueue {
         }
     }
     remove(value: number) {
-        let i = this.indexOf(value)
+        const i = this.indexOf(value)
         if (i !== -1) {
             this.data.splice(i, 1)
             this.sort()
@@ -956,14 +965,19 @@ class FloorDisplay {
         this.up_icon = {} as HTMLElement
         this.down_icon = {} as HTMLElement
     }
-    updateIcon(state: string) { // up down none both
+    /**
+     * 
+     * @param state 
+     * string, including: "up", "down", "none" and "both".
+     */
+    updateIcon(state: string) {
         if (this.up_icon !== {} as HTMLElement) {
             this.up_icon = qs('#up-icon')
         }
         if (this.down_icon !== {} as HTMLElement) {
             this.down_icon = qs('#down-icon')
         }
-        let class_name = 'invisible'
+        const class_name = 'invisible'
         switch (state) {
             case 'up':
                 removeElementClass(this.up_icon, class_name)
@@ -1027,7 +1041,7 @@ class SavePanel {
         }
     }
     move() {
-        let cover_top = parseInt(this.cover.style.top)
+        const cover_top = parseInt(this.cover.style.top)
         switch (this.direction) {
             case 'open':
                 this.cover.style.top = `${cover_top - this.step}px`
@@ -1063,7 +1077,6 @@ class SavePanel {
 }
 
 class LanguageDisplay {
-    // private language_list: string[]
     private index: number
     private next_index: number
     public is_moving: boolean
@@ -1077,7 +1090,6 @@ class LanguageDisplay {
     private counter: number
 
     constructor() {
-        // this.language_list = ['zh_cn', 'en']
         this.index = 0
         this.next_index = 0
         this.is_moving = false
@@ -1090,25 +1102,12 @@ class LanguageDisplay {
         this.step = 0
         this.counter = 0
     }
-    // getLanguageName(key: string): string {
-    //     switch (key) {
-    //         case 'zh_cn':
-    //             return '中文'
-    //         case 'en':
-    //             return 'EN'
-    //         case 'ru':
-    //             return 'РУ'
-    //         default:
-    //             return ''
-    //     }
-    // }
     stop() {
         this.is_moving = false
         this.direction = ''
         this.counter = 0
         this.index = this.next_index
         qs('#lang-name-prev>.lang-name-text').textContent = ''
-        // qs('#lang-name-cur>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.index])
         qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name
         qs('#lang-name-next>.lang-name-text').textContent = ''
         this.spin.style.transform = `rotate(${this.ori_angle}deg)`
@@ -1133,17 +1132,13 @@ class LanguageDisplay {
         this.step = Math.ceil(this.angle / this.timer_count)
         switch (this.direction) {
             case 'right':
-                // this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length
                 this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength()
-                // qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 qs('#lang-name-next>.lang-name-text').textContent = ''
                 break
             case 'left':
-                // this.next_index = (this.index + 1) % this.language_list.length
                 this.next_index = (this.index + 1) % game_lang_list.getLength()
                 qs('#lang-name-prev>.lang-name-text').textContent = ''
-                // qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 break
             default:
@@ -1161,17 +1156,13 @@ class LanguageDisplay {
         this.step = Math.ceil(this.angle / this.timer_count)
         switch (this.direction) {
             case 'right':
-                // this.next_index = (this.index - 1 + this.language_list.length) % this.language_list.length
                 this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength()
-                // qs('#lang-name-prev>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 qs('#lang-name-next>.lang-name-text').textContent = ''
                 break
             case 'left':
-                // this.next_index = (this.index + 1) % this.language_list.length
                 this.next_index = (this.index + 1) % game_lang_list.getLength()
                 qs('#lang-name-prev>.lang-name-text').textContent = ''
-                // qs('#lang-name-next>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.next_index])
                 qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name
                 break
             default:
@@ -1184,19 +1175,16 @@ class LanguageDisplay {
         this.stop()
     }
     set(id: string) {
-        // let i = this.language_list.indexOf(key)
         let i = game_lang_list.indexOfKey(id)
         if (i === -1) {
             i = 0
         }
         this.index = i
         qs('#lang-name-prev>.lang-name-text').textContent = ''
-        // qs('#lang-name-cur>.lang-name-text').textContent = this.getLanguageName(this.language_list[this.index])
         qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name
         qs('#lang-name-next>.lang-name-text').textContent = ''
     }
     get(): string {
-        // return this.language_list[this.index]
         return game_lang_list.getItemByIndex(this.index).id
     }
 }
@@ -1216,7 +1204,7 @@ abstract class ListDisplay<T> {
     }
 
     remove(id: string) {
-        let index = this.data.indexOf(id)
+        const index = this.data.indexOf(id)
         if (index !== -1) {
             return
         }
@@ -1230,7 +1218,6 @@ abstract class ListDisplay<T> {
     abstract render(lang: string): void
 }
 
-// TODO: render
 class PassengerDisplay extends ListDisplay<Passenger> {
     constructor(id_list: string[] = []) {
         super(id_list)
@@ -1239,7 +1226,7 @@ class PassengerDisplay extends ListDisplay<Passenger> {
     getValidCount(): number {
         let count = 0
         for (let id of this.data) {
-            let psg = game_passenger_list.getById(id)
+            const psg = game_passenger_list.getById(id)
             if (psg !== null && psg.is_diaplay) {
                 count += 1
             }
@@ -1262,7 +1249,7 @@ class PassengerDisplay extends ListDisplay<Passenger> {
 
         clearChildren(psg_list)
         for (let id of this.data) {
-            let psg = game_passenger_list.getById(id)
+            const psg = game_passenger_list.getById(id)
             if (psg !== null && psg.is_diaplay) {
                 let div = document.createElement('div')
                 div.classList.add('passenger-item')
@@ -1281,7 +1268,7 @@ class TaskDisplay extends ListDisplay<GameTask> {
     getValidCount(): number {
         let count = 0
         for (let id of this.data) {
-            let tsk = game_task_list.getById(id)
+            const tsk = game_task_list.getById(id)
             if (tsk !== null && (tsk.isActive() || tsk.isFinished())) {
                 count += 1
             }
@@ -1301,7 +1288,7 @@ class TaskDisplay extends ListDisplay<GameTask> {
 
         clearChildren(tsk_container)
         for (let id of this.data) {
-            let tsk = game_task_list.getById(id)
+            const tsk = game_task_list.getById(id)
             if (tsk !== null && (tsk.isActive() || tsk.isFinished)) {
                 let div = document.createElement('div')
                 div.classList.add('task-item')
@@ -1344,12 +1331,10 @@ class Game {
     public cur_dest: number
     public pending_queue: PendingQueue
     public door: Door
-    // public floors: Floor[]
     public dots_animation: WaitingDotsAnimation
     public floor_display: FloorDisplay
     public save_panel: SavePanel
     public language_display: LanguageDisplay
-    // public characters: Passenger[]
     public ui_string: UiStringDict
     public passenger_display: PassengerDisplay
     public task_display: TaskDisplay
@@ -1362,23 +1347,14 @@ class Game {
         this.min_floor = -2
         this.is_lifting = false
         this.lift_interval = 200
-        this.lift_direction = '' //up down
+        this.lift_direction = '' // up down
         this.cur_dest = 0
         this.pending_queue = new PendingQueue()
         this.door = new Door()
-        // this.floors = []
-        // for (let i of range(-2, 6)) {
-        //     if (i !== 0) {
-        //         this.floors.push(new Floor(i))
-        //     }
-        // }
         this.dots_animation = new WaitingDotsAnimation()
         this.floor_display = new FloorDisplay()
         this.save_panel = new SavePanel()
         this.language_display = new LanguageDisplay()
-        // this.characters = [
-        //     new Passenger("0", new L10nText({ zh_cn: '我', en: 'Me' }), '', '', new L10nText({ zh_cn: '我', en: 'ME' }))
-        // ]
         this.ui_string = {}
         for (let key of Object.keys(game_ui_string_raw)) {
             this.ui_string[key] = new L10nText(game_ui_string_raw[key])
@@ -1404,17 +1380,9 @@ class Game {
             return icon_f
         }
     }
-    // getFloorById(id: number): Floor | null {
-    //     for (let floor of this.floors) {
-    //         if (floor.id === id) {
-    //             return floor
-    //         }
-    //     }
-    //     return null
-    // }
     renderFloor() {
-        let dialog_container = qs('#dialog-container')
-        let floor = game_floor_list.getById(this.cur_floor.toString())
+        const dialog_container = qs('#dialog-container')
+        const floor = game_floor_list.getById(this.cur_floor.toString())
         clearChildren(dialog_container)
         if (floor !== null) {
             let dialog_item = document.createElement('div')
@@ -1439,12 +1407,12 @@ class Game {
     calcLiftDirection() {
         if (this.pending_queue.length() > 0) {
             if (this.pending_queue.length() === 1) {
-                let dest = this.pending_queue.getMax().floor
+                const dest = this.pending_queue.getMax().floor
                 this.lift_direction = dest > this.cur_floor ? 'up' : (dest < this.cur_floor ? 'down' : '')
                 this.cur_dest = dest
             } else {
-                let top = this.pending_queue.getMax()
-                let bottom = this.pending_queue.getMin()
+                const top = this.pending_queue.getMax()
+                const bottom = this.pending_queue.getMin()
                 if (top.floor >= this.cur_floor &&
                     this.cur_floor >= bottom.floor) {
                     if (top.index <= bottom.index) {
@@ -1512,15 +1480,15 @@ class Game {
         }
     }
     createFloorButtons() {
-        let func_button_row = qs('#func-buttons')
-        let button_container = qs('#floor-buttons')
+        const func_button_row = qs('#func-buttons')
+        const button_container = qs('#floor-buttons')
         for (let child of Array.from(button_container.children)) {
             if (child.id !== 'func-buttons') {
                 button_container.removeChild(child)
             }
         }
         this.floor_buttons = []
-        for (let i = this.max_floor - 1; i >= 1; i -= 2) { //地上部分
+        for (let i = this.max_floor - 1; i >= 1; i -= 2) { // on ground
             this.floor_buttons.push([
                 new FloorButton(i, i.toString(), true),
                 new FloorButton(
@@ -1530,7 +1498,7 @@ class Game {
                 )
             ])
         }
-        for (let i = -2; i >= this.min_floor; i -= 2) { //地下部分
+        for (let i = -2; i >= this.min_floor; i -= 2) { // under ground
             this.floor_buttons.push([
                 new FloorButton(i + 1, (i + 1).toString(), true),
                 new FloorButton(
@@ -1576,11 +1544,12 @@ class Game {
     }
     initialize() {
         this.createFloorButtons()
-        this.renderFloor()
+        // this.renderFloor()
         this.language_display.set(this.lang)
         this.updateUIStrings()
     }
     async debug() {
+        this.renderFloor()
         this.door.syncStart('open');
         // this.save_panel.syncStart('open')
         // qs('.number-button[index="5"]').click()
@@ -1604,8 +1573,8 @@ const binding_buttons: BindingButton[] = [
         selector: '.number-button',
         is_single: false,
         func: (event) => {
-            let class_name = 'button-selected'
-            let index = parseInt((event.target as HTMLElement).getAttribute('index')!)
+            const class_name = 'button-selected'
+            const index = parseInt((event.target as HTMLElement).getAttribute('index')!)
             if (!game.is_lifting && index === game.cur_floor) {
                 return
             }
@@ -1672,7 +1641,7 @@ const binding_buttons: BindingButton[] = [
         func: () => {
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
-            let res = <SaveRootType>JSON.parse(game.serializate())
+            const res = <SaveRootType>JSON.parse(game.serializate())
             qs('#save-export-button').appendChild(game.getTFIcon(res.status))
         }
     },
@@ -1682,7 +1651,7 @@ const binding_buttons: BindingButton[] = [
         func: () => {
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
-            let text = (qs('#save-text-area') as HTMLTextAreaElement).value
+            const text = (qs('#save-text-area') as HTMLTextAreaElement).value
             qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate(text)))
         }
     },
@@ -1753,6 +1722,6 @@ const game_ui_string_raw: UiStringDictRaw = {
     'PERSON_NUM': { zh_cn: '人数', en: 'Persons' },
     'COPY': { zh_cn: '复制', en: 'COPY' },
     'IMPORT': { zh_cn: '导入', en: 'IMP' },
-    'EXPORT': { zh_cn: '导出', en: 'EXP' },
+    'EXPORT': { zh_cn: '导出', en: 'EXP' }
 }
 const game = new Game()
