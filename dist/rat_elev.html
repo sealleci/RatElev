@@ -1593,6 +1593,12 @@ class GameTask {
         this.description = description;
         this.status = status !== null && status !== void 0 ? status : TaskStatus.DEACTIVE;
     }
+    isActive() {
+        return this.status === TaskStatus.ACTIVE;
+    }
+    isFinished() {
+        return this.status === TaskStatus.FINISHED;
+    }
     activiate() {
         this.status = TaskStatus.ACTIVE;
     }
@@ -2281,18 +2287,51 @@ class PassengerDisplay extends ListDisplay {
     constructor(id_list = []) {
         super(id_list);
     }
+    getValidCount() {
+        let count = 0;
+        for (let id of this.data) {
+            let psg = game_passenger_list.getById(id);
+            if (psg !== null && psg.is_diaplay) {
+                count += 1;
+            }
+        }
+        return count;
+    }
     getByIndex(index) {
         if (index < 0 || index >= this.data.length) {
             return null;
         }
         return game_passenger_list.getById(this.data[index]);
     }
-    render() {
+    render(lang) {
+        const psg_list = qs('#passenger-list');
+        const psg_count = qs('#passenger-display-count');
+        psg_count.innerHTML = this.getValidCount().toString();
+        clearChildren(psg_list);
+        for (let id of this.data) {
+            let psg = game_passenger_list.getById(id);
+            if (psg !== null && psg.is_diaplay) {
+                let div = document.createElement('div');
+                div.classList.add('passenger-item');
+                div.innerHTML = psg.name.get(lang);
+                psg_list.appendChild(div);
+            }
+        }
     }
 }
 class TaskDisplay extends ListDisplay {
     constructor(id_list = []) {
         super(id_list);
+    }
+    getValidCount() {
+        let count = 0;
+        for (let id of this.data) {
+            let tsk = game_task_list.getById(id);
+            if (tsk !== null && (tsk.isActive() || tsk.isFinished())) {
+                count += 1;
+            }
+        }
+        return count;
     }
     getByIndex(index) {
         if (index < 0 || index >= this.data.length) {
@@ -2300,7 +2339,21 @@ class TaskDisplay extends ListDisplay {
         }
         return game_task_list.getById(this.data[index]);
     }
-    render() {
+    render(lang) {
+        const tsk_container = qs('#task-container');
+        clearChildren(tsk_container);
+        for (let id of this.data) {
+            let tsk = game_task_list.getById(id);
+            if (tsk !== null && (tsk.isActive() || tsk.isFinished)) {
+                let div = document.createElement('div');
+                div.classList.add('task-item');
+                if (tsk.isFinished()) {
+                    div.classList.add('task-done-item');
+                }
+                div.innerHTML = tsk.description.get(lang);
+                tsk_container.appendChild(div);
+            }
+        }
     }
 }
 class Game {
@@ -2324,8 +2377,8 @@ class Game {
         for (let key of Object.keys(game_ui_string_raw)) {
             this.ui_string[key] = new L10nText(game_ui_string_raw[key]);
         }
-        this.passenger_display = new PassengerDisplay();
-        this.task_display = new TaskDisplay();
+        this.passenger_display = new PassengerDisplay([]);
+        this.task_display = new TaskDisplay([]);
     }
     getTFIcon(type) {
         if (type) {

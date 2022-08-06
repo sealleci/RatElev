@@ -71,6 +71,8 @@ declare class GameTask {
     description: L10nText;
     status: TaskStatus;
     constructor(id: string, description: L10nText, status?: TaskStatus | undefined);
+    isActive(): boolean;
+    isFinished(): boolean;
     activiate(): void;
     finish(): void;
     deactiviate(): void;
@@ -330,18 +332,21 @@ declare abstract class ListDisplay<T> {
     constructor(id_list?: string[]);
     add(id: string): void;
     remove(id: string): void;
+    abstract getValidCount(): number;
     abstract getByIndex(index: number): T | null;
-    abstract render(): void;
+    abstract render(lang: string): void;
 }
 declare class PassengerDisplay extends ListDisplay<Passenger> {
     constructor(id_list?: string[]);
+    getValidCount(): number;
     getByIndex(index: number): Passenger | null;
-    render(): void;
+    render(lang: string): void;
 }
 declare class TaskDisplay extends ListDisplay<GameTask> {
     constructor(id_list?: string[]);
+    getValidCount(): number;
     getByIndex(index: number): GameTask | null;
-    render(): void;
+    render(lang: string): void;
 }
 interface UiStringDictRaw {
     [key: string]: L10nTextDict;

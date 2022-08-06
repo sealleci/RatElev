@@ -1,4 +1,4 @@
-/*TODO:
+/*TODO: main
  *存档功能
  *分支选项
  */
@@ -159,9 +159,6 @@ class LanguageList extends AbstractList<NaturalLanguage>{
     }
 }
 
-
-
-//TODO: replace any
 interface L10nTextDict {
     [key: string]: string
 }
@@ -278,6 +275,15 @@ class GameTask {
         this.id = id
         this.description = description
         this.status = status ?? TaskStatus.DEACTIVE
+    }
+
+    isActive(): boolean {
+        return this.status === TaskStatus.ACTIVE
+    }
+
+    isFinished(): boolean {
+        return this.status === TaskStatus.FINISHED
+
     }
 
     activiate() {
@@ -1217,15 +1223,28 @@ abstract class ListDisplay<T> {
         this.data.splice(index, 1)
     }
 
+    abstract getValidCount(): number
+
     abstract getByIndex(index: number): T | null
 
-    abstract render(): void
+    abstract render(lang: string): void
 }
 
 // TODO: render
 class PassengerDisplay extends ListDisplay<Passenger> {
     constructor(id_list: string[] = []) {
         super(id_list)
+    }
+
+    getValidCount(): number {
+        let count = 0
+        for (let id of this.data) {
+            let psg = game_passenger_list.getById(id)
+            if (psg !== null && psg.is_diaplay) {
+                count += 1
+            }
+        }
+        return count
     }
 
     getByIndex(index: number): Passenger | null {
@@ -1235,14 +1254,39 @@ class PassengerDisplay extends ListDisplay<Passenger> {
         return game_passenger_list.getById(this.data[index])
     }
 
-    render() {
+    render(lang: string) {
+        const psg_list = qs('#passenger-list')
+        const psg_count = qs('#passenger-display-count')
 
+        psg_count.innerHTML = this.getValidCount().toString()
+
+        clearChildren(psg_list)
+        for (let id of this.data) {
+            let psg = game_passenger_list.getById(id)
+            if (psg !== null && psg.is_diaplay) {
+                let div = document.createElement('div')
+                div.classList.add('passenger-item')
+                div.innerHTML = psg.name.get(lang)
+                psg_list.appendChild(div)
+            }
+        }
     }
 }
 
 class TaskDisplay extends ListDisplay<GameTask> {
     constructor(id_list: string[] = []) {
         super(id_list)
+    }
+
+    getValidCount(): number {
+        let count = 0
+        for (let id of this.data) {
+            let tsk = game_task_list.getById(id)
+            if (tsk !== null && (tsk.isActive() || tsk.isFinished())) {
+                count += 1
+            }
+        }
+        return count
     }
 
     getByIndex(index: number): GameTask | null {
@@ -1252,8 +1296,22 @@ class TaskDisplay extends ListDisplay<GameTask> {
         return game_task_list.getById(this.data[index])
     }
 
-    render() {
+    render(lang: string) {
+        const tsk_container = qs('#task-container')
 
+        clearChildren(tsk_container)
+        for (let id of this.data) {
+            let tsk = game_task_list.getById(id)
+            if (tsk !== null && (tsk.isActive() || tsk.isFinished)) {
+                let div = document.createElement('div')
+                div.classList.add('task-item')
+                if (tsk.isFinished()) {
+                    div.classList.add('task-done-item')
+                }
+                div.innerHTML = tsk.description.get(lang)
+                tsk_container.appendChild(div)
+            }
+        }
     }
 }
 
@@ -1325,8 +1383,8 @@ class Game {
         for (let key of Object.keys(game_ui_string_raw)) {
             this.ui_string[key] = new L10nText(game_ui_string_raw[key])
         }
-        this.passenger_display = new PassengerDisplay()
-        this.task_display = new TaskDisplay()
+        this.passenger_display = new PassengerDisplay([])
+        this.task_display = new TaskDisplay([])
     }
     getTFIcon(type: boolean): HTMLElement {
         if (type) {
