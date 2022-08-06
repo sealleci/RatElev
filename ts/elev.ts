@@ -967,8 +967,8 @@ class PendingQueue {
 enum FloorLiftStatus {
     UP = 'up',
     DOWN = 'down',
-    BOTH = 'both',
-    NONE = 'none'
+    NONE = 'none',
+    BOTH = 'both'
 }
 
 class FloorDisplay {

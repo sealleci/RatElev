@@ -297,8 +297,8 @@ declare class PendingQueue {
 declare enum FloorLiftStatus {
     UP = "up",
     DOWN = "down",
-    BOTH = "both",
-    NONE = "none"
+    NONE = "none",
+    BOTH = "both"
 }
 declare class FloorDisplay {
     private display_number;

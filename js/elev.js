@@ -706,8 +706,8 @@ var FloorLiftStatus;
 (function (FloorLiftStatus) {
     FloorLiftStatus["UP"] = "up";
     FloorLiftStatus["DOWN"] = "down";
-    FloorLiftStatus["BOTH"] = "both";
     FloorLiftStatus["NONE"] = "none";
+    FloorLiftStatus["BOTH"] = "both";
 })(FloorLiftStatus || (FloorLiftStatus = {}));
 class FloorDisplay {
     constructor() {
