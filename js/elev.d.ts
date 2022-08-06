@@ -294,12 +294,18 @@ declare class PendingQueue {
     getMax(): PendingFloor;
     getMin(): PendingFloor;
 }
+declare enum FloorLiftStatus {
+    UP = "up",
+    DOWN = "down",
+    BOTH = "both",
+    NONE = "none"
+}
 declare class FloorDisplay {
     private display_number;
     private up_icon;
     private down_icon;
     constructor();
-    updateIcon(state: "up" | "down" | "none" | "both"): void;
+    updateIcon(status: FloorLiftStatus): void;
     updateNumber(num: number): void;
 }
 declare enum SavePanelDir {

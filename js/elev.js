@@ -702,13 +702,20 @@ class PendingQueue {
         return this.data[k];
     }
 }
+var FloorLiftStatus;
+(function (FloorLiftStatus) {
+    FloorLiftStatus["UP"] = "up";
+    FloorLiftStatus["DOWN"] = "down";
+    FloorLiftStatus["BOTH"] = "both";
+    FloorLiftStatus["NONE"] = "none";
+})(FloorLiftStatus || (FloorLiftStatus = {}));
 class FloorDisplay {
     constructor() {
         this.display_number = {};
         this.up_icon = {};
         this.down_icon = {};
     }
-    updateIcon(state) {
+    updateIcon(status) {
         if (this.up_icon !== {}) {
             this.up_icon = qs('#up-icon');
         }
@@ -716,20 +723,20 @@ class FloorDisplay {
             this.down_icon = qs('#down-icon');
         }
         const class_name = 'invisible';
-        switch (state) {
-            case 'up':
+        switch (status) {
+            case FloorLiftStatus.UP:
                 removeElementClass(this.up_icon, class_name);
                 addElementClass(this.down_icon, class_name);
                 break;
-            case 'down':
+            case FloorLiftStatus.DOWN:
                 removeElementClass(this.down_icon, class_name);
                 addElementClass(this.up_icon, class_name);
                 break;
-            case 'none':
+            case FloorLiftStatus.NONE:
                 addElementClass(this.up_icon, class_name);
                 addElementClass(this.down_icon, class_name);
                 break;
-            case 'both':
+            case FloorLiftStatus.BOTH:
                 removeElementClass(this.up_icon, class_name);
                 removeElementClass(this.down_icon, class_name);
                 break;
@@ -850,8 +857,6 @@ class LanguageDisplay {
             case LangBtnDir.RIGHT:
                 this.spin.style.transform = `rotate(${this.ori_angle + this.step * this.counter}deg)`;
                 break;
-            case LangBtnDir.NONE:
-                break;
             default:
                 break;
         }
@@ -871,8 +876,6 @@ class LanguageDisplay {
                 this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
                 qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                 qs('#lang-name-next>.lang-name-text').textContent = '';
-                break;
-            case LangBtnDir.NONE:
                 break;
             default:
                 break;
@@ -898,8 +901,6 @@ class LanguageDisplay {
                     this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
                     qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
                     qs('#lang-name-next>.lang-name-text').textContent = '';
-                    break;
-                case LangBtnDir.NONE:
                     break;
                 default:
                     break;
@@ -1025,7 +1026,7 @@ class Game {
         this.min_floor = -2;
         this.is_lifting = false;
         this.lift_interval = 200;
-        this.lift_direction = '';
+        this.lift_direction = FloorLiftStatus.NONE;
         this.cur_dest = 0;
         this.pending_queue = new PendingQueue();
         this.door = new Door();
@@ -1074,7 +1075,7 @@ class Game {
     }
     isLiftable() {
         return !(this.pending_queue.length() <= 0 ||
-            this.lift_direction !== 'up' && this.lift_direction !== 'down' ||
+            this.lift_direction !== FloorLiftStatus.UP && this.lift_direction !== FloorLiftStatus.DOWN ||
             this.cur_dest > this.max_floor ||
             this.cur_dest < this.min_floor ||
             this.cur_dest === 0 ||
@@ -1084,7 +1085,7 @@ class Game {
         if (this.pending_queue.length() > 0) {
             if (this.pending_queue.length() === 1) {
                 const dest = this.pending_queue.getMax().floor;
-                this.lift_direction = dest > this.cur_floor ? 'up' : (dest < this.cur_floor ? 'down' : '');
+                this.lift_direction = dest > this.cur_floor ? FloorLiftStatus.UP : (dest < this.cur_floor ? FloorLiftStatus.DOWN : FloorLiftStatus.NONE);
                 this.cur_dest = dest;
             }
             else {
@@ -1093,30 +1094,30 @@ class Game {
                 if (top.floor >= this.cur_floor &&
                     this.cur_floor >= bottom.floor) {
                     if (top.index <= bottom.index) {
-                        this.lift_direction = 'up';
+                        this.lift_direction = FloorLiftStatus.UP;
                         this.cur_dest = top.floor;
                     }
                     else {
-                        this.lift_direction = 'down';
+                        this.lift_direction = FloorLiftStatus.DOWN;
                         this.cur_dest = bottom.floor;
                     }
                 }
                 else if (bottom.floor >= this.cur_floor) {
-                    this.lift_direction = 'up';
+                    this.lift_direction = FloorLiftStatus.UP;
                     this.cur_dest = top.floor;
                 }
                 else if (top.floor <= this.cur_floor) {
-                    this.lift_direction = 'down';
+                    this.lift_direction = FloorLiftStatus.DOWN;
                     this.cur_dest = bottom.floor;
                 }
                 else {
-                    this.lift_direction = '';
+                    this.lift_direction = FloorLiftStatus.NONE;
                     this.cur_dest = 0;
                 }
             }
         }
         else {
-            this.lift_direction = '';
+            this.lift_direction = FloorLiftStatus.NONE;
             this.cur_dest = 0;
         }
     }
@@ -1125,17 +1126,17 @@ class Game {
     }
     lift() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.lift_direction !== 'up' && this.lift_direction !== 'down') {
+            if (this.lift_direction !== FloorLiftStatus.UP && this.lift_direction !== FloorLiftStatus.DOWN) {
                 return;
             }
             this.floor_display.updateIcon(this.lift_direction);
             this.is_lifting = true;
             lift_loop: do {
                 switch (this.lift_direction) {
-                    case 'up':
+                    case FloorLiftStatus.UP:
                         this.cur_floor = Math.min(this.cur_floor + 1 === 0 ? 1 : this.cur_floor + 1, this.max_floor);
                         break;
-                    case 'down':
+                    case FloorLiftStatus.DOWN:
                         this.cur_floor = Math.max(this.cur_floor - 1 === 0 ? -1 : this.cur_floor - 1, this.min_floor);
                         break;
                     default:
@@ -1153,7 +1154,7 @@ class Game {
             this.pending_queue.remove(this.cur_floor);
             removeElementClass(qs(`.number-button[index="${this.cur_floor}"]`), 'button-selected');
             this.is_lifting = false;
-            this.floor_display.updateIcon('none');
+            this.floor_display.updateIcon(FloorLiftStatus.NONE);
         });
     }
     checkBeforeLift() {
