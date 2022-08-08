@@ -4,6 +4,8 @@ declare function clearChildren(elem: HTMLElement): void;
 declare function toggleElementClass(elem: HTMLElement, class_name: string): void;
 declare function addElementClass(elem: HTMLElement, class_name: string): void;
 declare function removeElementClass(elem: HTMLElement, class_name: string): void;
+declare function padLeftZero(num: number): string;
+declare function getNumFromId(id: string): string;
 declare const qs: (selector: any) => HTMLElement;
 declare const qsa: (selector: any) => NodeListOf<HTMLElement>;
 interface IdClass {
@@ -136,9 +138,11 @@ declare abstract class DialogBlockItem {
     isSelect(): boolean;
 }
 declare class SelectOption {
+    id: string;
     next_dialog_block_id: string;
     text: L10nText;
-    constructor(next_id: string, text: L10nText);
+    constructor(id: string, next_id: string, text: L10nText);
+    static splitId(id: string): [string, string];
     toString(): string;
 }
 interface OptionObject {
@@ -148,6 +152,7 @@ interface OptionObject {
 declare class BranchSelect extends DialogBlockItem {
     options: SelectOption[];
     constructor(id: string, options?: OptionObject[]);
+    getOptionByid(id: string): SelectOption | null;
     toString(): string;
 }
 declare enum DialogLayout {
@@ -156,17 +161,17 @@ declare enum DialogLayout {
     RIGHT = "right"
 }
 declare class Dialog extends DialogBlockItem {
-    person_id: number;
+    person_id: string;
     text: L10nText;
     layout: DialogLayout;
     is_having_action: boolean;
     action_id: string;
-    constructor(id: string, person_id: number, text: L10nText, layout: DialogLayout, action_id?: string);
+    constructor(id: string, person_id: string, text: L10nText, layout: DialogLayout, action_id?: string);
     doAction(): void;
     toString(): string;
 }
 interface DialogObject {
-    person_id: number;
+    person_id: string;
     text: L10nTextDict;
     layout: DialogLayout;
     action_id?: string;
@@ -405,6 +410,9 @@ declare class Game {
     task_display: TaskDisplay;
     constructor();
     getTFIcon(icon_type: boolean): HTMLElement;
+    createAvatar(psg_id: string): HTMLElement;
+    createDialogElement(dialog: Dialog, is_not_first?: boolean): HTMLElement | null;
+    createSelectOpntions(select: BranchSelect): void;
     renderFloor(): void;
     isLiftable(): boolean;
     calcLiftDirection(): void;
@@ -424,7 +432,7 @@ declare class Game {
 interface BindingButton {
     selector: string;
     is_single: boolean;
-    func(this: HTMLElement, event: MouseEvent): void;
+    func: (this: HTMLElement, event: MouseEvent) => void;
 }
 declare function clickSwitchLangButton(dir: LangBtnDir): Promise<void>;
 declare const binding_buttons: BindingButton[];

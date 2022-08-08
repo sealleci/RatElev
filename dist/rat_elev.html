@@ -1436,6 +1436,14 @@ function removeElementClass(elem, class_name) {
         elem.classList.remove(class_name);
     }
 }
+function padLeftZero(num) {
+    let num_s = num.toString();
+    return /^[0-9]$/.test(num_s) ? '0' + num_s : num_s;
+}
+function getNumFromId(id) {
+    let num = id.match(/\d+/);
+    return num === null || num.length <= 0 ? '' : num[0];
+}
 const qs = function (selector) {
     return document.querySelector(selector);
 };
@@ -1703,9 +1711,24 @@ class DialogBlockItem {
     }
 }
 class SelectOption {
-    constructor(next_id, text) {
+    constructor(id, next_id, text) {
+        this.id = id;
         this.next_dialog_block_id = next_id;
         this.text = text;
+    }
+    static splitId(id) {
+        let arr = id.match(/(\d+)_(\d+)_opt/);
+        let id1 = '';
+        let id2 = '';
+        if (arr !== null) {
+            if (arr.length > 0) {
+                id1 = arr[0];
+            }
+            if (arr.length > 1) {
+                id2 = arr[1];
+            }
+        }
+        return [id1, id2];
     }
     toString() {
         return `{}`;
@@ -1715,9 +1738,17 @@ class BranchSelect extends DialogBlockItem {
     constructor(id, options = []) {
         super(id, DialogBlockItemType.SELECT);
         this.options = [];
-        for (let option of options) {
-            this.options.push(new SelectOption(option.next, new L10nText(option.text)));
+        for (let i = 0; i < options.length; ++i) {
+            this.options.push(new SelectOption(`${i}_${getNumFromId(this.id)}_opt`, options[i].next, new L10nText(options[i].text)));
         }
+    }
+    getOptionByid(id) {
+        for (let opt of this.options) {
+            if (opt.id === id) {
+                return opt;
+            }
+        }
+        return null;
     }
     toString() {
         return `{}`;
@@ -1755,10 +1786,10 @@ class DialogBlock {
         this.cur_dialog_index = 0;
         this.data = [];
         for (let i = 0; i < dialogs.length; ++i) {
-            this.data.push(new Dialog(this.id + i.toString(), dialogs[i].person_id, new L10nText(dialogs[i].text), dialogs[i].layout, (_a = dialogs[i].action_id) !== null && _a !== void 0 ? _a : ''));
+            this.data.push(new Dialog(`${getNumFromId(this.id)}${padLeftZero(i)}_dlg`, dialogs[i].person_id, new L10nText(dialogs[i].text), dialogs[i].layout, (_a = dialogs[i].action_id) !== null && _a !== void 0 ? _a : ''));
         }
         if (select !== null) {
-            this.data.push(new BranchSelect(this.id, select.options));
+            this.data.push(new BranchSelect(`${getNumFromId(this.id)}00_slt`, select.options));
         }
     }
     toString() {
@@ -2430,6 +2461,76 @@ class Game {
             }
             return icon_f;
         }
+    }
+    createAvatar(psg_id) {
+        const psg = game_passenger_list.getById(psg_id);
+        let pfp = document.createElement('div');
+        pfp.classList.add('avatar');
+        let pfp_text = document.createElement('div');
+        pfp_text.classList.add('unselectable');
+        if (psg !== null) {
+            pfp_text.style.backgroundColor = psg.avatar_color;
+            pfp_text.style.color = psg.avatar_font_color;
+            pfp_text.innerHTML = psg.avatar_text.get(this.lang);
+            pfp_text.setAttribute('lkey', psg.id);
+        }
+        pfp.appendChild(pfp_text);
+        return pfp;
+    }
+    createDialogElement(dialog, is_not_first = true) {
+        switch (dialog.layout) {
+            case DialogLayout.LEFT:
+                let l = document.createElement('div');
+                l.classList.add('dialog-row', 'left-dialog-row');
+                let l_box = document.createElement('div');
+                l_box.classList.add('dialog-box', 'left-dialog-box');
+                if (is_not_first) {
+                    l_box.classList.add('left-not-first-line');
+                }
+                l_box.innerHTML = dialog.text.get(this.lang);
+                l_box.setAttribute('lkey', dialog.id);
+                l.append(this.createAvatar(dialog.person_id));
+                l.append(l_box);
+                return l;
+            case DialogLayout.RIGHT:
+                let r = document.createElement('div');
+                r.classList.add('dialog-row', 'right-dialog-row');
+                let r_box = document.createElement('div');
+                r_box.classList.add('dialog-box', 'right-dialog-box');
+                if (is_not_first) {
+                    r_box.classList.add('right-not-first-line');
+                }
+                r_box.innerHTML = dialog.text.get(this.lang);
+                r_box.setAttribute('lkey', dialog.id);
+                r.append(r_box);
+                r.append(this.createAvatar(dialog.person_id));
+                return r;
+            case DialogLayout.MIDDLE:
+                let m = document.createElement('div');
+                m.classList.add('dialog-row', 'mid-dialog-row');
+                let m_box = document.createElement('div');
+                m_box.classList.add('dialog-box', 'mid-dialog-box');
+                m_box.innerHTML = dialog.text.get(this.lang);
+                m_box.setAttribute('lkey', dialog.id);
+                m.appendChild(m_box);
+                return m;
+            default:
+                return null;
+        }
+    }
+    createSelectOpntions(select) {
+        const opt_row = qs('#options-row');
+        clearChildren(opt_row);
+        for (let opt of select.options) {
+            let opt_btn = document.createElement('div');
+            opt_btn.classList.add('option-button');
+            let opt_text = document.createElement('div');
+            opt_text.classList.add('unselectable');
+            opt_text.innerHTML = opt.text.get(this.lang);
+            opt_text.setAttribute('lkey', opt.id);
+            opt_btn.appendChild(opt_text);
+        }
+        opt_row.style.display = 'flex';
     }
     renderFloor() {
         const dialog_container = qs('#dialog-container');

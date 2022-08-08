@@ -1,6 +1,7 @@
 /* TODO: main
  * save function
  * branch select
+ * auto id
  */
 
 function sleep(time: number) {
@@ -62,6 +63,16 @@ function removeElementClass(elem: HTMLElement, class_name: string) {
     }
 }
 
+function padLeftZero(num: number): string {
+    let num_s = num.toString()
+    return /^[0-9]$/.test(num_s) ? '0' + num_s : num_s
+}
+
+function getNumFromId(id: string): string {
+    let num = id.match(/\d+/)
+    return num === null || num.length <= 0 ? '' : num[0]
+}
+
 const qs = function (selector: any): HTMLElement {
     return document.querySelector(selector as string)!
 }
@@ -70,6 +81,11 @@ const qsa = function (selector: any): NodeListOf<HTMLElement> {
     return document.querySelectorAll(selector as string)
 }
 
+// TODO: interface document
+
+/**
+ * @param id - string
+ */
 interface IdClass {
     id: string
 }
@@ -80,11 +96,9 @@ abstract class AbstractList<T extends IdClass>{
     constructor() {
         this.data = []
     }
-
     getLength(): number {
         return this.data.length
     }
-
     isIncluding(id: string): boolean {
         for (let i = 0; i < this.data.length; ++i) {
             if (this.data[i].id === id) {
@@ -93,7 +107,6 @@ abstract class AbstractList<T extends IdClass>{
         }
         return false
     }
-
     getById(id: string): T | null {
         for (let item of this.data) {
             if (item.id === id) {
@@ -104,6 +117,10 @@ abstract class AbstractList<T extends IdClass>{
     }
 }
 
+/**
+ * @param id - string
+ * @param name - string
+ */
 interface NaturalLanguage {
     id: string
     name: string
@@ -114,11 +131,9 @@ class LanguageList extends AbstractList<NaturalLanguage>{
         super()
         this.data = data
     }
-
     isKeyIn(id: string): boolean {
         return id in this.data.map(value => value.id)
     }
-
     indexOfKey(id: string): number {
         if (!this.isKeyIn(id)) {
             return -1
@@ -130,7 +145,6 @@ class LanguageList extends AbstractList<NaturalLanguage>{
         }
         return -1
     }
-
     getItemByIndex(index: number): NaturalLanguage {
         if (index < 0) {
             index = 0
@@ -140,7 +154,6 @@ class LanguageList extends AbstractList<NaturalLanguage>{
         }
         return this.data[index]
     }
-
     getItemByKey(id: string): NaturalLanguage | null {
         for (let item of this.data) {
             if (id === item.id) {
@@ -149,7 +162,6 @@ class LanguageList extends AbstractList<NaturalLanguage>{
         }
         return null
     }
-
     getNameByKey(id: string): string {
         if (!this.isKeyIn(id)) {
             return ''
@@ -159,6 +171,9 @@ class LanguageList extends AbstractList<NaturalLanguage>{
     }
 }
 
+/**
+ * @param \[key: string\]: string
+ */
 interface L10nTextDict {
     [key: string]: string
 }
@@ -169,21 +184,18 @@ class L10nText {
     constructor(data: L10nTextDict) {
         this.data = data
     }
-
     get(key: string): string {
         if (key in this.data) {
             return this.data[key]
         }
         return this.data[game_default_lang]
     }
-
     set(key: string, value: string) {
         if (!game_lang_list.isKeyIn(key)) {
             return
         }
         this.data[key] = value
     }
-
     toString(): string {
         return `{}`
     }
@@ -195,6 +207,9 @@ enum SignatureStatus {
 }
 
 class Signature {
+    /**
+     * regex: /\d+_sig/
+     */
     public id: string
     public status: SignatureStatus
 
@@ -202,28 +217,31 @@ class Signature {
         this.id = id
         this.status = status
     }
-
     activiate() {
         this.status = SignatureStatus.ACTIVE
     }
-
     /**
      * Set the status of this signature to deactive.
      */
     deactiviate() {
         this.status = SignatureStatus.DEACTIVE
     }
-
     isActive(): boolean {
         return this.status === SignatureStatus.ACTIVE
     }
-
     toString(): string {
         return `{}`
     }
 }
 
+/**
+ * @param id - string(/\d+_sig/)
+ * @param status - SignatureStatus
+ */
 interface SignatureObject {
+    /**
+     * regex: /\d+_sig/
+     */
     id: string
     status: SignatureStatus
 }
@@ -238,18 +256,15 @@ class SignatureList extends AbstractList<Signature>{
             ))
         }
     }
-
     initialize() {
         for (let signarue of this.data) {
             signarue.deactiviate()
         }
     }
-
     isActiveById(id: string): boolean {
         const signature = this.getById(id)
         return signature !== null && signature.status === SignatureStatus.ACTIVE
     }
-
     activateById(id: string): boolean {
         const signature = this.getById(id)
         if (signature !== null) {
@@ -258,7 +273,6 @@ class SignatureList extends AbstractList<Signature>{
         }
         return false
     }
-
     deactivateById(id: string): boolean {
         const signature = this.getById(id)
         if (signature !== null) {
@@ -276,6 +290,9 @@ enum TaskStatus {
 }
 
 class GameTask {
+    /**
+     * regex: /\d+_tsk/
+     */
     public id: string
     public description: L10nText
     public status: TaskStatus
@@ -285,30 +302,33 @@ class GameTask {
         this.description = description
         this.status = status ?? TaskStatus.DEACTIVE
     }
-
     isActive(): boolean {
         return this.status === TaskStatus.ACTIVE
     }
-
     isFinished(): boolean {
         return this.status === TaskStatus.FINISHED
 
     }
-
     activiate() {
         this.status = TaskStatus.ACTIVE
     }
-
     finish() {
         this.status = TaskStatus.FINISHED
     }
-
     deactiviate() {
         this.status = TaskStatus.DEACTIVE
     }
 }
 
+/**
+ * @param id - string(/\d+_tsk/)
+ * @param description - L10nTextDict
+ * @param status - Optional(TaskStatus)
+ */
 interface GameTaskObject {
+    /**
+     * regex: /\d+_tsk/
+     */
     id: string
     description: L10nTextDict
     status?: TaskStatus
@@ -325,17 +345,14 @@ class GameTaskList extends AbstractList<GameTask>{
             ))
         }
     }
-
     isActiveById(id: string): boolean {
         const task = this.getById(id)
         return task !== null && task.status === TaskStatus.ACTIVE
     }
-
     isFinishedById(id: string): boolean {
         const task = this.getById(id)
         return task !== null && task.status === TaskStatus.FINISHED
     }
-
     activateById(id: string): boolean {
         const task = this.getById(id)
         if (task !== null) {
@@ -344,7 +361,6 @@ class GameTaskList extends AbstractList<GameTask>{
         }
         return false
     }
-
     deactivateById(id: string): boolean {
         const task = this.getById(id)
         if (task !== null) {
@@ -356,6 +372,9 @@ class GameTaskList extends AbstractList<GameTask>{
 }
 
 class GameAction {
+    /**
+     * regex: /\d+_act/
+     */
     public id: string
     public action: () => void
 
@@ -363,17 +382,22 @@ class GameAction {
         this.id = id
         this.action = f
     }
-
     do() {
         this.action()
     }
-
     toString(): string {
         return `{}`
     }
 }
 
+/**
+ * @param id - string(/\d+_act/)
+ * @param action - Function(() => void)
+ */
 interface GameActionObject {
+    /**
+     * regex: /\d+_act/
+     */
     id: string
     action: () => void
 }
@@ -388,6 +412,9 @@ class GameActionList extends AbstractList<GameAction>{
 }
 
 class Passenger {
+    /**
+     * regex: /\d+_psg/
+     */
     public id: string
     public name: L10nText
     public avatar_color: string
@@ -403,13 +430,23 @@ class Passenger {
         this.avatar_text = avatar_text
         this.is_diaplay = is_display
     }
-
     toString(): string {
         return `{}`
     }
 }
 
+/**
+ * @param id - string(/\d+_psg/)
+ * @param name - L10nTextDict
+ * @param avatar_color - string
+ * @param avatar_font_color - string
+ * @param avatar_text - L10nTextDict
+ * @param is_display - Optional(boolean)
+ */
 interface PassengerObject {
+    /**
+     * regex: /\d+_psg/
+     */
     id: string,
     name: L10nTextDict,
     avatar_color: string,
@@ -440,6 +477,9 @@ enum DialogBlockItemType {
 }
 
 abstract class DialogBlockItem {
+    /**
+     * regex: /\d+_dlg|\d+_slt/
+     */
     public id: string
     public item_type: DialogBlockItemType
 
@@ -447,27 +487,54 @@ abstract class DialogBlockItem {
         this.id = id
         this.item_type = type
     }
-
     isSelect(): boolean {
         return this.item_type === DialogBlockItemType.SELECT
     }
 }
 
 class SelectOption {
+    /**
+     * regex: /\d+_\d+_opt/
+     */
+    public id: string
+    /**
+     * regex: /\d+_dlg/
+     */
     public next_dialog_block_id: string
     public text: L10nText
 
-    constructor(next_id: string, text: L10nText) {
+    constructor(id: string, next_id: string, text: L10nText) {
+        this.id = id
         this.next_dialog_block_id = next_id
         this.text = text
     }
-
+    static splitId(id: string): [string, string] {
+        let arr = id.match(/(\d+)_(\d+)_opt/)
+        let id1 = ''
+        let id2 = ''
+        if (arr !== null) {
+            if (arr.length > 0) {
+                id1 = arr[0]
+            }
+            if (arr.length > 1) {
+                id2 = arr[1]
+            }
+        }
+        return [id1, id2]
+    }
     toString(): string {
         return `{}`
     }
 }
 
+/**
+ * @param next - string
+ * @param text - L10nTextDict
+ */
 interface OptionObject {
+    /**
+     * regex: /\d+_dlg/
+     */
     next: string
     text: L10nTextDict
 }
@@ -478,11 +545,22 @@ class BranchSelect extends DialogBlockItem {
     constructor(id: string, options: OptionObject[] = []) {
         super(id, DialogBlockItemType.SELECT)
         this.options = []
-        for (let option of options) {
-            this.options.push(new SelectOption(option.next, new L10nText(option.text)))
+        for (let i = 0; i < options.length; ++i) {
+            this.options.push(new SelectOption(
+                `${i}_${getNumFromId(this.id)}_opt`,
+                options[i].next,
+                new L10nText(options[i].text)
+            ))
         }
     }
-
+    getOptionByid(id: string): SelectOption | null {
+        for (let opt of this.options) {
+            if (opt.id === id) {
+                return opt
+            }
+        }
+        return null
+    }
     toString(): string {
         return `{}`
     }
@@ -495,13 +573,19 @@ enum DialogLayout {
 }
 
 class Dialog extends DialogBlockItem {
-    public person_id: number
+    /**
+     * regex: /\d+_psg/
+     */
+    public person_id: string
     public text: L10nText
     public layout: DialogLayout
     public is_having_action: boolean
+    /**
+     * regex: /\d+_act/
+     */
     public action_id: string
 
-    constructor(id: string, person_id: number, text: L10nText, layout: DialogLayout, action_id: string = '') {
+    constructor(id: string, person_id: string, text: L10nText, layout: DialogLayout, action_id: string = '') {
         super(id)
         this.person_id = person_id
         this.text = text
@@ -509,30 +593,46 @@ class Dialog extends DialogBlockItem {
         this.action_id = action_id
         this.is_having_action = action_id === '' ? false : true
     }
-
     doAction() {
         if (this.is_having_action) {
             game_action_list.getById(this.action_id)?.do()
         }
     }
-
     toString(): string {
         return `{}`
     }
 }
 
+/**
+ * @param person_id - string(/\d+_psg/)
+ * @param text - L10nTextDict
+ * @param layout - DialogLayout
+ * @param action_id - Optional(string)
+ */
 interface DialogObject {
-    person_id: number,
+    /**
+     * regex: /\d+_psg/
+     */
+    person_id: string,
     text: L10nTextDict,
     layout: DialogLayout,
+    /**
+     * regex: /\d+_act/
+     */
     action_id?: string
 }
 
+/**
+ * @param options - OptionObject[]
+ */
 interface SelectObject {
     options: OptionObject[]
 }
 
 class DialogBlock {
+    /**
+     * regex: /\d+_dbk/
+     */
     public id: string
     public cur_dialog_index: number
     public data: DialogBlockItem[]
@@ -543,7 +643,7 @@ class DialogBlock {
         this.data = []
         for (let i = 0; i < dialogs.length; ++i) {
             this.data.push(new Dialog(
-                this.id + i.toString(),
+                `${getNumFromId(this.id)}${padLeftZero(i)}_dlg`,
                 dialogs[i].person_id,
                 new L10nText(dialogs[i].text),
                 dialogs[i].layout,
@@ -551,23 +651,35 @@ class DialogBlock {
             ))
         }
         if (select !== null) {
-            this.data.push(new BranchSelect(this.id, select.options))
+            this.data.push(new BranchSelect(
+                `${getNumFromId(this.id)}00_slt`,
+                select.options
+            ))
         }
     }
-
     toString(): string {
         return `{}`
     }
 }
 
-
+/**
+ * @param id - string(/\d+_dbk/)
+ * @param dialogs - DialogObject[]
+ * @param select - Optional(SelectObject)
+ */
 interface DialogBlockObject {
+    /**
+     * regex: /\d+_dbk/
+     */
     id: string,
     dialogs: DialogObject[],
     select?: SelectObject
 }
 
 class DialogScene {
+    /**
+     * regex: /\d+_dsc/
+     */
     public id: string
     public dialog_blocks: DialogBlock[]
     public cur_block_id: string
@@ -588,7 +700,6 @@ class DialogScene {
         this.cur_block_id = ''
         this.visited_blocks = []
     }
-
     getDialogBlock(id: string): DialogBlock | null {
         for (let block of this.dialog_blocks) {
             if (block.id === id) {
@@ -597,23 +708,36 @@ class DialogScene {
         }
         return null
     }
-
     toString(): string {
         return `{}`
     }
 }
 
+/**
+ * @param id - string(/\d+dsc/)
+ * @param blocks - DialogBlockObject[]
+ */
 interface DialogSceneObject {
+    /**
+     * regex: /\d+_dsc/
+     */
     id: string,
     blocks: DialogBlockObject[]
 }
 
+/**
+ * @param bg_color - string
+ * @param bg_color - string
+ */
 interface Background {
     bg_color: string,
     inner_html: string
 }
 
 class Floor {
+    /**
+     * regex: /\d+_flr/
+     */
     public id: string
     public dialog_scene: DialogScene
     public plot_id_list: string[]
@@ -627,14 +751,21 @@ class Floor {
     }
 }
 
+/**
+ * @param id - string(/\d+_flr/)
+ * @param dialog_scene - DialogSceneObject
+ * @param background - Optional(Background)
+ */
 interface FloorObject {
+    /**
+     * regex: /\d+_flr/
+     */
     id: string
     dialog_scene: DialogSceneObject
     background?: Background
 }
 
 class FloorList extends AbstractList<Floor>{
-
     constructor(floors: FloorObject[]) {
         super()
         for (let floor of floors) {
@@ -648,6 +779,9 @@ class FloorList extends AbstractList<Floor>{
 }
 
 class PlotThread {
+    /**
+     * regex: /\d+_plt/
+     */
     public id: string
     public priority: number
     public signatures: string[]
@@ -665,11 +799,9 @@ class PlotThread {
         this.in_signatures = in_signatures
         this.cur_signature_index = 0
     }
-
     step() {
         this.cur_signature_index += 1
     }
-
     isUnlocked(): boolean {
         if (this.in_signatures.length <= 0) {
             return true
@@ -684,7 +816,6 @@ class PlotThread {
         }
         return true
     }
-
     isFinished(): boolean {
         if (this.signatures.length <= 0) {
             return true
@@ -701,18 +832,17 @@ class PlotThread {
     }
 }
 
+// TODO: PlotThread fields
 interface PlotThreadObject {
 
 }
 
 class PlotThreadList extends AbstractList<PlotThread>{
-
     constructor(data: PlotThread[]) {
         // TODO: PlotThreadObject
         super()
         this.data = data
     }
-
     getById(id: string): PlotThread | null {
         for (let thread of this.data) {
             if (thread.id === id) {
@@ -898,6 +1028,10 @@ class Door {
     }
 }
 
+/**
+ * @param index - number
+ * @param floor - number
+ */
 interface PendingFloor {
     index: number
     floor: number
@@ -1222,14 +1356,12 @@ abstract class ListDisplay<T> {
     constructor(id_list: string[] = []) {
         this.data = id_list
     }
-
     add(id: string) {
         if (this.data.indexOf(id) !== -1) {
             return
         }
         this.data.push(id)
     }
-
     remove(id: string) {
         const index = this.data.indexOf(id)
         if (index !== -1) {
@@ -1237,11 +1369,8 @@ abstract class ListDisplay<T> {
         }
         this.data.splice(index, 1)
     }
-
     abstract getValidCount(): number
-
     abstract getByIndex(index: number): T | null
-
     abstract render(lang: string): void
 }
 
@@ -1249,7 +1378,6 @@ class PassengerDisplay extends ListDisplay<Passenger> {
     constructor(id_list: string[] = []) {
         super(id_list)
     }
-
     getValidCount(): number {
         let count = 0
         for (let id of this.data) {
@@ -1260,14 +1388,12 @@ class PassengerDisplay extends ListDisplay<Passenger> {
         }
         return count
     }
-
     getByIndex(index: number): Passenger | null {
         if (index < 0 || index >= this.data.length) {
             return null
         }
         return game_passenger_list.getById(this.data[index])
     }
-
     render(lang: string) {
         const psg_list = qs('#passenger-list')
         const psg_count = qs('#passenger-display-count')
@@ -1291,7 +1417,6 @@ class TaskDisplay extends ListDisplay<GameTask> {
     constructor(id_list: string[] = []) {
         super(id_list)
     }
-
     getValidCount(): number {
         let count = 0
         for (let id of this.data) {
@@ -1302,17 +1427,14 @@ class TaskDisplay extends ListDisplay<GameTask> {
         }
         return count
     }
-
     getByIndex(index: number): GameTask | null {
         if (index < 0 || index >= this.data.length) {
             return null
         }
         return game_task_list.getById(this.data[index])
     }
-
     render(lang: string) {
         const tsk_container = qs('#task-container')
-
         clearChildren(tsk_container)
         for (let id of this.data) {
             const tsk = game_task_list.getById(id)
@@ -1329,10 +1451,16 @@ class TaskDisplay extends ListDisplay<GameTask> {
     }
 }
 
+/**
+ * @param \[key: string\]: L10nTextDict
+ */
 interface UiStringDictRaw {
     [key: string]: L10nTextDict
 }
 
+/**
+ * @param \[key: string\]: L10nText
+ */
 interface UiStringDict {
     [key: string]: L10nText
 }
@@ -1341,6 +1469,10 @@ interface SaveDataType {
 
 }
 
+/**
+ * @param status - boolean
+ * @param data - SaveDataType
+ */
 interface SaveRootType {
     status: boolean
     data: SaveDataType
@@ -1406,6 +1538,76 @@ class Game {
             }
             return icon_f
         }
+    }
+    createAvatar(psg_id: string): HTMLElement {
+        const psg = game_passenger_list.getById(psg_id)
+        let pfp: HTMLElement = document.createElement('div')
+        pfp.classList.add('avatar')
+        let pfp_text: HTMLElement = document.createElement('div')
+        pfp_text.classList.add('unselectable')
+        if (psg !== null) {
+            pfp_text.style.backgroundColor = psg.avatar_color
+            pfp_text.style.color = psg.avatar_font_color
+            pfp_text.innerHTML = psg.avatar_text.get(this.lang)
+            pfp_text.setAttribute('lkey', psg.id)
+        }
+        pfp.appendChild(pfp_text)
+        return pfp
+    }
+    createDialogElement(dialog: Dialog, is_not_first: boolean = true): HTMLElement | null {
+        switch (dialog.layout) {
+            case DialogLayout.LEFT:
+                let l: HTMLElement = document.createElement('div')
+                l.classList.add('dialog-row', 'left-dialog-row')
+                let l_box: HTMLElement = document.createElement('div')
+                l_box.classList.add('dialog-box', 'left-dialog-box')
+                if (is_not_first) {
+                    l_box.classList.add('left-not-first-line')
+                }
+                l_box.innerHTML = dialog.text.get(this.lang)
+                l_box.setAttribute('lkey', dialog.id)
+                l.append(this.createAvatar(dialog.person_id))
+                l.append(l_box)
+                return l
+            case DialogLayout.RIGHT:
+                let r: HTMLElement = document.createElement('div')
+                r.classList.add('dialog-row', 'right-dialog-row')
+                let r_box: HTMLElement = document.createElement('div')
+                r_box.classList.add('dialog-box', 'right-dialog-box')
+                if (is_not_first) {
+                    r_box.classList.add('right-not-first-line')
+                }
+                r_box.innerHTML = dialog.text.get(this.lang)
+                r_box.setAttribute('lkey', dialog.id)
+                r.append(r_box)
+                r.append(this.createAvatar(dialog.person_id))
+                return r
+            case DialogLayout.MIDDLE:
+                let m: HTMLElement = document.createElement('div')
+                m.classList.add('dialog-row', 'mid-dialog-row')
+                let m_box: HTMLElement = document.createElement('div')
+                m_box.classList.add('dialog-box', 'mid-dialog-box')
+                m_box.innerHTML = dialog.text.get(this.lang)
+                m_box.setAttribute('lkey', dialog.id)
+                m.appendChild(m_box)
+                return m
+            default:
+                return null
+        }
+    }
+    createSelectOpntions(select: BranchSelect) {
+        const opt_row: HTMLElement = qs('#options-row')
+        clearChildren(opt_row)
+        for (let opt of select.options) {
+            let opt_btn = document.createElement('div')
+            opt_btn.classList.add('option-button')
+            let opt_text = document.createElement('div')
+            opt_text.classList.add('unselectable')
+            opt_text.innerHTML = opt.text.get(this.lang)
+            opt_text.setAttribute('lkey', opt.id)
+            opt_btn.appendChild(opt_text)
+        }
+        opt_row.style.display = 'flex'
     }
     renderFloor() {
         const dialog_container = qs('#dialog-container')
@@ -1591,10 +1793,15 @@ class Game {
     }
 }
 
+/**
+ * @param selector - string
+ * @param is_single - boolean
+ * @param func - Function((HTMLElement, MouseEvent) => void)
+ */
 interface BindingButton {
     selector: string
     is_single: boolean
-    func(this: HTMLElement, event: MouseEvent): void
+    func: (this: HTMLElement, event: MouseEvent) => void
 }
 
 async function clickSwitchLangButton(dir: LangBtnDir) {
