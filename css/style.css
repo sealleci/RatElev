@@ -572,9 +572,11 @@ body {
     justify-content: center;
     align-items: center;
     line-height: 35px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-family: Georgia, '黑体';
     /* text-shadow: black 0 0 2px; */
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .dialog-row {
@@ -746,7 +748,7 @@ body {
     align-items: center;
     justify-content: space-around;
     cursor: pointer;
-    font-size: .8rem;
+    font-size: 1rem;
     font-family: "Palatino Linotype";
     word-wrap: break-word;
     word-break: break-all;
@@ -754,7 +756,7 @@ body {
     color: rgba(255, 255, 255, .8);
     padding: 4px 5px;
     transition: background-color .2s, color .2s, outline .2s;
-    border-radius: 10px 10px 10px 0;
+    border-radius: 15px 15px 15px 0;
     text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
     overflow-y: scroll;
     scrollbar-width: none;

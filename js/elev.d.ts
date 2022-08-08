@@ -152,7 +152,7 @@ interface OptionObject {
 declare class BranchSelect extends DialogBlockItem {
     options: SelectOption[];
     constructor(id: string, options?: OptionObject[]);
-    getOptionByid(id: string): SelectOption | null;
+    getOptionById(id: string): SelectOption | null;
     toString(): string;
 }
 declare enum DialogLayout {
@@ -167,6 +167,7 @@ declare class Dialog extends DialogBlockItem {
     is_having_action: boolean;
     action_id: string;
     constructor(id: string, person_id: string, text: L10nText, layout: DialogLayout, action_id?: string);
+    static splitId(id: string): [string, string];
     doAction(): void;
     toString(): string;
 }
@@ -185,6 +186,7 @@ declare class DialogBlock {
     data: DialogBlockItem[];
     constructor(id: string, dialogs: DialogObject[], select?: SelectObject | null);
     getItemByIndex(index: number): DialogBlockItem | null;
+    getItemById(id: string): DialogBlockItem | null;
     getCurItem(): DialogBlockItem | null;
     resetIndex(): void;
     setIndexToEnd(): void;
@@ -426,10 +428,10 @@ declare class Game {
     static getTFIcon(icon_type: boolean): HTMLElement;
     static createAvatar(psg_id: string, lang: string): HTMLElement;
     static createDialogElement(dialog: Dialog, lang: string, is_not_first?: boolean): HTMLElement | null;
-    static stepDialog(block: DialogBlock, lang: string): void;
     static createOptionElement(opt: SelectOption, lang: string): HTMLElement;
     static renderDialog(dialog: Dialog, lang: string, is_not_first?: boolean): boolean;
     static renderSelect(select: BranchSelect, lang: string): void;
+    static stepDialog(block: DialogBlock, lang: string): void;
     static renderBlock(block: DialogBlock, lang: string, is_render_all?: boolean): void;
     renderFloor(): void;
     isLiftable(): boolean;
@@ -462,6 +464,7 @@ declare const game_action_list: GameActionList;
 declare const game_task_list: GameTaskList;
 declare const game_passenger_list: PassengerList;
 declare const game_plot_thread_list: PlotThreadList;
+declare let aaa: OptionObject;
 declare const game_floor_list: FloorList;
 declare const game_ui_string_raw: UiStringDictRaw;
 declare const game: Game;

@@ -69,7 +69,7 @@ function padLeftZero(num: number): string {
 }
 
 function getNumFromId(id: string): string {
-    let num = id.match(/\d+/)
+    let num = id.match(/[^_]+/)
     return num === null || num.length <= 0 ? '' : num[0]
 }
 
@@ -186,7 +186,7 @@ class L10nText {
         if (key in this.data) {
             return this.data[key]
         }
-        return this.data[game_default_lang]
+        return ''
     }
     set(key: string, value: string) {
         if (!game_lang_list.isKeyIn(key)) {
@@ -507,15 +507,15 @@ class SelectOption {
         this.text = text
     }
     static splitId(id: string): [string, string] {
-        let arr = id.match(/(\d+)_(\d+)_opt/)
+        let arr = id.match(/^([^_]+)_([^_]+)_opt$/)
         let id1 = ''
         let id2 = ''
         if (arr !== null) {
-            if (arr.length > 0) {
-                id1 = arr[0]
-            }
             if (arr.length > 1) {
-                id2 = arr[1]
+                id1 = arr[1]
+            }
+            if (arr.length > 2) {
+                id2 = arr[2]
             }
         }
         return [id1, id2]
@@ -545,13 +545,13 @@ class BranchSelect extends DialogBlockItem {
         this.options = []
         for (let i = 0; i < options.length; ++i) {
             this.options.push(new SelectOption(
-                `${i}_${getNumFromId(this.id)}_opt`,
+                `${padLeftZero(i)}_${getNumFromId(this.id)}_opt`,
                 options[i].next,
                 new L10nText(options[i].text)
             ))
         }
     }
-    getOptionByid(id: string): SelectOption | null {
+    getOptionById(id: string): SelectOption | null {
         for (let opt of this.options) {
             if (opt.id === id) {
                 return opt
@@ -590,6 +590,20 @@ class Dialog extends DialogBlockItem {
         this.layout = layout
         this.action_id = action_id
         this.is_having_action = action_id === '' ? false : true
+    }
+    static splitId(id: string): [string, string] {
+        let arr = id.match(/^([^_]+)_([^_]+)_dlg$/)
+        let id1 = ''
+        let id2 = ''
+        if (arr !== null) {
+            if (arr.length > 1) {
+                id1 = arr[1]
+            }
+            if (arr.length > 2) {
+                id2 = arr[2]
+            }
+        }
+        return [id1, id2]
     }
     doAction() {
         if (this.is_having_action) {
@@ -641,7 +655,7 @@ class DialogBlock {
         this.data = []
         for (let i = 0; i < dialogs.length; ++i) {
             this.data.push(new Dialog(
-                `${getNumFromId(this.id)}${padLeftZero(i)}_dlg`,
+                `${padLeftZero(i)}_${getNumFromId(this.id)}_dlg`,
                 dialogs[i].person_id,
                 new L10nText(dialogs[i].text),
                 dialogs[i].layout,
@@ -650,13 +664,21 @@ class DialogBlock {
         }
         if (select !== null) {
             this.data.push(new BranchSelect(
-                `${getNumFromId(this.id)}00_slt`,
+                `${getNumFromId(this.id)}$_slt`,
                 select.options
             ))
         }
     }
     getItemByIndex(index: number): DialogBlockItem | null {
         return index < 0 || index >= this.data.length ? null : this.data[index]
+    }
+    getItemById(id: string): DialogBlockItem | null {
+        for (let item of this.data) {
+            if (item.id === id) {
+                return item
+            }
+        }
+        return null
     }
     getCurItem(): DialogBlockItem | null {
         return this.getItemByIndex(this.cur_item_index)
@@ -732,7 +754,8 @@ class DialogScene {
                 )
             )
         }
-        this.cur_block_id = ''
+        // TODO: init cur block id
+        this.cur_block_id = this.dialog_blocks[0].id
         this.visited_blocks = []
     }
     getCurDialogBlock(): DialogBlock | null {
@@ -1671,25 +1694,6 @@ class Game {
                 return null
         }
     }
-    static stepDialog(block: DialogBlock, lang: string) {
-        const item = block.getCurItem()
-        if (item === null) {
-            Game.hideOptions()
-            block.stepIndex()
-            Game.showGoOnButton()
-            return
-        }
-        if (item.isSelect()) {
-            Game.renderSelect(item as BranchSelect, lang)
-            block.setIndexToEnd()
-        } else {
-            Game.hideOptions()
-            Game.renderDialog(item as Dialog, lang);
-            (item as Dialog).doAction()
-            block.stepIndex()
-            Game.showGoOnButton()
-        }
-    }
     static createOptionElement(opt: SelectOption, lang: string): HTMLElement {
         let opt_btn = document.createElement('div')
         opt_btn.classList.add('option-button')
@@ -1735,6 +1739,25 @@ class Game {
         }
         Game.showOptions()
     }
+    static stepDialog(block: DialogBlock, lang: string) {
+        const item = block.getCurItem()
+        if (item === null) {
+            Game.hideOptions()
+            block.stepIndex()
+            Game.showGoOnButton()
+            return
+        }
+        if (item.isSelect()) {
+            Game.renderSelect(item as BranchSelect, lang)
+            block.setIndexToEnd()
+        } else {
+            Game.hideOptions()
+            Game.renderDialog(item as Dialog, lang, block.isNotFirstLine());
+            (item as Dialog).doAction()
+            block.stepIndex()
+            Game.showGoOnButton()
+        }
+    }
     /**
      * 
      * @param block 
@@ -1769,6 +1792,8 @@ class Game {
     }
     renderFloor() {
         // TODO: select block by thread
+        Game.hideGoOnButton()
+        Game.hideOptions()
         const floor = this.getCurrentFloor()
         clearChildren(qs('#dialog-container') as HTMLElement)
         if (floor === null) {
@@ -1932,18 +1957,43 @@ class Game {
         return false
     }
     switchUiLanguge() {
-        for (let e of Array.from(qsa('.l10n-text-ui'))) {
+        for (let e of qsa('.l10n-text-ui')) {
             e.textContent = this.ui_string[e.getAttribute('lkey')!].get(this.lang)
         }
     }
     switchTextLanguage() {
-
+        // avatar
+        for (let e of qsa('.avatar>div[lkey]')) {
+            e.innerHTML = game_passenger_list.getById(e.getAttribute('lkey') ?? '')?.avatar_text.get(game.lang) ?? ''
+        }
+        // dialog
+        for (let e of qsa('.dialog-box[lkey]')) {
+            const dlg_id = e.getAttribute('lkey') ?? ''
+            const [_, dbk_num] = Dialog.splitId(dlg_id)
+            e.innerHTML =
+                (game.getCurrentFloor()?.
+                    dialog_scene.getDialogBlock(`${dbk_num}_dbk`)?.
+                    getItemById(dlg_id) as Dialog)?.text.get(game.lang) ?? ''
+        }
+        // option
+        for (let e of qsa('.option-button>div[lkey]')) {
+            const opt_id = e.getAttribute('lkey') ?? ''
+            const [_, slt_num] = SelectOption.splitId(opt_id)
+            e.innerHTML =
+                (game.getCurrentFloor()?.
+                    dialog_scene.getCurDialogBlock()?.
+                    getItemById(`${slt_num}_slt`) as BranchSelect)?.
+                    getOptionById(opt_id)?.text.get(game.lang) ?? ''
+        }
+        // passenger
+        // task
     }
     initialize() {
         this.createFloorButtons()
         // this.renderFloor()
         this.language_display.set(this.lang)
         this.switchUiLanguge()
+        this.dots_animation.start()
     }
     async debug() {
         this.renderFloor()
@@ -1953,7 +2003,6 @@ class Game {
         Game.hideGoOnButton()
         qs('#options-row').style.display = 'none';
         (qs('#save-text-area') as HTMLTextAreaElement).value = ''
-        this.dots_animation.start()
     }
 }
 
@@ -2128,38 +2177,71 @@ const game_lang_list = new LanguageList([
 ])
 const game_default_lang = 'zh_cn'
 const game_signature_list = new SignatureList([])
+// TODO: generate function
 const game_action_list = new GameActionList([])
 const game_task_list = new GameTaskList([])
 const game_passenger_list = new PassengerList([
     {
         id: 'me_psg',
-        name: {
-            zh_cn: '我',
-            en: 'Me'
-        },
+        name: { zh_cn: '我', en: 'Me' },
         avatar_color: 'black',
         avatar_font_color: 'white',
-        avatar_text: {
-            zh_cn: '我',
-            en: 'ME'
-        },
+        avatar_text: { zh_cn: '我', en: 'ME' },
     },
     {
         id: 'jacob_psg',
-        name: {
-            zh_cn: '邓霜杰',
-            en: 'Jacob'
-        },
+        name: { zh_cn: '邓霜杰', en: 'Jacob' },
         avatar_color: 'black',
         avatar_font_color: 'white',
-        avatar_text: {
-            zh_cn: '霜杰',
-            en: 'JC'
-        },
+        avatar_text: { zh_cn: '杰', en: 'JC' },
     },
 ])
 const game_plot_thread_list = new PlotThreadList([])
-const game_floor_list = new FloorList([])
+let aaa: OptionObject
+const game_floor_list = new FloorList([
+    {
+        id: '1_flr',
+        dialog_scene: {
+            id: '1_dsc',
+            blocks: [
+                {
+                    id: 'A01_dbk',
+                    dialogs: [
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '我超', en: 'ong' },
+                            layout: DialogLayout.RIGHT
+                        }, {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '什么情况', en: 'wat happened' },
+                            layout: DialogLayout.RIGHT
+                        }, {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
+                            layout: DialogLayout.RIGHT
+                        }, {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '哦草', en: 'f word' },
+                            layout: DialogLayout.RIGHT
+                        },
+                    ],
+                    select: {
+                        options: [
+                            {
+                                next: '',
+                                text: { zh_cn: '打胶', en: 'fap' }
+                            },
+                            {
+                                next: '',
+                                text: { zh_cn: '炉管', en: 'jerk' }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+])
 const game_ui_string_raw: UiStringDictRaw = {
     'PERSON_NUM': { zh_cn: '人数', en: 'Persons' },
     'COPY': { zh_cn: '复制', en: 'COPY' },
