@@ -411,7 +411,7 @@ class DialogBlock {
     constructor(id, dialogs, select = null) {
         var _a;
         this.id = id;
-        this.cur_dialog_index = 0;
+        this.cur_item_index = 0;
         this.data = [];
         for (let i = 0; i < dialogs.length; ++i) {
             this.data.push(new Dialog(`${getNumFromId(this.id)}${padLeftZero(i)}_dlg`, dialogs[i].person_id, new L10nText(dialogs[i].text), dialogs[i].layout, (_a = dialogs[i].action_id) !== null && _a !== void 0 ? _a : ''));
@@ -419,6 +419,40 @@ class DialogBlock {
         if (select !== null) {
             this.data.push(new BranchSelect(`${getNumFromId(this.id)}00_slt`, select.options));
         }
+    }
+    getItemByIndex(index) {
+        return index < 0 || index >= this.data.length ? null : this.data[index];
+    }
+    getCurItem() {
+        return this.getItemByIndex(this.cur_item_index);
+    }
+    resetIndex() {
+        this.cur_item_index = 0;
+    }
+    setIndexToEnd() {
+        this.cur_item_index = this.data.length;
+    }
+    stepIndex() {
+        this.cur_item_index += 1;
+        if (this.cur_item_index < 0) {
+            this.cur_item_index = 0;
+        }
+        if (this.cur_item_index > this.data.length) {
+            this.cur_item_index = this.data.length;
+        }
+    }
+    isNotFirstLine() {
+        if (this.cur_item_index <= 0 || this.cur_item_index >= this.data.length) {
+            return false;
+        }
+        const cur = this.getCurItem();
+        const pre = this.getItemByIndex(this.cur_item_index - 1);
+        if (cur !== null && pre !== null &&
+            !cur.isSelect() && !pre.isSelect() &&
+            cur.person_id === pre.person_id) {
+            return true;
+        }
+        return false;
     }
     toString() {
         return `{}`;
@@ -435,6 +469,14 @@ class DialogScene {
         this.cur_block_id = '';
         this.visited_blocks = [];
     }
+    getCurDialogBlock() {
+        for (let block of this.dialog_blocks) {
+            if (block.id === this.cur_block_id) {
+                return block;
+            }
+        }
+        return null;
+    }
     getDialogBlock(id) {
         for (let block of this.dialog_blocks) {
             if (block.id === id) {
@@ -442,6 +484,19 @@ class DialogScene {
             }
         }
         return null;
+    }
+    addVisitedBlock(id) {
+        if (this.visited_blocks.indexOf(id) !== -1) {
+            return;
+        }
+        this.visited_blocks.push(id);
+    }
+    removeVisitedBlock(id) {
+        const index = this.visited_blocks.indexOf(id);
+        if (index === -1) {
+            return;
+        }
+        this.visited_blocks.splice(index, 1);
     }
     toString() {
         return `{}`;
@@ -969,7 +1024,7 @@ class ListDisplay {
     }
     remove(id) {
         const index = this.data.indexOf(id);
-        if (index !== -1) {
+        if (index === -1) {
             return;
         }
         this.data.splice(index, 1);
@@ -1072,7 +1127,24 @@ class Game {
         this.passenger_display = new PassengerDisplay([]);
         this.task_display = new TaskDisplay([]);
     }
-    getTFIcon(icon_type) {
+    static hideGoOnButton() {
+        qs('#sheng-lue-dots').style.display = 'none';
+        qs('#go-on-button-row').style.display = 'none';
+    }
+    static showGoOnButton() {
+        qs('#sheng-lue-dots').style.display = 'flex';
+        qs('#go-on-button-row').style.display = 'flex';
+    }
+    static hideOptions() {
+        qs('#options-row').style.display = 'none';
+    }
+    static showOptions() {
+        qs('#options-row').style.display = 'flex';
+    }
+    getCurrentFloor() {
+        return game_floor_list.getById(`${this.cur_floor}_flr`);
+    }
+    static getTFIcon(icon_type) {
         if (icon_type) {
             let icon_t = document.createElement('div');
             icon_t.classList.add('save-opration-succ');
@@ -1090,7 +1162,7 @@ class Game {
             return icon_f;
         }
     }
-    createAvatar(psg_id) {
+    static createAvatar(psg_id, lang) {
         const psg = game_passenger_list.getById(psg_id);
         let pfp = document.createElement('div');
         pfp.classList.add('avatar');
@@ -1099,13 +1171,13 @@ class Game {
         if (psg !== null) {
             pfp_text.style.backgroundColor = psg.avatar_color;
             pfp_text.style.color = psg.avatar_font_color;
-            pfp_text.innerHTML = psg.avatar_text.get(this.lang);
+            pfp_text.innerHTML = psg.avatar_text.get(lang);
             pfp_text.setAttribute('lkey', psg.id);
         }
         pfp.appendChild(pfp_text);
         return pfp;
     }
-    createDialogElement(dialog, is_not_first = true) {
+    static createDialogElement(dialog, lang, is_not_first = true) {
         switch (dialog.layout) {
             case DialogLayout.LEFT:
                 let l = document.createElement('div');
@@ -1115,9 +1187,11 @@ class Game {
                 if (is_not_first) {
                     l_box.classList.add('left-not-first-line');
                 }
-                l_box.innerHTML = dialog.text.get(this.lang);
+                l_box.innerHTML = dialog.text.get(lang);
                 l_box.setAttribute('lkey', dialog.id);
-                l.append(this.createAvatar(dialog.person_id));
+                if (!is_not_first) {
+                    l.append(Game.createAvatar(dialog.person_id, lang));
+                }
                 l.append(l_box);
                 return l;
             case DialogLayout.RIGHT:
@@ -1128,17 +1202,19 @@ class Game {
                 if (is_not_first) {
                     r_box.classList.add('right-not-first-line');
                 }
-                r_box.innerHTML = dialog.text.get(this.lang);
+                r_box.innerHTML = dialog.text.get(lang);
                 r_box.setAttribute('lkey', dialog.id);
                 r.append(r_box);
-                r.append(this.createAvatar(dialog.person_id));
+                if (!is_not_first) {
+                    r.append(Game.createAvatar(dialog.person_id, lang));
+                }
                 return r;
             case DialogLayout.MIDDLE:
                 let m = document.createElement('div');
                 m.classList.add('dialog-row', 'mid-dialog-row');
                 let m_box = document.createElement('div');
                 m_box.classList.add('dialog-box', 'mid-dialog-box');
-                m_box.innerHTML = dialog.text.get(this.lang);
+                m_box.innerHTML = dialog.text.get(lang);
                 m_box.setAttribute('lkey', dialog.id);
                 m.appendChild(m_box);
                 return m;
@@ -1146,33 +1222,118 @@ class Game {
                 return null;
         }
     }
-    createSelectOpntions(select) {
+    static stepDialog(block, lang) {
+        const item = block.getCurItem();
+        if (item === null) {
+            Game.hideOptions();
+            block.stepIndex();
+            Game.showGoOnButton();
+            return;
+        }
+        if (item.isSelect()) {
+            Game.renderSelect(item, lang);
+            block.setIndexToEnd();
+        }
+        else {
+            Game.hideOptions();
+            Game.renderDialog(item, lang);
+            item.doAction();
+            block.stepIndex();
+            Game.showGoOnButton();
+        }
+    }
+    static createOptionElement(opt, lang) {
+        let opt_btn = document.createElement('div');
+        opt_btn.classList.add('option-button');
+        opt_btn.setAttribute('next', opt.next_dialog_block_id);
+        let opt_text = document.createElement('div');
+        opt_text.classList.add('unselectable');
+        opt_text.innerHTML = opt.text.get(lang);
+        opt_text.setAttribute('lkey', opt.id);
+        opt_btn.appendChild(opt_text);
+        opt_btn.addEventListener('click', () => {
+            Game.hideOptions();
+            const next = opt_btn.getAttribute('next');
+            const floor = game.getCurrentFloor();
+            if (floor === null || next === null) {
+                return;
+            }
+            floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id);
+            floor.dialog_scene.cur_block_id = next;
+            const block = floor.dialog_scene.getCurDialogBlock();
+            if (block === null) {
+                return;
+            }
+            block.resetIndex();
+            Game.stepDialog(block, game.lang);
+        });
+        return opt_btn;
+    }
+    static renderDialog(dialog, lang, is_not_first = true) {
+        const dialog_container = qs('#dialog-container');
+        const dialog_ele = Game.createDialogElement(dialog, lang, is_not_first);
+        if (dialog_ele !== null) {
+            dialog_container.appendChild(dialog_ele);
+            return true;
+        }
+        return false;
+    }
+    static renderSelect(select, lang) {
+        Game.hideGoOnButton();
         const opt_row = qs('#options-row');
         clearChildren(opt_row);
         for (let opt of select.options) {
-            let opt_btn = document.createElement('div');
-            opt_btn.classList.add('option-button');
-            let opt_text = document.createElement('div');
-            opt_text.classList.add('unselectable');
-            opt_text.innerHTML = opt.text.get(this.lang);
-            opt_text.setAttribute('lkey', opt.id);
-            opt_btn.appendChild(opt_text);
+            opt_row.appendChild(Game.createOptionElement(opt, lang));
         }
-        opt_row.style.display = 'flex';
+        Game.showOptions();
+    }
+    static renderBlock(block, lang, is_render_all = true) {
+        let pre_id = '';
+        for (let i = 0; i < block.data.length; ++i) {
+            if (!is_render_all && i >= block.cur_item_index) {
+                if (i === 0) {
+                    Game.stepDialog(block, lang);
+                }
+                break;
+            }
+            const item = block.getItemByIndex(i);
+            if (item === null) {
+                break;
+            }
+            if (item.isSelect()) {
+                if (!is_render_all) {
+                    Game.renderSelect(item, lang);
+                    break;
+                }
+            }
+            else {
+                Game.hideOptions();
+                if (Game.renderDialog(item, lang, pre_id === item.person_id)) {
+                    pre_id = item.person_id;
+                }
+                Game.showGoOnButton();
+            }
+        }
     }
     renderFloor() {
-        const dialog_container = qs('#dialog-container');
-        const floor = game_floor_list.getById(this.cur_floor.toString());
-        clearChildren(dialog_container);
-        if (floor !== null) {
-            let dialog_item = document.createElement('div');
-            let dialog_text = document.createElement('div');
-            dialog_item.classList.add('dialog-row', 'mid-dialog-row');
-            dialog_text.classList.add('dialog-box', 'mid-dialog-box');
-            dialog_text.textContent = '';
-            dialog_item.appendChild(dialog_text);
-            dialog_container.appendChild(dialog_item);
+        const floor = this.getCurrentFloor();
+        clearChildren(qs('#dialog-container'));
+        if (floor === null) {
+            return;
         }
+        for (let block_id of floor.dialog_scene.visited_blocks) {
+            const vis_block = floor.dialog_scene.getDialogBlock(block_id);
+            if (vis_block !== null) {
+                Game.renderBlock(vis_block, this.lang);
+            }
+        }
+        const cur_block = floor.dialog_scene.getCurDialogBlock();
+        if (cur_block !== null) {
+            Game.renderBlock(cur_block, this.lang, false);
+        }
+        const bg = qs('#background');
+        bg.style.backgroundColor = floor.background.bg_color;
+        bg.innerHTML = floor.background.inner_html;
     }
     isLiftable() {
         return !(this.pending_queue.length() <= 0 ||
@@ -1329,8 +1490,7 @@ class Game {
         return __awaiter(this, void 0, void 0, function* () {
             this.renderFloor();
             this.door.syncStart(DoorDir.OPEN);
-            qs('#sheng-lue-dots').style.display = 'none';
-            qs('#go-on-button-row').style.display = 'none';
+            Game.hideGoOnButton();
             qs('#options-row').style.display = 'none';
             qs('#save-text-area').value = '';
             this.dots_animation.start();
@@ -1423,7 +1583,7 @@ const binding_buttons = [
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
             const res = JSON.parse(game.serializate());
-            qs('#save-export-button').appendChild(game.getTFIcon(res.status));
+            qs('#save-export-button').appendChild(Game.getTFIcon(res.status));
             if (res.status) {
                 qs('#save-text-area').value = JSON.stringify(res.data);
             }
@@ -1436,7 +1596,7 @@ const binding_buttons = [
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
             const text = qs('#save-text-area').value;
-            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate(text)));
+            qs('#save-import-button').appendChild(Game.getTFIcon(game.deserializate(text)));
         }
     },
     {
@@ -1459,6 +1619,18 @@ const binding_buttons = [
         func: () => __awaiter(void 0, void 0, void 0, function* () {
             yield clickSwitchLangButton(LangBtnDir.RIGHT);
         })
+    },
+    {
+        selector: '#go-on-button-row',
+        is_single: true,
+        func: () => {
+            var _a;
+            const block = (_a = game.getCurrentFloor()) === null || _a === void 0 ? void 0 : _a.dialog_scene.getCurDialogBlock();
+            if (!block) {
+                return;
+            }
+            Game.stepDialog(block, game.lang);
+        }
     }
 ];
 function bindButtonFunctions() {
@@ -1476,7 +1648,6 @@ function bindButtonFunctions() {
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize();
     bindButtonFunctions();
-    game.debug();
 });
 const game_lang_list = new LanguageList([
     { id: 'zh_cn', name: '中文' },
@@ -1486,7 +1657,34 @@ const game_default_lang = 'zh_cn';
 const game_signature_list = new SignatureList([]);
 const game_action_list = new GameActionList([]);
 const game_task_list = new GameTaskList([]);
-const game_passenger_list = new PassengerList([]);
+const game_passenger_list = new PassengerList([
+    {
+        id: 'me_psg',
+        name: {
+            zh_cn: '我',
+            en: 'Me'
+        },
+        avatar_color: 'black',
+        avatar_font_color: 'white',
+        avatar_text: {
+            zh_cn: '我',
+            en: 'ME'
+        },
+    },
+    {
+        id: 'jacob_psg',
+        name: {
+            zh_cn: '邓霜杰',
+            en: 'Jacob'
+        },
+        avatar_color: 'black',
+        avatar_font_color: 'white',
+        avatar_text: {
+            zh_cn: '霜杰',
+            en: 'JC'
+        },
+    },
+]);
 const game_plot_thread_list = new PlotThreadList([]);
 const game_floor_list = new FloorList([]);
 const game_ui_string_raw = {

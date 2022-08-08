@@ -181,9 +181,15 @@ interface SelectObject {
 }
 declare class DialogBlock {
     id: string;
-    cur_dialog_index: number;
+    cur_item_index: number;
     data: DialogBlockItem[];
     constructor(id: string, dialogs: DialogObject[], select?: SelectObject | null);
+    getItemByIndex(index: number): DialogBlockItem | null;
+    getCurItem(): DialogBlockItem | null;
+    resetIndex(): void;
+    setIndexToEnd(): void;
+    stepIndex(): void;
+    isNotFirstLine(): boolean;
     toString(): string;
 }
 interface DialogBlockObject {
@@ -197,7 +203,10 @@ declare class DialogScene {
     cur_block_id: string;
     visited_blocks: string[];
     constructor(id: string, blocks: DialogBlockObject[]);
+    getCurDialogBlock(): DialogBlock | null;
     getDialogBlock(id: string): DialogBlock | null;
+    addVisitedBlock(id: string): void;
+    removeVisitedBlock(id: string): void;
     toString(): string;
 }
 interface DialogSceneObject {
@@ -409,10 +418,19 @@ declare class Game {
     passenger_display: PassengerDisplay;
     task_display: TaskDisplay;
     constructor();
-    getTFIcon(icon_type: boolean): HTMLElement;
-    createAvatar(psg_id: string): HTMLElement;
-    createDialogElement(dialog: Dialog, is_not_first?: boolean): HTMLElement | null;
-    createSelectOpntions(select: BranchSelect): void;
+    static hideGoOnButton(): void;
+    static showGoOnButton(): void;
+    static hideOptions(): void;
+    static showOptions(): void;
+    getCurrentFloor(): Floor | null;
+    static getTFIcon(icon_type: boolean): HTMLElement;
+    static createAvatar(psg_id: string, lang: string): HTMLElement;
+    static createDialogElement(dialog: Dialog, lang: string, is_not_first?: boolean): HTMLElement | null;
+    static stepDialog(block: DialogBlock, lang: string): void;
+    static createOptionElement(opt: SelectOption, lang: string): HTMLElement;
+    static renderDialog(dialog: Dialog, lang: string, is_not_first?: boolean): boolean;
+    static renderSelect(select: BranchSelect, lang: string): void;
+    static renderBlock(block: DialogBlock, lang: string, is_render_all?: boolean): void;
     renderFloor(): void;
     isLiftable(): boolean;
     calcLiftDirection(): void;

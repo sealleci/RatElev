@@ -1,7 +1,7 @@
 /* TODO: main
- * save function
- * branch select
- * auto id
+ * - [ ] save function
+ * - [x] branch select
+ * - [x] auto id
  */
 
 function sleep(time: number) {
@@ -80,8 +80,6 @@ const qs = function (selector: any): HTMLElement {
 const qsa = function (selector: any): NodeListOf<HTMLElement> {
     return document.querySelectorAll(selector as string)
 }
-
-// TODO: interface document
 
 /**
  * @param id - string
@@ -634,12 +632,12 @@ class DialogBlock {
      * regex: /\d+_dbk/
      */
     public id: string
-    public cur_dialog_index: number
+    public cur_item_index: number
     public data: DialogBlockItem[]
 
     constructor(id: string, dialogs: DialogObject[], select: SelectObject | null = null) {
         this.id = id
-        this.cur_dialog_index = 0
+        this.cur_item_index = 0
         this.data = []
         for (let i = 0; i < dialogs.length; ++i) {
             this.data.push(new Dialog(
@@ -656,6 +654,43 @@ class DialogBlock {
                 select.options
             ))
         }
+    }
+    getItemByIndex(index: number): DialogBlockItem | null {
+        return index < 0 || index >= this.data.length ? null : this.data[index]
+    }
+    getCurItem(): DialogBlockItem | null {
+        return this.getItemByIndex(this.cur_item_index)
+    }
+    resetIndex() {
+        this.cur_item_index = 0
+    }
+    setIndexToEnd() {
+        this.cur_item_index = this.data.length
+    }
+    /**
+     * range of `cur_dialog_index` is `[0, length]`, `length` is for the end.
+     */
+    stepIndex() {
+        this.cur_item_index += 1
+        if (this.cur_item_index < 0) {
+            this.cur_item_index = 0
+        }
+        if (this.cur_item_index > this.data.length) {
+            this.cur_item_index = this.data.length
+        }
+    }
+    isNotFirstLine(): boolean {
+        if (this.cur_item_index <= 0 || this.cur_item_index >= this.data.length) {
+            return false
+        }
+        const cur = this.getCurItem()
+        const pre = this.getItemByIndex(this.cur_item_index - 1)
+        if (cur !== null && pre !== null &&
+            !cur.isSelect() && !pre.isSelect() &&
+            (cur as Dialog).person_id === (pre as Dialog).person_id) {
+            return true
+        }
+        return false
     }
     toString(): string {
         return `{}`
@@ -700,6 +735,14 @@ class DialogScene {
         this.cur_block_id = ''
         this.visited_blocks = []
     }
+    getCurDialogBlock(): DialogBlock | null {
+        for (let block of this.dialog_blocks) {
+            if (block.id === this.cur_block_id) {
+                return block
+            }
+        }
+        return null
+    }
     getDialogBlock(id: string): DialogBlock | null {
         for (let block of this.dialog_blocks) {
             if (block.id === id) {
@@ -707,6 +750,19 @@ class DialogScene {
             }
         }
         return null
+    }
+    addVisitedBlock(id: string) {
+        if (this.visited_blocks.indexOf(id) !== -1) {
+            return
+        }
+        this.visited_blocks.push(id)
+    }
+    removeVisitedBlock(id: string) {
+        const index = this.visited_blocks.indexOf(id)
+        if (index === -1) {
+            return
+        }
+        this.visited_blocks.splice(index, 1)
     }
     toString(): string {
         return `{}`
@@ -839,7 +895,6 @@ interface PlotThreadObject {
 
 class PlotThreadList extends AbstractList<PlotThread>{
     constructor(data: PlotThread[]) {
-        // TODO: PlotThreadObject
         super()
         this.data = data
     }
@@ -1364,7 +1419,7 @@ abstract class ListDisplay<T> {
     }
     remove(id: string) {
         const index = this.data.indexOf(id)
-        if (index !== -1) {
+        if (index === -1) {
             return
         }
         this.data.splice(index, 1)
@@ -1521,7 +1576,24 @@ class Game {
         this.passenger_display = new PassengerDisplay([])
         this.task_display = new TaskDisplay([])
     }
-    getTFIcon(icon_type: boolean): HTMLElement {
+    static hideGoOnButton() {
+        qs('#sheng-lue-dots').style.display = 'none'
+        qs('#go-on-button-row').style.display = 'none'
+    }
+    static showGoOnButton() {
+        qs('#sheng-lue-dots').style.display = 'flex'
+        qs('#go-on-button-row').style.display = 'flex'
+    }
+    static hideOptions() {
+        qs('#options-row').style.display = 'none'
+    }
+    static showOptions() {
+        qs('#options-row').style.display = 'flex'
+    }
+    getCurrentFloor(): Floor | null {
+        return game_floor_list.getById(`${this.cur_floor}_flr`)
+    }
+    static getTFIcon(icon_type: boolean): HTMLElement {
         if (icon_type) {
             let icon_t = document.createElement('div')
             icon_t.classList.add('save-opration-succ')
@@ -1539,7 +1611,7 @@ class Game {
             return icon_f
         }
     }
-    createAvatar(psg_id: string): HTMLElement {
+    static createAvatar(psg_id: string, lang: string): HTMLElement {
         const psg = game_passenger_list.getById(psg_id)
         let pfp: HTMLElement = document.createElement('div')
         pfp.classList.add('avatar')
@@ -1548,13 +1620,13 @@ class Game {
         if (psg !== null) {
             pfp_text.style.backgroundColor = psg.avatar_color
             pfp_text.style.color = psg.avatar_font_color
-            pfp_text.innerHTML = psg.avatar_text.get(this.lang)
+            pfp_text.innerHTML = psg.avatar_text.get(lang)
             pfp_text.setAttribute('lkey', psg.id)
         }
         pfp.appendChild(pfp_text)
         return pfp
     }
-    createDialogElement(dialog: Dialog, is_not_first: boolean = true): HTMLElement | null {
+    static createDialogElement(dialog: Dialog, lang: string, is_not_first: boolean = true): HTMLElement | null {
         switch (dialog.layout) {
             case DialogLayout.LEFT:
                 let l: HTMLElement = document.createElement('div')
@@ -1564,9 +1636,11 @@ class Game {
                 if (is_not_first) {
                     l_box.classList.add('left-not-first-line')
                 }
-                l_box.innerHTML = dialog.text.get(this.lang)
+                l_box.innerHTML = dialog.text.get(lang)
                 l_box.setAttribute('lkey', dialog.id)
-                l.append(this.createAvatar(dialog.person_id))
+                if (!is_not_first) {
+                    l.append(Game.createAvatar(dialog.person_id, lang))
+                }
                 l.append(l_box)
                 return l
             case DialogLayout.RIGHT:
@@ -1577,17 +1651,19 @@ class Game {
                 if (is_not_first) {
                     r_box.classList.add('right-not-first-line')
                 }
-                r_box.innerHTML = dialog.text.get(this.lang)
+                r_box.innerHTML = dialog.text.get(lang)
                 r_box.setAttribute('lkey', dialog.id)
                 r.append(r_box)
-                r.append(this.createAvatar(dialog.person_id))
+                if (!is_not_first) {
+                    r.append(Game.createAvatar(dialog.person_id, lang))
+                }
                 return r
             case DialogLayout.MIDDLE:
                 let m: HTMLElement = document.createElement('div')
                 m.classList.add('dialog-row', 'mid-dialog-row')
                 let m_box: HTMLElement = document.createElement('div')
                 m_box.classList.add('dialog-box', 'mid-dialog-box')
-                m_box.innerHTML = dialog.text.get(this.lang)
+                m_box.innerHTML = dialog.text.get(lang)
                 m_box.setAttribute('lkey', dialog.id)
                 m.appendChild(m_box)
                 return m
@@ -1595,35 +1671,124 @@ class Game {
                 return null
         }
     }
-    createSelectOpntions(select: BranchSelect) {
+    static stepDialog(block: DialogBlock, lang: string) {
+        const item = block.getCurItem()
+        if (item === null) {
+            Game.hideOptions()
+            block.stepIndex()
+            Game.showGoOnButton()
+            return
+        }
+        if (item.isSelect()) {
+            Game.renderSelect(item as BranchSelect, lang)
+            block.setIndexToEnd()
+        } else {
+            Game.hideOptions()
+            Game.renderDialog(item as Dialog, lang);
+            (item as Dialog).doAction()
+            block.stepIndex()
+            Game.showGoOnButton()
+        }
+    }
+    static createOptionElement(opt: SelectOption, lang: string): HTMLElement {
+        let opt_btn = document.createElement('div')
+        opt_btn.classList.add('option-button')
+        opt_btn.setAttribute('next', opt.next_dialog_block_id)
+        let opt_text = document.createElement('div')
+        opt_text.classList.add('unselectable')
+        opt_text.innerHTML = opt.text.get(lang)
+        opt_text.setAttribute('lkey', opt.id)
+        opt_btn.appendChild(opt_text)
+        opt_btn.addEventListener('click', () => {
+            Game.hideOptions()
+            const next = opt_btn.getAttribute('next')
+            const floor = game.getCurrentFloor()
+            if (floor === null || next === null) {
+                return
+            }
+            floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id)
+            floor.dialog_scene.cur_block_id = next;
+            const block = floor.dialog_scene.getCurDialogBlock()
+            if (block === null) {
+                return
+            }
+            block.resetIndex()
+            Game.stepDialog(block, game.lang)
+        })
+        return opt_btn
+    }
+    static renderDialog(dialog: Dialog, lang: string, is_not_first: boolean = true): boolean {
+        const dialog_container = qs('#dialog-container')
+        const dialog_ele = Game.createDialogElement(dialog, lang, is_not_first)
+        if (dialog_ele !== null) {
+            dialog_container.appendChild(dialog_ele)
+            return true
+        }
+        return false
+    }
+    static renderSelect(select: BranchSelect, lang: string) {
+        Game.hideGoOnButton()
         const opt_row: HTMLElement = qs('#options-row')
         clearChildren(opt_row)
         for (let opt of select.options) {
-            let opt_btn = document.createElement('div')
-            opt_btn.classList.add('option-button')
-            let opt_text = document.createElement('div')
-            opt_text.classList.add('unselectable')
-            opt_text.innerHTML = opt.text.get(this.lang)
-            opt_text.setAttribute('lkey', opt.id)
-            opt_btn.appendChild(opt_text)
+            opt_row.appendChild(Game.createOptionElement(opt, lang))
         }
-        opt_row.style.display = 'flex'
+        Game.showOptions()
+    }
+    /**
+     * 
+     * @param block 
+     * @param is_render_all - if true, will not render select; if false, render to `cur_item_index`
+     */
+    static renderBlock(block: DialogBlock, lang: string, is_render_all: boolean = true) {
+        let pre_id = ''
+        for (let i = 0; i < block.data.length; ++i) {
+            if (!is_render_all && i >= block.cur_item_index) {
+                if (i === 0) {
+                    Game.stepDialog(block, lang)
+                }
+                break
+            }
+            const item = block.getItemByIndex(i)
+            if (item === null) {
+                break
+            }
+            if (item.isSelect()) {
+                if (!is_render_all) {
+                    Game.renderSelect(item as BranchSelect, lang)
+                    break
+                }
+            } else {
+                Game.hideOptions()
+                if (Game.renderDialog(item as Dialog, lang, pre_id === (item as Dialog).person_id)) {
+                    pre_id = (item as Dialog).person_id
+                }
+                Game.showGoOnButton()
+            }
+        }
     }
     renderFloor() {
-        const dialog_container = qs('#dialog-container')
-        const floor = game_floor_list.getById(this.cur_floor.toString())
-        clearChildren(dialog_container)
-        if (floor !== null) {
-            let dialog_item = document.createElement('div')
-            let dialog_text = document.createElement('div')
-            dialog_item.classList.add('dialog-row', 'mid-dialog-row')
-            dialog_text.classList.add('dialog-box', 'mid-dialog-box')
-            // TODO: redener dialog
-            // dialog_text.textContent = floor.dialogs[0].data[0].text.get(this.lang)
-            dialog_text.textContent = ''
-            dialog_item.appendChild(dialog_text)
-            dialog_container.appendChild(dialog_item)
+        // TODO: select block by thread
+        const floor = this.getCurrentFloor()
+        clearChildren(qs('#dialog-container') as HTMLElement)
+        if (floor === null) {
+            return
         }
+        // render visited blocks
+        for (let block_id of floor.dialog_scene.visited_blocks) {
+            const vis_block = floor.dialog_scene.getDialogBlock(block_id)
+            if (vis_block !== null) {
+                Game.renderBlock(vis_block, this.lang)
+            }
+        }
+        //render current block
+        const cur_block = floor.dialog_scene.getCurDialogBlock()
+        if (cur_block !== null) {
+            Game.renderBlock(cur_block, this.lang, false)
+        }
+        const bg: HTMLElement = qs('#background')
+        bg.style.backgroundColor = floor.background.bg_color
+        bg.innerHTML = floor.background.inner_html
     }
     isLiftable(): boolean {
         return !(this.pending_queue.length() <= 0 ||
@@ -1785,8 +1950,7 @@ class Game {
         this.door.syncStart(DoorDir.OPEN);
         // this.save_panel.syncStart('open')
         // qs('.number-button[index="5"]').click()
-        qs('#sheng-lue-dots').style.display = 'none'
-        qs('#go-on-button-row').style.display = 'none'
+        Game.hideGoOnButton()
         qs('#options-row').style.display = 'none';
         (qs('#save-text-area') as HTMLTextAreaElement).value = ''
         this.dots_animation.start()
@@ -1796,7 +1960,7 @@ class Game {
 /**
  * @param selector - string
  * @param is_single - boolean
- * @param func - Function((HTMLElement, MouseEvent) => void)
+ * @param func - Function((this: HTMLElement, event: MouseEvent) => void)
  */
 interface BindingButton {
     selector: string
@@ -1887,7 +2051,7 @@ const binding_buttons: BindingButton[] = [
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
             const res = <SaveRootType>JSON.parse(game.serializate())
-            qs('#save-export-button').appendChild(game.getTFIcon(res.status))
+            qs('#save-export-button').appendChild(Game.getTFIcon(res.status))
             if (res.status) {
                 (qs('#save-text-area') as HTMLTextAreaElement).value = JSON.stringify(res.data)
             }
@@ -1900,7 +2064,7 @@ const binding_buttons: BindingButton[] = [
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
             const text = (qs('#save-text-area') as HTMLTextAreaElement).value
-            qs('#save-import-button').appendChild(game.getTFIcon(game.deserializate(text)))
+            qs('#save-import-button').appendChild(Game.getTFIcon(game.deserializate(text)))
         }
     },
     {
@@ -1925,6 +2089,17 @@ const binding_buttons: BindingButton[] = [
             await clickSwitchLangButton(LangBtnDir.RIGHT)
         }
 
+    },
+    {
+        selector: '#go-on-button-row',
+        is_single: true,
+        func: () => {
+            const block = game.getCurrentFloor()?.dialog_scene.getCurDialogBlock()
+            if (!block) {
+                return
+            }
+            Game.stepDialog(block, game.lang)
+        }
     }
 ]
 
@@ -1944,7 +2119,7 @@ function bindButtonFunctions() {
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize()
     bindButtonFunctions()
-    game.debug()
+    // game.debug()
 })
 
 const game_lang_list = new LanguageList([
@@ -1955,7 +2130,34 @@ const game_default_lang = 'zh_cn'
 const game_signature_list = new SignatureList([])
 const game_action_list = new GameActionList([])
 const game_task_list = new GameTaskList([])
-const game_passenger_list = new PassengerList([])
+const game_passenger_list = new PassengerList([
+    {
+        id: 'me_psg',
+        name: {
+            zh_cn: '我',
+            en: 'Me'
+        },
+        avatar_color: 'black',
+        avatar_font_color: 'white',
+        avatar_text: {
+            zh_cn: '我',
+            en: 'ME'
+        },
+    },
+    {
+        id: 'jacob_psg',
+        name: {
+            zh_cn: '邓霜杰',
+            en: 'Jacob'
+        },
+        avatar_color: 'black',
+        avatar_font_color: 'white',
+        avatar_text: {
+            zh_cn: '霜杰',
+            en: 'JC'
+        },
+    },
+])
 const game_plot_thread_list = new PlotThreadList([])
 const game_floor_list = new FloorList([])
 const game_ui_string_raw: UiStringDictRaw = {
