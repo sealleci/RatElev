@@ -112,7 +112,11 @@ body {
     padding: 0 0 4px 5px;
     margin: 2px 0;
     font-family: 'DFKai-SB';
+    font-size: 1rem;
     border-bottom: 1px dotted #2666CF;
+    overflow-x: scroll;
+    scrollbar-width: none;
+    white-space: nowrap;
 }
 
 #passenger-list .passenger-item::before {
@@ -759,15 +763,10 @@ body {
     border-radius: 15px 15px 15px 0;
     text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
     overflow-y: scroll;
-    scrollbar-width: none;
 }
 
 .option-button>div {
     margin: auto;
-}
-
-.option-button::-webkit-scrollbar {
-    width: 0;
 }
 
 .option-button:hover {

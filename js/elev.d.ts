@@ -464,7 +464,6 @@ declare const game_action_list: GameActionList;
 declare const game_task_list: GameTaskList;
 declare const game_passenger_list: PassengerList;
 declare const game_plot_thread_list: PlotThreadList;
-declare let aaa: OptionObject;
 declare const game_floor_list: FloorList;
 declare const game_ui_string_raw: UiStringDictRaw;
 declare const game: Game;

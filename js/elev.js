@@ -1246,7 +1246,7 @@ class Game {
     }
     static createOptionElement(opt, lang) {
         let opt_btn = document.createElement('div');
-        opt_btn.classList.add('option-button');
+        opt_btn.classList.add('option-button', 'noscrollbar');
         opt_btn.setAttribute('next', opt.next_dialog_block_id);
         let opt_text = document.createElement('div');
         opt_text.classList.add('unselectable');
@@ -1707,14 +1707,13 @@ const game_passenger_list = new PassengerList([
     },
     {
         id: 'jacob_psg',
-        name: { zh_cn: '邓霜杰', en: 'Jacob' },
+        name: { zh_cn: '邓霜杰', en: 'Jacob Derek' },
         avatar_color: 'black',
         avatar_font_color: 'white',
-        avatar_text: { zh_cn: '杰', en: 'JC' },
+        avatar_text: { zh_cn: '杰', en: 'JD' },
     },
 ]);
 const game_plot_thread_list = new PlotThreadList([]);
-let aaa;
 const game_floor_list = new FloorList([
     {
         id: '1_flr',
@@ -1745,15 +1744,25 @@ const game_floor_list = new FloorList([
                     select: {
                         options: [
                             {
-                                next: '',
+                                next: 'A02_dbk',
                                 text: { zh_cn: '打胶', en: 'fap' }
                             },
                             {
-                                next: '',
+                                next: 'A02_dbk',
                                 text: { zh_cn: '炉管', en: 'jerk' }
                             }
                         ]
                     }
+                },
+                {
+                    id: 'A02_dbk',
+                    dialogs: [
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '好似喵', en: 'nice dead' },
+                            layout: DialogLayout.LEFT
+                        }
+                    ],
                 }
             ]
         }
