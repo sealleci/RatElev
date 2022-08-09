@@ -431,7 +431,7 @@ declare class Game {
     static createOptionElement(opt: SelectOption, lang: string): HTMLElement;
     static renderDialog(dialog: Dialog, lang: string, is_not_first?: boolean): boolean;
     static renderSelect(select: BranchSelect, lang: string): void;
-    static stepDialog(block: DialogBlock, lang: string): void;
+    static stepDialog(block: DialogBlock, lang: string, is_do_action?: boolean): void;
     static renderBlock(block: DialogBlock, lang: string, is_render_all?: boolean): void;
     renderFloor(): void;
     isLiftable(): boolean;

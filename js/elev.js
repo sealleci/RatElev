@@ -1289,7 +1289,7 @@ class Game {
         }
         Game.showOptions();
     }
-    static stepDialog(block, lang) {
+    static stepDialog(block, lang, is_do_action = true) {
         const item = block.getCurItem();
         if (item === null) {
             Game.hideOptions();
@@ -1304,7 +1304,9 @@ class Game {
         else {
             Game.hideOptions();
             Game.renderDialog(item, lang, block.isNotFirstLine());
-            item.doAction();
+            if (is_do_action) {
+                item.doAction();
+            }
             block.stepIndex();
             Game.showGoOnButton();
         }
@@ -1314,7 +1316,7 @@ class Game {
         for (let i = 0; i < block.data.length; ++i) {
             if (!is_render_all && i >= block.cur_item_index) {
                 if (i === 0) {
-                    Game.stepDialog(block, lang);
+                    Game.stepDialog(block, lang, false);
                 }
                 break;
             }

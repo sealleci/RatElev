@@ -1737,7 +1737,7 @@ class Game {
         }
         Game.showOptions()
     }
-    static stepDialog(block: DialogBlock, lang: string) {
+    static stepDialog(block: DialogBlock, lang: string, is_do_action: boolean = true) {
         const item = block.getCurItem()
         if (item === null) {
             Game.hideOptions()
@@ -1750,8 +1750,10 @@ class Game {
             block.setIndexToEnd()
         } else {
             Game.hideOptions()
-            Game.renderDialog(item as Dialog, lang, block.isNotFirstLine());
-            (item as Dialog).doAction()
+            Game.renderDialog(item as Dialog, lang, block.isNotFirstLine())
+            if (is_do_action) {
+                (item as Dialog).doAction()
+            }
             block.stepIndex()
             Game.showGoOnButton()
         }
@@ -1766,7 +1768,7 @@ class Game {
         for (let i = 0; i < block.data.length; ++i) {
             if (!is_render_all && i >= block.cur_item_index) {
                 if (i === 0) {
-                    Game.stepDialog(block, lang)
+                    Game.stepDialog(block, lang, false)
                 }
                 break
             }
