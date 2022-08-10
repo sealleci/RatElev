@@ -91,12 +91,22 @@ declare class GameTaskList extends AbstractList<GameTask> {
     isFinishedById(id: string): boolean;
     activateById(id: string): boolean;
     deactivateById(id: string): boolean;
+    finishById(id: string): boolean;
 }
 declare class GameAction {
     id: string;
     action: () => void;
     constructor(id: string, f?: () => void);
     do(): void;
+    static genDeactivateSignatureAct(id: string): () => void;
+    static genActivateSignatureAct(id: string): () => void;
+    static genDeactivateTaskAct(id: string): () => void;
+    static genActiveTaskAct(id: string): () => void;
+    static genFinishTaskAct(id: string): () => void;
+    static genAddPassengerAct(id: string): () => void;
+    static genRemovePassengerAct(id: string): () => void;
+    static genStepActionAct(id: string): () => void;
+    static polyActs(...fs: Array<() => void>): () => void;
     toString(): string;
 }
 interface GameActionObject {
@@ -183,8 +193,9 @@ interface SelectObject {
 declare class DialogBlock {
     id: string;
     cur_item_index: number;
+    in_signatures: string[];
     data: DialogBlockItem[];
-    constructor(id: string, dialogs: DialogObject[], select?: SelectObject | null);
+    constructor(id: string, in_signatures: string[], dialogs: DialogObject[], select?: SelectObject | null);
     getItemByIndex(index: number): DialogBlockItem | null;
     getItemById(id: string): DialogBlockItem | null;
     getCurItem(): DialogBlockItem | null;
@@ -196,14 +207,19 @@ declare class DialogBlock {
 }
 interface DialogBlockObject {
     id: string;
+    in_signatures: string[];
     dialogs: DialogObject[];
     select?: SelectObject;
+}
+interface DialogInDict {
+    [dialog_id: string]: string[];
 }
 declare class DialogScene {
     id: string;
     dialog_blocks: DialogBlock[];
     cur_block_id: string;
     visited_blocks: string[];
+    dialog_in_dict: DialogInDict;
     constructor(id: string, blocks: DialogBlockObject[]);
     getCurDialogBlock(): DialogBlock | null;
     getDialogBlock(id: string): DialogBlock | null;
@@ -225,6 +241,7 @@ declare class Floor {
     plot_id_list: string[];
     background: Background;
     constructor(id: string, scene: DialogSceneObject, background?: Background | null);
+    checkPlotThreads(): void;
 }
 interface FloorObject {
     id: string;
@@ -234,23 +251,31 @@ interface FloorObject {
 declare class FloorList extends AbstractList<Floor> {
     constructor(floors: FloorObject[]);
 }
+interface SignatureFloorDict {
+    [signature_id: string]: string;
+}
 declare class PlotThread {
     id: string;
     priority: number;
+    signature_floor_dict: SignatureFloorDict;
     signatures: string[];
-    passengers: string[];
-    floors: number[];
     in_signatures: string[];
     cur_signature_index: number;
-    constructor(id: string, priority: number, signatures: string[], passengers: string[], floors: number[], in_signatures?: string[]);
+    constructor(id: string, priority: number, sig_floor_dict: SignatureFloorDict, in_signatures?: string[]);
     step(): void;
+    getSignatureById(index: number): Signature | null;
+    getCurrentSignature(): Signature | null;
     isUnlocked(): boolean;
     isFinished(): boolean;
 }
 interface PlotThreadObject {
+    id: string;
+    priority: number;
+    signature_floor_dict: SignatureFloorDict;
+    in_signatures: string[];
 }
 declare class PlotThreadList extends AbstractList<PlotThread> {
-    constructor(data: PlotThread[]);
+    constructor(threads: PlotThreadObject[]);
     getById(id: string): PlotThread | null;
 }
 declare enum DotColor {
@@ -463,6 +488,7 @@ declare const game_signature_list: SignatureList;
 declare const game_action_list: GameActionList;
 declare const game_task_list: GameTaskList;
 declare const game_passenger_list: PassengerList;
+declare const game_passenger_me = "me_psg";
 declare const game_plot_thread_list: PlotThreadList;
 declare const game_floor_list: FloorList;
 declare const game_ui_string_raw: UiStringDictRaw;

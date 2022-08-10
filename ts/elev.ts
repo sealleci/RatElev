@@ -365,6 +365,14 @@ class GameTaskList extends AbstractList<GameTask>{
         }
         return false
     }
+    finishById(id: string): boolean {
+        const task = this.getById(id)
+        if (task !== null) {
+            task.finish()
+            return true
+        }
+        return false
+    }
 }
 
 class GameAction {
@@ -380,6 +388,58 @@ class GameAction {
     }
     do() {
         this.action()
+    }
+    static genDeactivateSignatureAct(id: string): () => void {
+        return () => {
+            game_signature_list.deactivateById(id)
+        }
+    }
+    static genActivateSignatureAct(id: string): () => void {
+        return () => {
+            game_signature_list.activateById(id)
+        }
+    }
+    static genDeactivateTaskAct(id: string): () => void {
+        return () => {
+            game_task_list.deactivateById(id)
+            game.task_display.remove(id)
+            game.task_display.render(game.lang)
+        }
+    }
+    static genActiveTaskAct(id: string): () => void {
+        return () => {
+            game_task_list.activateById(id)
+            game.task_display.add(id)
+            game.task_display.render(game.lang)
+        }
+    }
+    static genFinishTaskAct(id: string): () => void {
+        return () => {
+            game_task_list.finishById(id)
+            game.task_display.render(game.lang)
+        }
+    }
+    static genAddPassengerAct(id: string): () => void {
+        return () => {
+            game.passenger_display.add(id)
+            game.passenger_display.render(game.lang)
+        }
+    }
+    static genRemovePassengerAct(id: string): () => void {
+        return () => {
+            game.passenger_display.remove(id)
+            game.passenger_display.render(game.lang)
+        }
+    }
+    static genStepActionAct(id: string): () => void {
+        return () => {
+            game_plot_thread_list.getById(id)?.step()
+        }
+    }
+    static polyActs(...fs: Array<() => void>): () => void {
+        return () => {
+            fs.forEach(f => { f() })
+        }
     }
     toString(): string {
         return `{}`
@@ -443,11 +503,11 @@ interface PassengerObject {
     /**
      * regex: /\d+_psg/
      */
-    id: string,
-    name: L10nTextDict,
-    avatar_color: string,
-    avatar_font_color: string,
-    avatar_text: L10nTextDict,
+    id: string
+    name: L10nTextDict
+    avatar_color: string
+    avatar_font_color: string
+    avatar_text: L10nTextDict
     is_display?: boolean
 }
 
@@ -623,9 +683,9 @@ interface DialogObject {
     /**
      * regex: /\d+_psg/
      */
-    person_id: string,
-    text: L10nTextDict,
-    layout: DialogLayout,
+    person_id: string
+    text: L10nTextDict
+    layout: DialogLayout
     /**
      * regex: /\d+_act/
      */
@@ -645,11 +705,12 @@ class DialogBlock {
      */
     public id: string
     public cur_item_index: number
+    public in_signatures: string[]
     public data: DialogBlockItem[]
 
-    constructor(id: string, dialogs: DialogObject[], select: SelectObject | null = null) {
+    constructor(id: string, in_signatures: string[], dialogs: DialogObject[], select: SelectObject | null = null) {
         this.id = id
-        this.cur_item_index = 0
+        this.in_signatures = in_signatures
         this.data = []
         for (let i = 0; i < dialogs.length; ++i) {
             this.data.push(new Dialog(
@@ -666,6 +727,7 @@ class DialogBlock {
                 select.options
             ))
         }
+        this.cur_item_index = 0
     }
     getItemByIndex(index: number): DialogBlockItem | null {
         return index < 0 || index >= this.data.length ? null : this.data[index]
@@ -726,9 +788,17 @@ interface DialogBlockObject {
     /**
      * regex: /\d+_dbk/
      */
-    id: string,
-    dialogs: DialogObject[],
+    id: string
+    in_signatures: string[]
+    dialogs: DialogObject[]
     select?: SelectObject
+}
+
+/**
+ * @param dict_item - {dialog_id: [...signature_id]}
+ */
+interface DialogInDict {
+    [dialog_id: string]: string[]
 }
 
 class DialogScene {
@@ -739,18 +809,22 @@ class DialogScene {
     public dialog_blocks: DialogBlock[]
     public cur_block_id: string
     public visited_blocks: string[]
+    public dialog_in_dict: DialogInDict
 
     constructor(id: string, blocks: DialogBlockObject[]) {
         this.id = id
+        this.dialog_in_dict = {}
         this.dialog_blocks = []
         for (let i = 0; i < blocks.length; ++i) {
             this.dialog_blocks.push(
                 new DialogBlock(
                     blocks[i].id,
+                    blocks[i].in_signatures,
                     blocks[i].dialogs,
                     blocks[i].select ?? null
                 )
             )
+            this.dialog_in_dict[blocks[i].id] = blocks[i].in_signatures
         }
         // TODO: init cur block id
         this.cur_block_id = this.dialog_blocks[0].id
@@ -798,7 +872,7 @@ interface DialogSceneObject {
     /**
      * regex: /\d+_dsc/
      */
-    id: string,
+    id: string
     blocks: DialogBlockObject[]
 }
 
@@ -807,7 +881,7 @@ interface DialogSceneObject {
  * @param bg_color - string
  */
 interface Background {
-    bg_color: string,
+    bg_color: string
     inner_html: string
 }
 
@@ -825,6 +899,21 @@ class Floor {
         this.dialog_scene = new DialogScene(scene.id, scene.blocks)
         this.plot_id_list = []
         this.background = background ?? { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' }
+    }
+    checkPlotThreads() {
+        // TODO: check plot
+        let choice: string = ''
+        let cur_prioeity = -Infinity
+        for (let plot_id of this.plot_id_list) {
+            const plot = game_plot_thread_list.getById(plot_id)
+            if (plot === null) {
+                continue
+            }
+            if (plot.priority >= cur_prioeity) {
+                choice
+            }
+        }
+        this.dialog_scene
     }
 }
 
@@ -855,29 +944,52 @@ class FloorList extends AbstractList<Floor>{
     }
 }
 
+/**
+ * @param dict_item - {signature_id: floor_id}
+ */
+interface SignatureFloorDict {
+    [signature_id: string]: string
+}
+
+/**
+ * floor check plot, plot 
+ */
 class PlotThread {
     /**
      * regex: /\d+_plt/
      */
     public id: string
     public priority: number
+    public signature_floor_dict: SignatureFloorDict
     public signatures: string[]
-    public passengers: string[]
-    public floors: number[]
     public in_signatures: string[]
     public cur_signature_index: number
 
-    constructor(id: string, priority: number, signatures: string[], passengers: string[], floors: number[], in_signatures: string[] = []) {
+    constructor(id: string, priority: number, sig_floor_dict: SignatureFloorDict, in_signatures: string[] = []) {
         this.id = id
         this.priority = priority
-        this.signatures = signatures
-        this.passengers = passengers
-        this.floors = floors
+        this.signature_floor_dict = sig_floor_dict
+        this.signatures = Object.keys(this.signature_floor_dict)
         this.in_signatures = in_signatures
         this.cur_signature_index = 0
     }
     step() {
         this.cur_signature_index += 1
+        if (this.cur_signature_index < 0) {
+            this.cur_signature_index = 0
+        }
+        if (this.cur_signature_index > this.signatures.length) {
+            this.cur_signature_index = this.signatures.length
+        }
+    }
+    getSignatureById(index: number): Signature | null {
+        if (index < 0 || index >= this.signatures.length) {
+            return null
+        }
+        return game_signature_list.getById(this.signatures[index])
+    }
+    getCurrentSignature(): Signature | null {
+        return this.getSignatureById(this.cur_signature_index)
     }
     isUnlocked(): boolean {
         if (this.in_signatures.length <= 0) {
@@ -911,13 +1023,24 @@ class PlotThread {
 
 // TODO: PlotThread fields
 interface PlotThreadObject {
-
+    id: string
+    priority: number
+    signature_floor_dict: SignatureFloorDict
+    in_signatures: string[]
 }
 
 class PlotThreadList extends AbstractList<PlotThread>{
-    constructor(data: PlotThread[]) {
+    constructor(threads: PlotThreadObject[]) {
         super()
-        this.data = data
+        this.data = []
+        for (let thread of threads) {
+            this.data.push(new PlotThread(
+                thread.id,
+                thread.priority,
+                thread.signature_floor_dict,
+                thread.in_signatures
+            ))
+        }
     }
     getById(id: string): PlotThread | null {
         for (let thread of this.data) {
@@ -1481,7 +1604,7 @@ class PassengerDisplay extends ListDisplay<Passenger> {
             const psg = game_passenger_list.getById(id)
             if (psg !== null && psg.is_diaplay) {
                 let div = document.createElement('div')
-                div.classList.add('passenger-item')
+                div.classList.add('passenger-item', 'noscrollbar')
                 div.innerHTML = psg.name.get(lang)
                 psg_list.appendChild(div)
             }
@@ -1990,9 +2113,10 @@ class Game {
     }
     initialize() {
         this.createFloorButtons()
-        // this.renderFloor()
         this.language_display.set(this.lang)
         this.switchUiLanguge()
+        this.passenger_display.add(game_passenger_me)
+        this.passenger_display.render(this.lang)
         this.dots_animation.start()
     }
     async debug() {
@@ -2177,7 +2301,6 @@ const game_lang_list = new LanguageList([
 ])
 const game_default_lang = 'zh_cn'
 const game_signature_list = new SignatureList([])
-// TODO: generate function
 const game_action_list = new GameActionList([])
 const game_task_list = new GameTaskList([])
 const game_passenger_list = new PassengerList([
@@ -2196,6 +2319,7 @@ const game_passenger_list = new PassengerList([
         avatar_text: { zh_cn: '杰', en: 'JD' },
     },
 ])
+const game_passenger_me = 'me_psg'
 const game_plot_thread_list = new PlotThreadList([])
 const game_floor_list = new FloorList([
     {
@@ -2205,15 +2329,17 @@ const game_floor_list = new FloorList([
             blocks: [
                 {
                     id: 'A01_dbk',
+                    in_signatures: [],
                     dialogs: [
                         {
                             person_id: 'me_psg',
                             text: { zh_cn: '我超', en: 'ong' },
                             layout: DialogLayout.RIGHT
+
                         }, {
                             person_id: 'me_psg',
                             text: { zh_cn: '什么情况', en: 'wat happened' },
-                            layout: DialogLayout.RIGHT
+                            layout: DialogLayout.RIGHT,
                         }, {
                             person_id: 'me_psg',
                             text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
@@ -2239,6 +2365,7 @@ const game_floor_list = new FloorList([
                 },
                 {
                     id: 'A02_dbk',
+                    in_signatures: [],
                     dialogs: [
                         {
                             person_id: 'jacob_psg',

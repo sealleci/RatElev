@@ -281,6 +281,14 @@ class GameTaskList extends AbstractList {
         }
         return false;
     }
+    finishById(id) {
+        const task = this.getById(id);
+        if (task !== null) {
+            task.finish();
+            return true;
+        }
+        return false;
+    }
 }
 class GameAction {
     constructor(id, f = () => { }) {
@@ -289,6 +297,59 @@ class GameAction {
     }
     do() {
         this.action();
+    }
+    static genDeactivateSignatureAct(id) {
+        return () => {
+            game_signature_list.deactivateById(id);
+        };
+    }
+    static genActivateSignatureAct(id) {
+        return () => {
+            game_signature_list.activateById(id);
+        };
+    }
+    static genDeactivateTaskAct(id) {
+        return () => {
+            game_task_list.deactivateById(id);
+            game.task_display.remove(id);
+            game.task_display.render(game.lang);
+        };
+    }
+    static genActiveTaskAct(id) {
+        return () => {
+            game_task_list.activateById(id);
+            game.task_display.add(id);
+            game.task_display.render(game.lang);
+        };
+    }
+    static genFinishTaskAct(id) {
+        return () => {
+            game_task_list.finishById(id);
+            game.task_display.render(game.lang);
+        };
+    }
+    static genAddPassengerAct(id) {
+        return () => {
+            game.passenger_display.add(id);
+            game.passenger_display.render(game.lang);
+        };
+    }
+    static genRemovePassengerAct(id) {
+        return () => {
+            game.passenger_display.remove(id);
+            game.passenger_display.render(game.lang);
+        };
+    }
+    static genStepActionAct(id) {
+        return () => {
+            var _a;
+            (_a = game_plot_thread_list.getById(id)) === null || _a === void 0 ? void 0 : _a.step();
+        };
+    }
+    static polyActs(...fs) {
+        return () => {
+            fs.forEach(f => { f(); });
+        };
     }
     toString() {
         return `{}`;
@@ -422,10 +483,10 @@ class Dialog extends DialogBlockItem {
     }
 }
 class DialogBlock {
-    constructor(id, dialogs, select = null) {
+    constructor(id, in_signatures, dialogs, select = null) {
         var _a;
         this.id = id;
-        this.cur_item_index = 0;
+        this.in_signatures = in_signatures;
         this.data = [];
         for (let i = 0; i < dialogs.length; ++i) {
             this.data.push(new Dialog(`${padLeftZero(i)}_${getNumFromId(this.id)}_dlg`, dialogs[i].person_id, new L10nText(dialogs[i].text), dialogs[i].layout, (_a = dialogs[i].action_id) !== null && _a !== void 0 ? _a : ''));
@@ -433,6 +494,7 @@ class DialogBlock {
         if (select !== null) {
             this.data.push(new BranchSelect(`${getNumFromId(this.id)}$_slt`, select.options));
         }
+        this.cur_item_index = 0;
     }
     getItemByIndex(index) {
         return index < 0 || index >= this.data.length ? null : this.data[index];
@@ -484,9 +546,11 @@ class DialogScene {
     constructor(id, blocks) {
         var _a;
         this.id = id;
+        this.dialog_in_dict = {};
         this.dialog_blocks = [];
         for (let i = 0; i < blocks.length; ++i) {
-            this.dialog_blocks.push(new DialogBlock(blocks[i].id, blocks[i].dialogs, (_a = blocks[i].select) !== null && _a !== void 0 ? _a : null));
+            this.dialog_blocks.push(new DialogBlock(blocks[i].id, blocks[i].in_signatures, blocks[i].dialogs, (_a = blocks[i].select) !== null && _a !== void 0 ? _a : null));
+            this.dialog_in_dict[blocks[i].id] = blocks[i].in_signatures;
         }
         this.cur_block_id = this.dialog_blocks[0].id;
         this.visited_blocks = [];
@@ -531,6 +595,20 @@ class Floor {
         this.plot_id_list = [];
         this.background = background !== null && background !== void 0 ? background : { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' };
     }
+    checkPlotThreads() {
+        let choice = '';
+        let cur_prioeity = -Infinity;
+        for (let plot_id of this.plot_id_list) {
+            const plot = game_plot_thread_list.getById(plot_id);
+            if (plot === null) {
+                continue;
+            }
+            if (plot.priority >= cur_prioeity) {
+                choice;
+            }
+        }
+        this.dialog_scene;
+    }
 }
 class FloorList extends AbstractList {
     constructor(floors) {
@@ -542,17 +620,31 @@ class FloorList extends AbstractList {
     }
 }
 class PlotThread {
-    constructor(id, priority, signatures, passengers, floors, in_signatures = []) {
+    constructor(id, priority, sig_floor_dict, in_signatures = []) {
         this.id = id;
         this.priority = priority;
-        this.signatures = signatures;
-        this.passengers = passengers;
-        this.floors = floors;
+        this.signature_floor_dict = sig_floor_dict;
+        this.signatures = Object.keys(this.signature_floor_dict);
         this.in_signatures = in_signatures;
         this.cur_signature_index = 0;
     }
     step() {
         this.cur_signature_index += 1;
+        if (this.cur_signature_index < 0) {
+            this.cur_signature_index = 0;
+        }
+        if (this.cur_signature_index > this.signatures.length) {
+            this.cur_signature_index = this.signatures.length;
+        }
+    }
+    getSignatureById(index) {
+        if (index < 0 || index >= this.signatures.length) {
+            return null;
+        }
+        return game_signature_list.getById(this.signatures[index]);
+    }
+    getCurrentSignature() {
+        return this.getSignatureById(this.cur_signature_index);
     }
     isUnlocked() {
         if (this.in_signatures.length <= 0) {
@@ -584,9 +676,12 @@ class PlotThread {
     }
 }
 class PlotThreadList extends AbstractList {
-    constructor(data) {
+    constructor(threads) {
         super();
-        this.data = data;
+        this.data = [];
+        for (let thread of threads) {
+            this.data.push(new PlotThread(thread.id, thread.priority, thread.signature_floor_dict, thread.in_signatures));
+        }
     }
     getById(id) {
         for (let thread of this.data) {
@@ -1081,7 +1176,7 @@ class PassengerDisplay extends ListDisplay {
             const psg = game_passenger_list.getById(id);
             if (psg !== null && psg.is_diaplay) {
                 let div = document.createElement('div');
-                div.classList.add('passenger-item');
+                div.classList.add('passenger-item', 'noscrollbar');
                 div.innerHTML = psg.name.get(lang);
                 psg_list.appendChild(div);
             }
@@ -1527,6 +1622,8 @@ class Game {
         this.createFloorButtons();
         this.language_display.set(this.lang);
         this.switchUiLanguge();
+        this.passenger_display.add(game_passenger_me);
+        this.passenger_display.render(this.lang);
         this.dots_animation.start();
     }
     debug() {
@@ -1715,6 +1812,7 @@ const game_passenger_list = new PassengerList([
         avatar_text: { zh_cn: '杰', en: 'JD' },
     },
 ]);
+const game_passenger_me = 'me_psg';
 const game_plot_thread_list = new PlotThreadList([]);
 const game_floor_list = new FloorList([
     {
@@ -1724,6 +1822,7 @@ const game_floor_list = new FloorList([
             blocks: [
                 {
                     id: 'A01_dbk',
+                    in_signatures: [],
                     dialogs: [
                         {
                             person_id: 'me_psg',
@@ -1732,7 +1831,7 @@ const game_floor_list = new FloorList([
                         }, {
                             person_id: 'me_psg',
                             text: { zh_cn: '什么情况', en: 'wat happened' },
-                            layout: DialogLayout.RIGHT
+                            layout: DialogLayout.RIGHT,
                         }, {
                             person_id: 'me_psg',
                             text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
@@ -1758,6 +1857,7 @@ const game_floor_list = new FloorList([
                 },
                 {
                     id: 'A02_dbk',
+                    in_signatures: [],
                     dialogs: [
                         {
                             person_id: 'jacob_psg',
