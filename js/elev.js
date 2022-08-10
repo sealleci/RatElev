@@ -191,9 +191,10 @@ class Signature {
 }
 class SignatureList extends AbstractList {
     constructor(signatures) {
+        var _a;
         super();
         for (let signature of signatures) {
-            this.data.push(new Signature(signature.id, signature.status));
+            this.data.push(new Signature(signature.id, (_a = signature.status) !== null && _a !== void 0 ? _a : SignatureStatus.DEACTIVE));
         }
     }
     initialize() {
@@ -538,6 +539,18 @@ class DialogBlock {
         }
         return false;
     }
+    isFinished() {
+        return this.cur_item_index >= this.data.length;
+    }
+    isUnlocked() {
+        for (let id of this.in_signatures) {
+            const sig = game_signature_list.getById(id);
+            if (!(sig === null || sig === void 0 ? void 0 : sig.isActive())) {
+                return false;
+            }
+        }
+        return true;
+    }
     toString() {
         return `{}`;
     }
@@ -552,8 +565,21 @@ class DialogScene {
             this.dialog_blocks.push(new DialogBlock(blocks[i].id, blocks[i].in_signatures, blocks[i].dialogs, (_a = blocks[i].select) !== null && _a !== void 0 ? _a : null));
             this.dialog_in_dict[blocks[i].id] = blocks[i].in_signatures;
         }
-        this.cur_block_id = this.dialog_blocks[0].id;
+        this.cur_block_id = '';
         this.visited_blocks = [];
+    }
+    isInclduingBlock(id) {
+        for (let block of this.dialog_blocks) {
+            if (block.id === id) {
+                return true;
+            }
+        }
+        return false;
+    }
+    setCurDialogBlock(id) {
+        if (this.isInclduingBlock(id)) {
+            this.cur_block_id = id;
+        }
     }
     getCurDialogBlock() {
         for (let block of this.dialog_blocks) {
@@ -589,25 +615,46 @@ class DialogScene {
     }
 }
 class Floor {
-    constructor(id, scene, background = null) {
+    constructor(id, scene, plot_id_list, background = null) {
         this.id = id;
         this.dialog_scene = new DialogScene(scene.id, scene.blocks);
-        this.plot_id_list = [];
+        this.plot_id_list = plot_id_list;
         this.background = background !== null && background !== void 0 ? background : { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' };
     }
     checkPlotThreads() {
-        let choice = '';
-        let cur_prioeity = -Infinity;
+        var _a, _b;
+        let selected_block_id = '';
+        let max_prioeity = -Infinity;
         for (let plot_id of this.plot_id_list) {
             const plot = game_plot_thread_list.getById(plot_id);
-            if (plot === null) {
+            if (plot === null || !plot.isUnlocked() || plot.isFinished() || plot.getCurFloorId() !== this.id) {
                 continue;
             }
-            if (plot.priority >= cur_prioeity) {
-                choice;
+            let sig_id = plot.getCurSignatureId();
+            let is_set = false;
+            for (let block_id of Object.keys(this.dialog_scene.dialog_in_dict)) {
+                if (this.dialog_scene.dialog_in_dict[block_id].indexOf(sig_id) === -1) {
+                    continue;
+                }
+                const block = this.dialog_scene.getDialogBlock(block_id);
+                if (block === null || !block.isUnlocked() || this.dialog_scene.cur_block_id === block.id) {
+                    continue;
+                }
+                if (block.isFinished()) {
+                    plot.step();
+                    continue;
+                }
+                if (plot.priority > max_prioeity && !is_set) {
+                    selected_block_id = block.id;
+                    max_prioeity = plot.priority;
+                    is_set = true;
+                }
             }
         }
-        this.dialog_scene;
+        console.log(`slt: ${selected_block_id},\ncur: ${this.dialog_scene.cur_block_id},\nis_cur_finish: ${(_a = this.dialog_scene.getCurDialogBlock()) === null || _a === void 0 ? void 0 : _a.isFinished()}`);
+        if (this.dialog_scene.cur_block_id === '' || ((_b = this.dialog_scene.getCurDialogBlock()) === null || _b === void 0 ? void 0 : _b.isFinished())) {
+            this.dialog_scene.setCurDialogBlock(selected_block_id);
+        }
     }
 }
 class FloorList extends AbstractList {
@@ -615,16 +662,20 @@ class FloorList extends AbstractList {
         var _a;
         super();
         for (let floor of floors) {
-            this.data.push(new Floor(floor.id, floor.dialog_scene, (_a = floor.background) !== null && _a !== void 0 ? _a : null));
+            this.data.push(new Floor(floor.id, floor.dialog_scene, floor.plot_id_list, (_a = floor.background) !== null && _a !== void 0 ? _a : null));
         }
     }
 }
 class PlotThread {
-    constructor(id, priority, sig_floor_dict, in_signatures = []) {
+    constructor(id, priority, signature_floor_list, in_signatures = []) {
         this.id = id;
         this.priority = priority;
-        this.signature_floor_dict = sig_floor_dict;
-        this.signatures = Object.keys(this.signature_floor_dict);
+        this.signature_floor_dict = {};
+        this.signatures = [];
+        for (let item of signature_floor_list) {
+            this.signature_floor_dict[item.signature] = item.floor;
+            this.signatures.push(item.signature);
+        }
         this.in_signatures = in_signatures;
         this.cur_signature_index = 0;
     }
@@ -637,13 +688,28 @@ class PlotThread {
             this.cur_signature_index = this.signatures.length;
         }
     }
+    getCurFloorId() {
+        if (this.cur_signature_index < 0 ||
+            this.cur_signature_index >= this.signatures.length ||
+            Object.keys(this.signature_floor_dict).indexOf(this.signatures[this.cur_signature_index]) === -1) {
+            return '';
+        }
+        return this.signature_floor_dict[this.signatures[this.cur_signature_index]];
+    }
+    getCurSignatureId() {
+        if (this.cur_signature_index < 0 ||
+            this.cur_signature_index >= this.signatures.length) {
+            return '';
+        }
+        return this.signatures[this.cur_signature_index];
+    }
     getSignatureById(index) {
         if (index < 0 || index >= this.signatures.length) {
             return null;
         }
         return game_signature_list.getById(this.signatures[index]);
     }
-    getCurrentSignature() {
+    getCurSignature() {
         return this.getSignatureById(this.cur_signature_index);
     }
     isUnlocked() {
@@ -664,6 +730,9 @@ class PlotThread {
         if (this.signatures.length <= 0) {
             return true;
         }
+        if (this.cur_signature_index < this.signatures.length) {
+            return false;
+        }
         for (let id of this.signatures) {
             const signature = game_signature_list.getById(id);
             if (signature !== null) {
@@ -680,7 +749,7 @@ class PlotThreadList extends AbstractList {
         super();
         this.data = [];
         for (let thread of threads) {
-            this.data.push(new PlotThread(thread.id, thread.priority, thread.signature_floor_dict, thread.in_signatures));
+            this.data.push(new PlotThread(thread.id, thread.priority, thread.signature_floor_list, thread.in_signatures));
         }
     }
     getById(id) {
@@ -1356,7 +1425,7 @@ class Game {
                 return;
             }
             floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id);
-            floor.dialog_scene.cur_block_id = next;
+            floor.dialog_scene.setCurDialogBlock(next);
             const block = floor.dialog_scene.getCurDialogBlock();
             if (block === null) {
                 return;
@@ -1437,11 +1506,12 @@ class Game {
     renderFloor() {
         Game.hideGoOnButton();
         Game.hideOptions();
-        const floor = this.getCurrentFloor();
         clearChildren(qs('#dialog-container'));
+        const floor = this.getCurrentFloor();
         if (floor === null) {
             return;
         }
+        floor.checkPlotThreads();
         for (let block_id of floor.dialog_scene.visited_blocks) {
             const vis_block = floor.dialog_scene.getDialogBlock(block_id);
             if (vis_block !== null) {
@@ -1548,13 +1618,6 @@ class Game {
         }
     }
     createFloorButtons() {
-        const func_button_row = qs('#func-buttons');
-        const button_container = qs('#floor-buttons');
-        for (let child of Array.from(button_container.children)) {
-            if (child.id !== 'func-buttons') {
-                button_container.removeChild(child);
-            }
-        }
         this.floor_buttons = [];
         for (let i = this.max_floor - 1; i >= 1; i -= 2) {
             this.floor_buttons.push([
@@ -1567,6 +1630,15 @@ class Game {
                 new FloorButton(i + 1, (i + 1).toString(), true),
                 new FloorButton(i, i === this.min_floor ? '-∞' : i.toString(), i !== this.min_floor)
             ]);
+        }
+    }
+    renderFloorButtons() {
+        const func_button_row = qs('#func-buttons');
+        const button_container = qs('#floor-buttons');
+        for (let child of Array.from(button_container.children)) {
+            if (child.id !== 'func-buttons') {
+                button_container.removeChild(child);
+            }
         }
         this.floor_buttons.forEach(button_row => {
             let row = document.createElement('div');
@@ -1617,9 +1689,12 @@ class Game {
             e.innerHTML =
                 (_p = (_o = (_m = (_l = (_k = game.getCurrentFloor()) === null || _k === void 0 ? void 0 : _k.dialog_scene.getCurDialogBlock()) === null || _l === void 0 ? void 0 : _l.getItemById(`${slt_num}_slt`)) === null || _m === void 0 ? void 0 : _m.getOptionById(opt_id)) === null || _o === void 0 ? void 0 : _o.text.get(game.lang)) !== null && _p !== void 0 ? _p : '';
         }
+        this.passenger_display.render(this.lang);
+        this.task_display.render(this.lang);
     }
     initialize() {
         this.createFloorButtons();
+        this.renderFloorButtons();
         this.language_display.set(this.lang);
         this.switchUiLanguge();
         this.passenger_display.add(game_passenger_me);
@@ -1628,11 +1703,7 @@ class Game {
     }
     debug() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.renderFloor();
-            this.door.syncStart(DoorDir.OPEN);
-            Game.hideGoOnButton();
-            qs('#options-row').style.display = 'none';
-            qs('#save-text-area').value = '';
+            qs('#open-button').click();
         });
     }
 }
@@ -1793,9 +1864,28 @@ const game_lang_list = new LanguageList([
     { id: 'en', name: 'EN' }
 ]);
 const game_default_lang = 'zh_cn';
-const game_signature_list = new SignatureList([]);
-const game_action_list = new GameActionList([]);
+const game_signature_list = new SignatureList([
+    { id: 'I1_sig', status: SignatureStatus.ACTIVE },
+    { id: 'I1.1_sig' }
+]);
+const game_action_list = new GameActionList([
+    {
+        id: 'to2_act',
+        action: GameAction.polyActs(GameAction.genActivateSignatureAct('I1.1_sig'), GameAction.genStepActionAct('I1_plt'))
+    }
+]);
 const game_task_list = new GameTaskList([]);
+const game_plot_thread_list = new PlotThreadList([
+    {
+        id: 'I1_plt',
+        priority: 1,
+        signature_floor_list: [
+            { signature: 'I1_sig', floor: '1_flr' },
+            { signature: 'I1.1_sig', floor: '2_flr' },
+        ],
+        in_signatures: []
+    }
+]);
 const game_passenger_list = new PassengerList([
     {
         id: 'me_psg',
@@ -1813,30 +1903,33 @@ const game_passenger_list = new PassengerList([
     },
 ]);
 const game_passenger_me = 'me_psg';
-const game_plot_thread_list = new PlotThreadList([]);
 const game_floor_list = new FloorList([
     {
         id: '1_flr',
+        plot_id_list: ['I1_plt'],
         dialog_scene: {
             id: '1_dsc',
             blocks: [
                 {
                     id: 'A01_dbk',
-                    in_signatures: [],
+                    in_signatures: ['I1_sig'],
                     dialogs: [
                         {
                             person_id: 'me_psg',
                             text: { zh_cn: '我超', en: 'ong' },
                             layout: DialogLayout.RIGHT
-                        }, {
+                        },
+                        {
                             person_id: 'me_psg',
                             text: { zh_cn: '什么情况', en: 'wat happened' },
                             layout: DialogLayout.RIGHT,
-                        }, {
+                        },
+                        {
                             person_id: 'me_psg',
                             text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
                             layout: DialogLayout.RIGHT
-                        }, {
+                        },
+                        {
                             person_id: 'me_psg',
                             text: { zh_cn: '哦草', en: 'f word' },
                             layout: DialogLayout.RIGHT
@@ -1862,9 +1955,30 @@ const game_floor_list = new FloorList([
                         {
                             person_id: 'jacob_psg',
                             text: { zh_cn: '好似喵', en: 'nice dead' },
-                            layout: DialogLayout.LEFT
+                            layout: DialogLayout.LEFT,
+                            action_id: 'to2_act'
                         }
                     ],
+                }
+            ]
+        }
+    },
+    {
+        id: '2_flr',
+        plot_id_list: ['I1_plt'],
+        dialog_scene: {
+            id: '2_dsc',
+            blocks: [
+                {
+                    id: 'A03_dbk',
+                    in_signatures: ['I1.1_sig'],
+                    dialogs: [
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '赢光光', en: 'WWW' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                    ]
                 }
             ]
         }

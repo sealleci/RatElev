@@ -204,7 +204,7 @@ enum SignatureStatus {
 
 class Signature {
     /**
-     * regex: /\d+_sig/
+     * regex: /[^_]+_sig/
      */
     public id: string
     public status: SignatureStatus
@@ -231,15 +231,15 @@ class Signature {
 }
 
 /**
- * @param id - string(/\d+_sig/)
+ * @param id - string(/[^_]+_sig/)
  * @param status - SignatureStatus
  */
 interface SignatureObject {
     /**
-     * regex: /\d+_sig/
+     * regex: /[^_]+_sig/
      */
     id: string
-    status: SignatureStatus
+    status?: SignatureStatus
 }
 
 class SignatureList extends AbstractList<Signature>{
@@ -248,7 +248,7 @@ class SignatureList extends AbstractList<Signature>{
         for (let signature of signatures) {
             this.data.push(new Signature(
                 signature.id,
-                signature.status
+                signature.status ?? SignatureStatus.DEACTIVE
             ))
         }
     }
@@ -287,7 +287,7 @@ enum TaskStatus {
 
 class GameTask {
     /**
-     * regex: /\d+_tsk/
+     * regex: /[^_]+_tsk/
      */
     public id: string
     public description: L10nText
@@ -317,13 +317,13 @@ class GameTask {
 }
 
 /**
- * @param id - string(/\d+_tsk/)
+ * @param id - string(/[^_]+_tsk/)
  * @param description - L10nTextDict
  * @param status - Optional(TaskStatus)
  */
 interface GameTaskObject {
     /**
-     * regex: /\d+_tsk/
+     * regex: /[^_]+_tsk/
      */
     id: string
     description: L10nTextDict
@@ -377,7 +377,7 @@ class GameTaskList extends AbstractList<GameTask>{
 
 class GameAction {
     /**
-     * regex: /\d+_act/
+     * regex: /[^_]+_act/
      */
     public id: string
     public action: () => void
@@ -447,12 +447,12 @@ class GameAction {
 }
 
 /**
- * @param id - string(/\d+_act/)
+ * @param id - string(/[^_]+_act/)
  * @param action - Function(() => void)
  */
 interface GameActionObject {
     /**
-     * regex: /\d+_act/
+     * regex: /[^_]+_act/
      */
     id: string
     action: () => void
@@ -469,7 +469,7 @@ class GameActionList extends AbstractList<GameAction>{
 
 class Passenger {
     /**
-     * regex: /\d+_psg/
+     * regex: /[^_]+_psg/
      */
     public id: string
     public name: L10nText
@@ -492,7 +492,7 @@ class Passenger {
 }
 
 /**
- * @param id - string(/\d+_psg/)
+ * @param id - string(/[^_]+_psg/)
  * @param name - L10nTextDict
  * @param avatar_color - string
  * @param avatar_font_color - string
@@ -501,7 +501,7 @@ class Passenger {
  */
 interface PassengerObject {
     /**
-     * regex: /\d+_psg/
+     * regex: /[^_]+_psg/
      */
     id: string
     name: L10nTextDict
@@ -534,7 +534,7 @@ enum DialogBlockItemType {
 
 abstract class DialogBlockItem {
     /**
-     * regex: /\d+_dlg|\d+_slt/
+     * regex: /[^_]+_dlg|[^_]+_slt/
      */
     public id: string
     public item_type: DialogBlockItemType
@@ -550,11 +550,11 @@ abstract class DialogBlockItem {
 
 class SelectOption {
     /**
-     * regex: /\d+_\d+_opt/
+     * regex: /[^_]+_[^_]+_opt/
      */
     public id: string
     /**
-     * regex: /\d+_dlg/
+     * regex: /[^_]+_dlg/
      */
     public next_dialog_block_id: string
     public text: L10nText
@@ -589,7 +589,7 @@ class SelectOption {
  */
 interface OptionObject {
     /**
-     * regex: /\d+_dlg/
+     * regex: /[^_]+_dlg/
      */
     next: string
     text: L10nTextDict
@@ -630,14 +630,14 @@ enum DialogLayout {
 
 class Dialog extends DialogBlockItem {
     /**
-     * regex: /\d+_psg/
+     * regex: /[^_]+_psg/
      */
     public person_id: string
     public text: L10nText
     public layout: DialogLayout
     public is_having_action: boolean
     /**
-     * regex: /\d+_act/
+     * regex: /[^_]+_act/
      */
     public action_id: string
 
@@ -674,20 +674,20 @@ class Dialog extends DialogBlockItem {
 }
 
 /**
- * @param person_id - string(/\d+_psg/)
+ * @param person_id - string(/[^_]+_psg/)
  * @param text - L10nTextDict
  * @param layout - DialogLayout
  * @param action_id - Optional(string)
  */
 interface DialogObject {
     /**
-     * regex: /\d+_psg/
+     * regex: /[^_]+_psg/
      */
     person_id: string
     text: L10nTextDict
     layout: DialogLayout
     /**
-     * regex: /\d+_act/
+     * regex: /[^_]+_act/
      */
     action_id?: string
 }
@@ -701,7 +701,7 @@ interface SelectObject {
 
 class DialogBlock {
     /**
-     * regex: /\d+_dbk/
+     * regex: /[^_]+_dbk/
      */
     public id: string
     public cur_item_index: number
@@ -774,19 +774,31 @@ class DialogBlock {
         }
         return false
     }
+    isFinished(): boolean {
+        return this.cur_item_index >= this.data.length
+    }
+    isUnlocked(): boolean {
+        for (let id of this.in_signatures) {
+            const sig = game_signature_list.getById(id)
+            if (!sig?.isActive()) {
+                return false
+            }
+        }
+        return true
+    }
     toString(): string {
         return `{}`
     }
 }
 
 /**
- * @param id - string(/\d+_dbk/)
+ * @param id - string(/[^_]+_dbk/)
  * @param dialogs - DialogObject[]
  * @param select - Optional(SelectObject)
  */
 interface DialogBlockObject {
     /**
-     * regex: /\d+_dbk/
+     * regex: /[^_]+_dbk/
      */
     id: string
     in_signatures: string[]
@@ -803,7 +815,7 @@ interface DialogInDict {
 
 class DialogScene {
     /**
-     * regex: /\d+_dsc/
+     * regex: /[^_]+_dsc/
      */
     public id: string
     public dialog_blocks: DialogBlock[]
@@ -826,9 +838,21 @@ class DialogScene {
             )
             this.dialog_in_dict[blocks[i].id] = blocks[i].in_signatures
         }
-        // TODO: init cur block id
-        this.cur_block_id = this.dialog_blocks[0].id
+        this.cur_block_id = ''
         this.visited_blocks = []
+    }
+    isInclduingBlock(id: string): boolean {
+        for (let block of this.dialog_blocks) {
+            if (block.id === id) {
+                return true
+            }
+        }
+        return false
+    }
+    setCurDialogBlock(id: string) {
+        if (this.isInclduingBlock(id)) {
+            this.cur_block_id = id
+        }
     }
     getCurDialogBlock(): DialogBlock | null {
         for (let block of this.dialog_blocks) {
@@ -865,12 +889,12 @@ class DialogScene {
 }
 
 /**
- * @param id - string(/\d+dsc/)
+ * @param id - string(/[^_]+dsc/)
  * @param blocks - DialogBlockObject[]
  */
 interface DialogSceneObject {
     /**
-     * regex: /\d+_dsc/
+     * regex: /[^_]+_dsc/
      */
     id: string
     blocks: DialogBlockObject[]
@@ -887,47 +911,73 @@ interface Background {
 
 class Floor {
     /**
-     * regex: /\d+_flr/
+     * regex: /[^_]+_flr/
      */
     public id: string
     public dialog_scene: DialogScene
     public plot_id_list: string[]
     public background: Background
 
-    constructor(id: string, scene: DialogSceneObject, background: Background | null = null) {
+    constructor(id: string, scene: DialogSceneObject, plot_id_list: string[], background: Background | null = null) {
         this.id = id
         this.dialog_scene = new DialogScene(scene.id, scene.blocks)
-        this.plot_id_list = []
+        this.plot_id_list = plot_id_list
         this.background = background ?? { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' }
     }
     checkPlotThreads() {
-        // TODO: check plot
-        let choice: string = ''
-        let cur_prioeity = -Infinity
+        let selected_block_id: string = ''
+        let max_prioeity = -Infinity
         for (let plot_id of this.plot_id_list) {
             const plot = game_plot_thread_list.getById(plot_id)
-            if (plot === null) {
+            if (plot === null || !plot.isUnlocked() || plot.isFinished() || plot.getCurFloorId() !== this.id) {
                 continue
             }
-            if (plot.priority >= cur_prioeity) {
-                choice
+            let sig_id = plot.getCurSignatureId()
+            let is_set = false
+            for (let block_id of Object.keys(this.dialog_scene.dialog_in_dict)) {
+                // check if in_list of block includes certain signarue
+                if (this.dialog_scene.dialog_in_dict[block_id].indexOf(sig_id) === -1) {
+                    continue
+                }
+                // check if block is unlocked and not finished
+                const block = this.dialog_scene.getDialogBlock(block_id)
+                if (block === null || !block.isUnlocked() || this.dialog_scene.cur_block_id === block.id) {
+                    continue
+                }
+                // if plot's current corresponding block is finished, step plot to next
+                if (block.isFinished()) {
+                    plot.step()
+                    continue
+                }
+                // priority of [...signature of plot] is MAX([...plot.priority])
+                if (plot.priority > max_prioeity && !is_set) {
+                    selected_block_id = block.id
+                    max_prioeity = plot.priority
+                    is_set = true
+                }
             }
         }
-        this.dialog_scene
+        console.log(`slt: ${selected_block_id},\ncur: ${this.dialog_scene.cur_block_id},\nis_cur_finish: ${this.dialog_scene.getCurDialogBlock()?.isFinished()}`)
+        // only if cur block is finished, new block can be set
+        if (this.dialog_scene.cur_block_id === '' || this.dialog_scene.getCurDialogBlock()?.isFinished()) {
+            this.dialog_scene.setCurDialogBlock(selected_block_id)
+        }
     }
 }
 
 /**
- * @param id - string(/\d+_flr/)
+ * @param id - string(/[^_]+_flr/)
  * @param dialog_scene - DialogSceneObject
+ * @param plot_id_list - string[]
  * @param background - Optional(Background)
  */
 interface FloorObject {
     /**
-     * regex: /\d+_flr/
+     * regex: /[^_]+_flr/
      */
     id: string
     dialog_scene: DialogSceneObject
+    plot_id_list: string[]
     background?: Background
 }
 
@@ -938,6 +988,7 @@ class FloorList extends AbstractList<Floor>{
             this.data.push(new Floor(
                 floor.id,
                 floor.dialog_scene,
+                floor.plot_id_list,
                 floor.background ?? null
             ))
         }
@@ -952,11 +1003,26 @@ interface SignatureFloorDict {
 }
 
 /**
+ * @param signature - string(/[^_]+_sig/)
+ * @param floor - string(/[^_]+_flr/)
+ */
+interface SignatureFloorItem {
+    /**
+     * regex: /[^_]+_sig/
+     */
+    signature: string
+    /**
+     * regex: /[^_]+_flr/
+     */
+    floor: string
+}
+
+/**
  * floor check plot, plot 
  */
 class PlotThread {
     /**
-     * regex: /\d+_plt/
+     * regex: /[^_]+_plt/
      */
     public id: string
     public priority: number
@@ -965,11 +1031,15 @@ class PlotThread {
     public in_signatures: string[]
     public cur_signature_index: number
 
-    constructor(id: string, priority: number, sig_floor_dict: SignatureFloorDict, in_signatures: string[] = []) {
+    constructor(id: string, priority: number, signature_floor_list: SignatureFloorItem[], in_signatures: string[] = []) {
         this.id = id
         this.priority = priority
-        this.signature_floor_dict = sig_floor_dict
-        this.signatures = Object.keys(this.signature_floor_dict)
+        this.signature_floor_dict = {}
+        this.signatures = []
+        for (let item of signature_floor_list) {
+            this.signature_floor_dict[item.signature] = item.floor
+            this.signatures.push(item.signature)
+        }
         this.in_signatures = in_signatures
         this.cur_signature_index = 0
     }
@@ -982,13 +1052,29 @@ class PlotThread {
             this.cur_signature_index = this.signatures.length
         }
     }
+    getCurFloorId(): string {
+        if (this.cur_signature_index < 0 ||
+            this.cur_signature_index >= this.signatures.length ||
+            Object.keys(this.signature_floor_dict).indexOf(this.signatures[this.cur_signature_index]) === -1) {
+            return ''
+        }
+        return this.signature_floor_dict[this.signatures[this.cur_signature_index]]
+    }
+    getCurSignatureId(): string {
+        if (this.cur_signature_index < 0 ||
+            this.cur_signature_index >= this.signatures.length) {
+            return ''
+        }
+
+        return this.signatures[this.cur_signature_index]
+    }
     getSignatureById(index: number): Signature | null {
         if (index < 0 || index >= this.signatures.length) {
             return null
         }
         return game_signature_list.getById(this.signatures[index])
     }
-    getCurrentSignature(): Signature | null {
+    getCurSignature(): Signature | null {
         return this.getSignatureById(this.cur_signature_index)
     }
     isUnlocked(): boolean {
@@ -1009,6 +1095,10 @@ class PlotThread {
         if (this.signatures.length <= 0) {
             return true
         }
+        if (this.cur_signature_index < this.signatures.length) {
+            return false
+        }
+
         for (let id of this.signatures) {
             const signature = game_signature_list.getById(id)
             if (signature !== null) {
@@ -1021,11 +1111,19 @@ class PlotThread {
     }
 }
 
-// TODO: PlotThread fields
+/**
+ * @param id - string(/[^_]+_plt/)
+ * @param priority - number
+ * @param signature_floor_list - SignatureFloorItem[]
+ * @param in_signatures - string[]
+ */
 interface PlotThreadObject {
+    /**
+     * regex: /[^_]+_plt/
+     */
     id: string
     priority: number
-    signature_floor_dict: SignatureFloorDict
+    signature_floor_list: SignatureFloorItem[]
     in_signatures: string[]
 }
 
@@ -1037,7 +1135,7 @@ class PlotThreadList extends AbstractList<PlotThread>{
             this.data.push(new PlotThread(
                 thread.id,
                 thread.priority,
-                thread.signature_floor_dict,
+                thread.signature_floor_list,
                 thread.in_signatures
             ))
         }
@@ -1664,6 +1762,9 @@ interface UiStringDict {
     [key: string]: L10nText
 }
 
+/**
+ * 
+ */
 interface SaveDataType {
 
 }
@@ -1832,7 +1933,7 @@ class Game {
                 return
             }
             floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id)
-            floor.dialog_scene.cur_block_id = next;
+            floor.dialog_scene.setCurDialogBlock(next)
             const block = floor.dialog_scene.getCurDialogBlock()
             if (block === null) {
                 return
@@ -1914,14 +2015,14 @@ class Game {
         }
     }
     renderFloor() {
-        // TODO: select block by thread
         Game.hideGoOnButton()
         Game.hideOptions()
-        const floor = this.getCurrentFloor()
         clearChildren(qs('#dialog-container') as HTMLElement)
+        const floor = this.getCurrentFloor()
         if (floor === null) {
             return
         }
+        floor.checkPlotThreads()
         // render visited blocks
         for (let block_id of floor.dialog_scene.visited_blocks) {
             const vis_block = floor.dialog_scene.getDialogBlock(block_id)
@@ -2022,13 +2123,6 @@ class Game {
         }
     }
     createFloorButtons() {
-        const func_button_row = qs('#func-buttons')
-        const button_container = qs('#floor-buttons')
-        for (let child of Array.from(button_container.children)) {
-            if (child.id !== 'func-buttons') {
-                button_container.removeChild(child)
-            }
-        }
         this.floor_buttons = []
         for (let i = this.max_floor - 1; i >= 1; i -= 2) { // on ground
             this.floor_buttons.push([
@@ -2049,6 +2143,15 @@ class Game {
                     i !== this.min_floor
                 )
             ])
+        }
+    }
+    renderFloorButtons() {
+        const func_button_row = qs('#func-buttons')
+        const button_container = qs('#floor-buttons')
+        for (let child of Array.from(button_container.children)) {
+            if (child.id !== 'func-buttons') {
+                button_container.removeChild(child)
+            }
         }
         this.floor_buttons.forEach(button_row => {
             let row = document.createElement('div')
@@ -2109,10 +2212,13 @@ class Game {
                     getOptionById(opt_id)?.text.get(game.lang) ?? ''
         }
         // passenger
+        this.passenger_display.render(this.lang)
         // task
+        this.task_display.render(this.lang)
     }
     initialize() {
         this.createFloorButtons()
+        this.renderFloorButtons()
         this.language_display.set(this.lang)
         this.switchUiLanguge()
         this.passenger_display.add(game_passenger_me)
@@ -2120,13 +2226,14 @@ class Game {
         this.dots_animation.start()
     }
     async debug() {
-        this.renderFloor()
-        this.door.syncStart(DoorDir.OPEN);
+        qs('#open-button').click()
+        // this.renderFloor()
+        // this.door.syncStart(DoorDir.OPEN);
         // this.save_panel.syncStart('open')
         // qs('.number-button[index="5"]').click()
-        Game.hideGoOnButton()
-        qs('#options-row').style.display = 'none';
-        (qs('#save-text-area') as HTMLTextAreaElement).value = ''
+        // Game.hideGoOnButton()
+        // qs('#options-row').style.display = 'none';
+        // (qs('#save-text-area') as HTMLTextAreaElement).value = ''
     }
 }
 
@@ -2300,9 +2407,31 @@ const game_lang_list = new LanguageList([
     { id: 'en', name: 'EN' }
 ])
 const game_default_lang = 'zh_cn'
-const game_signature_list = new SignatureList([])
-const game_action_list = new GameActionList([])
+const game_signature_list = new SignatureList([
+    { id: 'I1_sig', status: SignatureStatus.ACTIVE },
+    { id: 'I1.1_sig' }
+])
+const game_action_list = new GameActionList([
+    {
+        id: 'to2_act',
+        action: GameAction.polyActs(
+            GameAction.genActivateSignatureAct('I1.1_sig'),
+            GameAction.genStepActionAct('I1_plt')
+        )
+    }
+])
 const game_task_list = new GameTaskList([])
+const game_plot_thread_list = new PlotThreadList([
+    {
+        id: 'I1_plt',
+        priority: 1,
+        signature_floor_list: [
+            { signature: 'I1_sig', floor: '1_flr' },
+            { signature: 'I1.1_sig', floor: '2_flr' },
+        ],
+        in_signatures: []
+    }
+])
 const game_passenger_list = new PassengerList([
     {
         id: 'me_psg',
@@ -2320,31 +2449,34 @@ const game_passenger_list = new PassengerList([
     },
 ])
 const game_passenger_me = 'me_psg'
-const game_plot_thread_list = new PlotThreadList([])
 const game_floor_list = new FloorList([
     {
         id: '1_flr',
+        plot_id_list: ['I1_plt'],
         dialog_scene: {
             id: '1_dsc',
             blocks: [
                 {
                     id: 'A01_dbk',
-                    in_signatures: [],
+                    in_signatures: ['I1_sig'],
                     dialogs: [
                         {
                             person_id: 'me_psg',
                             text: { zh_cn: '我超', en: 'ong' },
                             layout: DialogLayout.RIGHT
 
-                        }, {
+                        },
+                        {
                             person_id: 'me_psg',
                             text: { zh_cn: '什么情况', en: 'wat happened' },
                             layout: DialogLayout.RIGHT,
-                        }, {
+                        },
+                        {
                             person_id: 'me_psg',
                             text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
                             layout: DialogLayout.RIGHT
-                        }, {
+                        },
+                        {
                             person_id: 'me_psg',
                             text: { zh_cn: '哦草', en: 'f word' },
                             layout: DialogLayout.RIGHT
@@ -2370,9 +2502,30 @@ const game_floor_list = new FloorList([
                         {
                             person_id: 'jacob_psg',
                             text: { zh_cn: '好似喵', en: 'nice dead' },
-                            layout: DialogLayout.LEFT
+                            layout: DialogLayout.LEFT,
+                            action_id: 'to2_act'
                         }
                     ],
+                }
+            ]
+        }
+    },
+    {
+        id: '2_flr',
+        plot_id_list: ['I1_plt'],
+        dialog_scene: {
+            id: '2_dsc',
+            blocks: [
+                {
+                    id: 'A03_dbk',
+                    in_signatures: ['I1.1_sig'],
+                    dialogs: [
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '赢光光', en: 'WWW' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                    ]
                 }
             ]
         }

@@ -55,7 +55,7 @@ declare class Signature {
 }
 interface SignatureObject {
     id: string;
-    status: SignatureStatus;
+    status?: SignatureStatus;
 }
 declare class SignatureList extends AbstractList<Signature> {
     constructor(signatures: SignatureObject[]);
@@ -203,6 +203,8 @@ declare class DialogBlock {
     setIndexToEnd(): void;
     stepIndex(): void;
     isNotFirstLine(): boolean;
+    isFinished(): boolean;
+    isUnlocked(): boolean;
     toString(): string;
 }
 interface DialogBlockObject {
@@ -221,6 +223,8 @@ declare class DialogScene {
     visited_blocks: string[];
     dialog_in_dict: DialogInDict;
     constructor(id: string, blocks: DialogBlockObject[]);
+    isInclduingBlock(id: string): boolean;
+    setCurDialogBlock(id: string): void;
     getCurDialogBlock(): DialogBlock | null;
     getDialogBlock(id: string): DialogBlock | null;
     addVisitedBlock(id: string): void;
@@ -240,12 +244,13 @@ declare class Floor {
     dialog_scene: DialogScene;
     plot_id_list: string[];
     background: Background;
-    constructor(id: string, scene: DialogSceneObject, background?: Background | null);
+    constructor(id: string, scene: DialogSceneObject, plot_id_list: string[], background?: Background | null);
     checkPlotThreads(): void;
 }
 interface FloorObject {
     id: string;
     dialog_scene: DialogSceneObject;
+    plot_id_list: string[];
     background?: Background;
 }
 declare class FloorList extends AbstractList<Floor> {
@@ -254,6 +259,10 @@ declare class FloorList extends AbstractList<Floor> {
 interface SignatureFloorDict {
     [signature_id: string]: string;
 }
+interface SignatureFloorItem {
+    signature: string;
+    floor: string;
+}
 declare class PlotThread {
     id: string;
     priority: number;
@@ -261,17 +270,19 @@ declare class PlotThread {
     signatures: string[];
     in_signatures: string[];
     cur_signature_index: number;
-    constructor(id: string, priority: number, sig_floor_dict: SignatureFloorDict, in_signatures?: string[]);
+    constructor(id: string, priority: number, signature_floor_list: SignatureFloorItem[], in_signatures?: string[]);
     step(): void;
+    getCurFloorId(): string;
+    getCurSignatureId(): string;
     getSignatureById(index: number): Signature | null;
-    getCurrentSignature(): Signature | null;
+    getCurSignature(): Signature | null;
     isUnlocked(): boolean;
     isFinished(): boolean;
 }
 interface PlotThreadObject {
     id: string;
     priority: number;
-    signature_floor_dict: SignatureFloorDict;
+    signature_floor_list: SignatureFloorItem[];
     in_signatures: string[];
 }
 declare class PlotThreadList extends AbstractList<PlotThread> {
@@ -465,6 +476,7 @@ declare class Game {
     lift(): Promise<void>;
     checkBeforeLift(): void;
     createFloorButtons(): void;
+    renderFloorButtons(): void;
     encrypt(): void;
     decipher(): void;
     serializate(): string;
@@ -487,9 +499,9 @@ declare const game_default_lang = "zh_cn";
 declare const game_signature_list: SignatureList;
 declare const game_action_list: GameActionList;
 declare const game_task_list: GameTaskList;
+declare const game_plot_thread_list: PlotThreadList;
 declare const game_passenger_list: PassengerList;
 declare const game_passenger_me = "me_psg";
-declare const game_plot_thread_list: PlotThreadList;
 declare const game_floor_list: FloorList;
 declare const game_ui_string_raw: UiStringDictRaw;
 declare const game: Game;
