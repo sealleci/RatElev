@@ -505,6 +505,9 @@ declare class Game {
     passenger_display: PassengerDisplay;
     task_display: TaskDisplay;
     constructor();
+    static jumpToBottom(): void;
+    static hideJumpButton(): void;
+    static showJumpButton(): void;
     static hideGoOnButton(): void;
     static showGoOnButton(): void;
     static hideOptions(): void;

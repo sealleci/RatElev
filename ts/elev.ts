@@ -1943,6 +1943,16 @@ class Game {
         this.passenger_display = new PassengerDisplay([])
         this.task_display = new TaskDisplay([])
     }
+    static jumpToBottom() {
+        const dlg_cn = qs('#dialog-container')
+        dlg_cn.scrollTop = dlg_cn.scrollHeight
+    }
+    static hideJumpButton() {
+        qs('#jump-button').style.display = 'none'
+    }
+    static showJumpButton() {
+        qs('#jump-button').style.display = 'flex'
+    }
     static hideGoOnButton() {
         qs('#sheng-lue-dots').style.display = 'none'
         qs('#go-on-button-row').style.display = 'none'
@@ -2062,6 +2072,7 @@ class Game {
             }
             block.resetIndex()
             Game.stepDialog(block, game.lang)
+            Game.jumpToBottom()
         })
         return opt_btn
     }
@@ -2179,6 +2190,8 @@ class Game {
                 Game.hideGoOnButton()
             }
         }
+        Game.hideJumpButton()
+        Game.jumpToBottom()
     }
     isLiftable(): boolean {
         return !(this.pending_queue.length() <= 0 ||
@@ -2316,13 +2329,6 @@ class Game {
     deserializate(encrypted: string): boolean {
         let is_catch = false
         try {
-            if (this.door.is_open) {
-                this.door.syncStart(DoorDir.CLOSE)
-            }
-            Game.hideGoOnButton()
-            Game.hideOptions()
-            clearChildren(qs('#dialog-container') as HTMLElement)
-
             const json_data = <SaveDataJSON>JSON.parse(EncryptTool.decipher(encrypted))
             // console.log(json_data)
             for (let sig_json of json_data.signatures) {
@@ -2390,6 +2396,14 @@ class Game {
             is_catch = true
             console.log(`deserializate error: ${(err as Error).message}`)
         }
+        if (!is_catch) {
+            if (this.door.is_open) {
+                this.door.syncStart(DoorDir.CLOSE)
+            }
+            Game.hideGoOnButton()
+            Game.hideOptions()
+            clearChildren(qs('#dialog-container') as HTMLElement)
+        }
         return !is_catch
     }
     switchUiLanguge() {
@@ -2431,6 +2445,7 @@ class Game {
         this.renderFloorButtons()
         this.language_display.set(this.lang)
         this.switchUiLanguge()
+        this.floor_display.updateNumber(this.cur_floor)
         this.passenger_display.add(game_passenger_me)
         this.passenger_display.render(this.lang)
         this.dots_animation.start()
@@ -2438,6 +2453,7 @@ class Game {
     async debug() {
         qs('#open-button').click()
         qs('#top-arch').click()
+        qs('#go-on-button').click()
         // this.renderFloor()
         // this.door.syncStart(DoorDir.OPEN);
         // this.save_panel.syncStart('open')
@@ -2590,6 +2606,15 @@ const binding_buttons: BindingButton[] = [
                 return
             }
             Game.stepDialog(block, game.lang)
+            Game.jumpToBottom()
+        }
+    },
+    {
+        selector: '#jump-button',
+        is_single: true,
+        func: () => {
+            Game.jumpToBottom()
+            Game.hideJumpButton()
         }
     }
 ]
@@ -2610,6 +2635,15 @@ function bindButtonFunctions() {
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize()
     bindButtonFunctions()
+    const dialog_container = qs('#dialog-container')
+    dialog_container.addEventListener('scroll', () => {
+        // console.log(dialog_container.scrollTop, dialog_container.offsetHeight, dialog_container.scrollHeight)
+        if (dialog_container.scrollTop + dialog_container.offsetHeight <= dialog_container.scrollHeight - dialog_container.offsetHeight / 2) {
+            Game.showJumpButton()
+        } else {
+            Game.hideJumpButton()
+        }
+    })
     game.debug()
 })
 
@@ -2687,7 +2721,7 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '我超', en: 'ong' },
+                            text: { zh_cn: '7777777777777777777777777777777777777777777777777777777777777<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>', en: 'ong' },
                             layout: DialogLayout.RIGHT,
                             action_id: 't1_act'
 
@@ -2760,7 +2794,8 @@ const game_floor_list = new FloorList([
 const game_ui_string_raw: UiStringDictRaw = {
     'PERSON_NUM': { zh_cn: '人数', en: 'Persons' },
     'COPY': { zh_cn: '复制', en: 'COPY' },
-    'IMPORT': { zh_cn: '导入', en: 'IMP' },
-    'EXPORT': { zh_cn: '导出', en: 'EXP' }
+    'IMPORT': { zh_cn: '导入', en: 'IMPORT' },
+    'EXPORT': { zh_cn: '导出', en: 'EXPORT' },
+    'JUMP_BUTTON': { zh_cn: '跳转至最新对话', en: 'Jump to present' }
 }
 const game = new Game()
