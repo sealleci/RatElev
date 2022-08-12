@@ -545,6 +545,7 @@ interface BindingButton {
 declare function clickSwitchLangButton(dir: LangBtnDir): Promise<void>;
 declare const binding_buttons: BindingButton[];
 declare function bindButtonFunctions(): void;
+declare function addDialogScrollListener(): void;
 declare const game_lang_list: LanguageList;
 declare const game_default_lang = "zh_cn";
 declare const game_signature_list: SignatureList;

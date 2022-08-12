@@ -1995,12 +1995,9 @@ function bindButtonFunctions() {
         }
     }
 }
-document.addEventListener('DOMContentLoaded', () => {
-    game.initialize();
-    bindButtonFunctions();
+function addDialogScrollListener() {
     const dialog_container = qs('#dialog-container');
     dialog_container.addEventListener('scroll', () => {
-        console.log(dialog_container.scrollTop, dialog_container.offsetHeight, dialog_container.scrollHeight);
         if (dialog_container.scrollTop + dialog_container.offsetHeight <= dialog_container.scrollHeight - dialog_container.offsetHeight / 2) {
             Game.showJumpButton();
         }
@@ -2008,7 +2005,11 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.hideJumpButton();
         }
     });
-    game.debug();
+}
+document.addEventListener('DOMContentLoaded', () => {
+    game.initialize();
+    bindButtonFunctions();
+    addDialogScrollListener();
 });
 const game_lang_list = new LanguageList([
     { id: 'zh_cn', name: '中文' },
@@ -2032,7 +2033,7 @@ const game_action_list = new GameActionList([
 const game_task_list = new GameTaskList([
     {
         id: 't1_tsk',
-        description: { zh_cn: '你好', en: 'hello' },
+        description: { zh_cn: '你好老鼠', en: 'hello world' },
     }
 ]);
 const game_plot_thread_list = new PlotThreadList([
@@ -2080,23 +2081,23 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '7777777777777777777777777777777777777777777777777777777777777<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>', en: 'ong' },
+                            text: { zh_cn: '老鼠老鼠', en: 'rat rat' },
                             layout: DialogLayout.RIGHT,
                             action_id: 't1_act'
                         },
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '什么情况', en: 'wat happened' },
+                            text: { zh_cn: '老鼠在哪里', en: 'where the rat is' },
                             layout: DialogLayout.RIGHT,
                         },
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
+                            text: { zh_cn: '我去', en: 'ong' },
                             layout: DialogLayout.RIGHT
                         },
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '哦草', en: 'f word' },
+                            text: { zh_cn: '这素在', en: 'wat is that' },
                             layout: DialogLayout.RIGHT
                         },
                     ],
@@ -2104,11 +2105,11 @@ const game_floor_list = new FloorList([
                         options: [
                             {
                                 next: 'A02_dbk',
-                                text: { zh_cn: '打胶', en: 'fap' }
+                                text: { zh_cn: '我是0', en: 'im bottom' }
                             },
                             {
                                 next: 'A02_dbk',
-                                text: { zh_cn: '炉管', en: 'jerk' }
+                                text: { zh_cn: '我是1', en: 'im top' }
                             }
                         ]
                     }
@@ -2119,7 +2120,7 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'jacob_psg',
-                            text: { zh_cn: '好似喵', en: 'nice dead' },
+                            text: { zh_cn: '不要南通', en: 'no homo' },
                             layout: DialogLayout.LEFT,
                             action_id: 'to2_act'
                         }
@@ -2140,7 +2141,7 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '赢光光', en: 'WWW' },
+                            text: { zh_cn: '测试', en: 'test' },
                             layout: DialogLayout.MIDDLE
                         },
                     ]
