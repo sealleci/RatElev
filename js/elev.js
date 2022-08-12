@@ -41,6 +41,12 @@ function range(...args) {
     }
     return arr;
 }
+function flattenNestArray(nest_array) {
+    function flatten2DArray(array) {
+        return [].concat(...array);
+    }
+    return flatten2DArray(nest_array.map(x => Array.isArray(x) ? flattenNestArray(x) : [x]));
+}
 function clearChildren(elem) {
     for (let child of Array.from(elem.childNodes)) {
         elem.removeChild(child);
@@ -101,6 +107,9 @@ class AbstractList {
         }
         return null;
     }
+    toString() {
+        return `[${this.data.map(s => s.toString()).join(',')}]`;
+    }
 }
 class LanguageList extends AbstractList {
     constructor(data) {
@@ -108,7 +117,7 @@ class LanguageList extends AbstractList {
         this.data = data;
     }
     isKeyIn(id) {
-        return id in this.data.map(value => value.id);
+        return this.data.map(x => x.id).indexOf(id) !== -1;
     }
     indexOfKey(id) {
         if (!this.isKeyIn(id)) {
@@ -163,7 +172,7 @@ class L10nText {
         this.data[key] = value;
     }
     toString() {
-        return `{}`;
+        return '{' + Object.keys(this.data).map(key => `"${key}":"${this.get(key)}"`).join(',') + '}';
     }
 }
 var SignatureStatus;
@@ -186,7 +195,10 @@ class Signature {
         return this.status === SignatureStatus.ACTIVE;
     }
     toString() {
-        return `{}`;
+        return `{"id":"${this.id}","status":"${this.status.toString()}"}`;
+    }
+    static convertStatus(status) {
+        return status === 'active' ? SignatureStatus.ACTIVE : SignatureStatus.DEACTIVE;
     }
 }
 class SignatureList extends AbstractList {
@@ -249,6 +261,12 @@ class GameTask {
     }
     deactiviate() {
         this.status = TaskStatus.DEACTIVE;
+    }
+    toString() {
+        return `{"id":"${this.id}","status":"${this.status.toString()}"}`;
+    }
+    static convertStatus(status) {
+        return status === 'active' ? TaskStatus.ACTIVE : status === 'finished' ? TaskStatus.FINISHED : TaskStatus.DEACTIVE;
     }
 }
 class GameTaskList extends AbstractList {
@@ -352,9 +370,6 @@ class GameAction {
             fs.forEach(f => { f(); });
         };
     }
-    toString() {
-        return `{}`;
-    }
 }
 class GameActionList extends AbstractList {
     constructor(actions) {
@@ -372,9 +387,6 @@ class Passenger {
         this.avatar_font_color = avatar_font_color;
         this.avatar_text = avatar_text;
         this.is_diaplay = is_display;
-    }
-    toString() {
-        return `{}`;
     }
 }
 class PassengerList extends AbstractList {
@@ -552,7 +564,7 @@ class DialogBlock {
         return true;
     }
     toString() {
-        return `{}`;
+        return `{"id":"${this.id}","cur_item_index":${this.cur_item_index}}`;
     }
 }
 class DialogScene {
@@ -611,7 +623,7 @@ class DialogScene {
         this.visited_blocks.splice(index, 1);
     }
     toString() {
-        return `{}`;
+        return `{"id":"${this.id}","cur_block_id":"${this.cur_block_id}","visited_blocks":[${this.visited_blocks.map(x => `"${x}"`).join(',')}],"dialog_blocks":[${this.dialog_blocks.map(x => x.toString()).join(',')}]}`;
     }
 }
 class Floor {
@@ -655,6 +667,9 @@ class Floor {
         if (this.dialog_scene.cur_block_id === '' || ((_b = this.dialog_scene.getCurDialogBlock()) === null || _b === void 0 ? void 0 : _b.isFinished())) {
             this.dialog_scene.setCurDialogBlock(selected_block_id);
         }
+    }
+    toString() {
+        return `{"id":"${this.id}","dialog_scene":${this.dialog_scene.toString()}}`;
     }
 }
 class FloorList extends AbstractList {
@@ -833,11 +848,10 @@ class WaitingDotsAnimation {
     }
 }
 class FloorButton {
-    constructor(index, text, available) {
+    constructor(index, text, is_available) {
         this.index = index;
         this.text = text;
-        this.available = available;
-        this.selected = false;
+        this.is_available = is_available;
     }
 }
 var DoorDir;
@@ -918,6 +932,9 @@ class Door {
 }
 class PendingQueue {
     constructor() {
+        this.data = [];
+    }
+    clear() {
         this.data = [];
     }
     sort() {
@@ -1215,6 +1232,12 @@ class ListDisplay {
         }
         this.data.splice(index, 1);
     }
+    toString() {
+        return `[${this.data.map(x => `"${x}"`).join(',')}]`;
+    }
+    reset(data) {
+        this.data = data;
+    }
 }
 class PassengerDisplay extends ListDisplay {
     constructor(id_list = []) {
@@ -1287,6 +1310,14 @@ class TaskDisplay extends ListDisplay {
                 tsk_container.appendChild(div);
             }
         }
+    }
+}
+class EncryptTool {
+    static encrypt(raw) {
+        return btoa(encodeURIComponent(raw));
+    }
+    static decipher(encrypted) {
+        return decodeURIComponent(atob(encrypted));
     }
 }
 class Game {
@@ -1456,9 +1487,15 @@ class Game {
     static stepDialog(block, lang, is_do_action = true) {
         const item = block.getCurItem();
         if (item === null) {
-            Game.hideOptions();
-            block.stepIndex();
-            Game.showGoOnButton();
+            if (!block.isFinished()) {
+                Game.hideOptions();
+                block.stepIndex();
+                Game.showGoOnButton();
+            }
+            else {
+                Game.hideOptions();
+                Game.hideGoOnButton();
+            }
             return;
         }
         if (item.isSelect()) {
@@ -1472,7 +1509,12 @@ class Game {
                 item.doAction();
             }
             block.stepIndex();
-            Game.showGoOnButton();
+            if (!block.isFinished()) {
+                Game.showGoOnButton();
+            }
+            else {
+                Game.hideGoOnButton();
+            }
         }
     }
     static renderBlock(block, lang, is_render_all = true) {
@@ -1480,7 +1522,10 @@ class Game {
         for (let i = 0; i < block.data.length; ++i) {
             if (!is_render_all && i >= block.cur_item_index) {
                 if (i === 0) {
-                    Game.stepDialog(block, lang, false);
+                    Game.hideOptions();
+                    if (!is_render_all) {
+                        Game.showGoOnButton();
+                    }
                 }
                 break;
             }
@@ -1499,7 +1544,9 @@ class Game {
                 if (Game.renderDialog(item, lang, pre_id === item.person_id)) {
                     pre_id = item.person_id;
                 }
-                Game.showGoOnButton();
+                if (!is_render_all) {
+                    Game.showGoOnButton();
+                }
             }
         }
     }
@@ -1512,6 +1559,9 @@ class Game {
             return;
         }
         floor.checkPlotThreads();
+        const bg = qs('#background');
+        bg.style.backgroundColor = floor.background.bg_color;
+        bg.innerHTML = floor.background.inner_html;
         for (let block_id of floor.dialog_scene.visited_blocks) {
             const vis_block = floor.dialog_scene.getDialogBlock(block_id);
             if (vis_block !== null) {
@@ -1521,10 +1571,10 @@ class Game {
         const cur_block = floor.dialog_scene.getCurDialogBlock();
         if (cur_block !== null) {
             Game.renderBlock(cur_block, this.lang, false);
+            if (cur_block.isFinished()) {
+                Game.hideGoOnButton();
+            }
         }
-        const bg = qs('#background');
-        bg.style.backgroundColor = floor.background.bg_color;
-        bg.innerHTML = floor.background.inner_html;
     }
     isLiftable() {
         return !(this.pending_queue.length() <= 0 ||
@@ -1646,7 +1696,7 @@ class Game {
             for (let button of button_row) {
                 let col = document.createElement('div');
                 col.classList.add('button-col', 'unselectable', 'number-button');
-                if (!button.available) {
+                if (!button.is_available) {
                     col.classList.add('invisible');
                 }
                 col.textContent = button.text;
@@ -1656,16 +1706,84 @@ class Game {
             button_container.insertBefore(row, func_button_row);
         });
     }
-    encrypt() {
-    }
-    decipher() {
-    }
     serializate() {
-        return JSON.stringify({ status: true, data: {} });
+        return EncryptTool.encrypt(`{"signatures":${game_signature_list.toString()},"tasks":${game_task_list.toString()},"floors":${game_floor_list.toString()},"game":${this.toString()}}`);
     }
-    deserializate(data) {
-        data = data;
-        return false;
+    deserializate(encrypted) {
+        let is_catch = false;
+        try {
+            if (this.door.is_open) {
+                this.door.syncStart(DoorDir.CLOSE);
+            }
+            Game.hideGoOnButton();
+            Game.hideOptions();
+            clearChildren(qs('#dialog-container'));
+            const json_data = JSON.parse(EncryptTool.decipher(encrypted));
+            for (let sig_json of json_data.signatures) {
+                const sig = game_signature_list.getById(sig_json.id);
+                if (sig !== null) {
+                    sig.status = Signature.convertStatus(sig_json.status);
+                }
+            }
+            for (let tsk_json of json_data.tasks) {
+                const tsk = game_task_list.getById(tsk_json.id);
+                if (tsk !== null) {
+                    tsk.status = GameTask.convertStatus(tsk_json.status);
+                }
+            }
+            for (let f_json of json_data.floors) {
+                const flr = game_floor_list.getById(f_json.id);
+                if (flr === null) {
+                    continue;
+                }
+                if (flr.dialog_scene.id !== f_json.dialog_scene.id) {
+                    continue;
+                }
+                flr.dialog_scene.setCurDialogBlock(f_json.dialog_scene.cur_block_id);
+                flr.dialog_scene.visited_blocks = f_json.dialog_scene.visited_blocks;
+                for (let b_json of f_json.dialog_scene.dialog_blocks) {
+                    const blk = flr.dialog_scene.getDialogBlock(b_json.id);
+                    if (blk === null) {
+                        continue;
+                    }
+                    blk.cur_item_index = b_json.cur_item_index;
+                }
+            }
+            this.lang = json_data.game.lang;
+            for (let rows of this.floor_buttons) {
+                for (let btn of rows) {
+                    let pos = json_data.game.floor_buttons.map(x => x.index).indexOf(btn.index);
+                    if (pos === -1) {
+                        continue;
+                    }
+                    btn.is_available = json_data.game.floor_buttons[pos].is_available;
+                    const num_btn = qs(`.number-button[index="${btn.index}"]`);
+                    if (num_btn === null) {
+                        continue;
+                    }
+                    if (btn.is_available) {
+                        num_btn.classList.remove('invisible');
+                    }
+                }
+            }
+            this.cur_floor = json_data.game.cur_floor;
+            this.is_lifting = false;
+            this.lift_direction = FloorLiftStatus.NONE;
+            this.cur_dest = 0;
+            this.pending_queue.clear();
+            this.floor_display.updateNumber(this.cur_floor);
+            this.passenger_display.reset(json_data.game.passenger_display);
+            this.task_display.reset(json_data.game.task_display);
+            this.language_display.set(this.lang);
+            this.switchUiLanguge();
+            this.passenger_display.render(this.lang);
+            this.task_display.render(this.lang);
+        }
+        catch (err) {
+            is_catch = true;
+            console.log(`deserializate error: ${err.message}`);
+        }
+        return !is_catch;
     }
     switchUiLanguge() {
         for (let e of qsa('.l10n-text-ui')) {
@@ -1704,7 +1822,11 @@ class Game {
     debug() {
         return __awaiter(this, void 0, void 0, function* () {
             qs('#open-button').click();
+            qs('#top-arch').click();
         });
+    }
+    toString() {
+        return `{"lang":"${this.lang}","cur_floor": ${this.cur_floor},"floor_buttons": [${flattenNestArray(this.floor_buttons).map(x => `{"index":${x.index},"is_available":${x.is_available}}`).join(',')}],"passenger_display":${this.passenger_display.toString()},"task_display":${this.task_display.toString()}}`;
     }
 }
 function clickSwitchLangButton(dir) {
@@ -1768,11 +1890,6 @@ const binding_buttons = [
         })
     },
     {
-        selector: '#go-on-button-row',
-        is_single: true,
-        func: () => { }
-    },
-    {
         selector: '#top-arch',
         is_single: true,
         func: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -1792,11 +1909,8 @@ const binding_buttons = [
         func: () => {
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
-            const res = JSON.parse(game.serializate());
-            qs('#save-export-button').appendChild(Game.getTFIcon(res.status));
-            if (res.status) {
-                qs('#save-text-area').value = JSON.stringify(res.data);
-            }
+            qs('#save-export-button').appendChild(Game.getTFIcon(true));
+            qs('#save-text-area').value = game.serializate();
         }
     },
     {
@@ -1858,6 +1972,7 @@ function bindButtonFunctions() {
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize();
     bindButtonFunctions();
+    game.debug();
 });
 const game_lang_list = new LanguageList([
     { id: 'zh_cn', name: '中文' },
@@ -1871,10 +1986,19 @@ const game_signature_list = new SignatureList([
 const game_action_list = new GameActionList([
     {
         id: 'to2_act',
-        action: GameAction.polyActs(GameAction.genActivateSignatureAct('I1.1_sig'), GameAction.genStepActionAct('I1_plt'))
+        action: GameAction.polyActs(GameAction.genActivateSignatureAct('I1.1_sig'), GameAction.genStepActionAct('I1_plt'), GameAction.genFinishTaskAct('t1_tsk'))
+    },
+    {
+        id: 't1_act',
+        action: GameAction.genActiveTaskAct('t1_tsk')
     }
 ]);
-const game_task_list = new GameTaskList([]);
+const game_task_list = new GameTaskList([
+    {
+        id: 't1_tsk',
+        description: { zh_cn: '你好', en: 'hello' },
+    }
+]);
 const game_plot_thread_list = new PlotThreadList([
     {
         id: 'I1_plt',
@@ -1890,14 +2014,14 @@ const game_passenger_list = new PassengerList([
     {
         id: 'me_psg',
         name: { zh_cn: '我', en: 'Me' },
-        avatar_color: 'black',
+        avatar_color: '#1F4690',
         avatar_font_color: 'white',
         avatar_text: { zh_cn: '我', en: 'ME' },
     },
     {
         id: 'jacob_psg',
         name: { zh_cn: '邓霜杰', en: 'Jacob Derek' },
-        avatar_color: 'black',
+        avatar_color: '#80558C',
         avatar_font_color: 'white',
         avatar_text: { zh_cn: '杰', en: 'JD' },
     },
@@ -1907,6 +2031,10 @@ const game_floor_list = new FloorList([
     {
         id: '1_flr',
         plot_id_list: ['I1_plt'],
+        background: {
+            bg_color: '#73A9AD',
+            inner_html: ''
+        },
         dialog_scene: {
             id: '1_dsc',
             blocks: [
@@ -1917,7 +2045,8 @@ const game_floor_list = new FloorList([
                         {
                             person_id: 'me_psg',
                             text: { zh_cn: '我超', en: 'ong' },
-                            layout: DialogLayout.RIGHT
+                            layout: DialogLayout.RIGHT,
+                            action_id: 't1_act'
                         },
                         {
                             person_id: 'me_psg',

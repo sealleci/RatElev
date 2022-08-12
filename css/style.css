@@ -5,8 +5,9 @@ body {
     margin: 0;
     padding: 4px 0;
     min-width: 1000px;
-    background-color: #343641;
+    /* background-color: #343641; */
     /* background-color: rgb(14, 14, 14); */
+    background-color: rgba(0, 0, 0, .7);
 }
 
 #elev-container {
@@ -18,6 +19,7 @@ body {
     height: 750px;
     background-color: white;
     overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, .25);
 }
 
 #elev-left {
@@ -30,7 +32,7 @@ body {
     height: 100%;
     background-color: #A0A0A0;
     border-right: 4px solid #524A4E;
-    box-shadow: 4px 0 4px rgba(0, 0, 0, .2);
+    box-shadow: 3px 0 4px rgba(0, 0, 0, .2);
     z-index: 50;
 }
 
@@ -43,7 +45,7 @@ body {
     height: 100%;
     background-color: #A0A0A0;
     border-left: 4px solid #524A4E;
-    box-shadow: -4px 0 4px rgba(0, 0, 0, .2);
+    box-shadow: -3px 0 4px rgba(0, 0, 0, .2);
     z-index: 50;
 }
 
@@ -479,7 +481,7 @@ body {
     background-color: #A0A0A0;
     border-bottom: 4px solid #524A4E;
     z-index: 100;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, .2);
+    box-shadow: 0 3px 4px rgba(0, 0, 0, .2);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -569,8 +571,8 @@ body {
 }
 
 .avatar>div {
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     /* margin-top: 3px; */
     background-color: #ccaf0e;
     border-radius: 50%;
@@ -580,8 +582,8 @@ body {
     justify-content: center;
     align-items: center;
     /* line-height: 35px; */
-    font-size: 1rem;
-    font-family: Georgia, '';
+    font-size: 18px;
+    font-family: Georgia, 'SimHei';
     /* text-shadow: black 0 0 2px; */
     white-space: nowrap;
     overflow: hidden;
@@ -603,8 +605,9 @@ body {
     max-width: 70%;
     min-height: 1.2rem;
     padding: 6px 8px;
+    background-color: rgba(125, 125, 125, 0.4);
     text-shadow: black 0 0 1px;
-    /* border: 1px solid red; */
+    /* border: 1px solid white; */
     flex-wrap: wrap;
     -webkit-user-select: text;
     -moz-user-select: text;
@@ -619,8 +622,8 @@ body {
 
 .dialog-box.left-dialog-box {
     /* background: linear-gradient(90deg, rgba(125, 125, 125, .6) 50%, transparent 100%); */
-    background-color: rgba(125, 125, 125, .6);
-    border-left: 5px solid #398AB9;
+    /* background-color: rgba(125, 125, 125, .6); */
+    border-left: 5px solid #8BDB81;
     border-radius: 0 15px 15px 0;
 }
 
@@ -634,8 +637,8 @@ body {
 
 .dialog-box.right-dialog-box {
     /* background: linear-gradient(-90deg, rgba(125, 125, 125, .6) 0%, transparent 100%); */
-    background-color: rgba(125, 125, 125, .6);
-    border-right: 5px solid #8BDB81;
+    /* background-color: rgba(125, 125, 125, .6); */
+    border-right: 5px solid #398AB9;
     border-radius: 15px 0 0 15px;
 }
 
@@ -650,7 +653,7 @@ body {
 .dialog-box.mid-dialog-box {
     /* background: linear-gradient(90deg, transparent 0%, rgba(125, 125, 125, .6) 50%, transparent 100%); */
     max-width: 90%;
-    background-color: rgba(125, 125, 125, .6);
+    /* background-color: rgba(125, 125, 125, .6); */
     border-radius: 10px;
 }
 
@@ -762,7 +765,7 @@ body {
     word-wrap: break-word;
     word-break: break-all;
     outline: 2px solid rgba(255, 255, 255, .6);
-    color: rgba(255, 255, 255, .8);
+    color: rgba(255, 255, 255, 1);
     padding: 4px 5px;
     transition: background-color .2s, color .2s, outline .2s;
     border-radius: 15px 15px 15px 0;
@@ -775,14 +778,12 @@ body {
 }
 
 .option-button:hover {
-    outline-color: rgba(244, 115, 185, .6);
-    background-color: rgba(255, 255, 255, .05);
-    color: rgba(244, 115, 185, .9);
+    background-color: rgba(244, 115, 185, .6);
 }
 
 .option-button:active {
-    background-color: rgba(244, 115, 185, .6);
-    color: rgba(255, 255, 255, .75);
+    outline-color: rgba(244, 115, 185, .75);
+    background-color: rgba(244, 115, 185, .75);
 }
 
 #save-panel {
@@ -822,11 +823,11 @@ body {
 }
 
 #top-arch:hover>#save-open-button {
-    background-color: rgba(246, 137, 137, .75);
+    background-color: #CFE8A9;
 }
 
 #top-arch:active>#save-open-button {
-    background-color: rgba(198, 93, 123, .75);
+    background-color: #acc783;
 }
 
 #save-panel-body {
@@ -923,11 +924,12 @@ body {
 }
 
 #save-copy-button:hover {
-    background-color: rgb(151, 139, 119);
+    background-color: rgb(160, 160, 160);
 }
 
 #save-copy-button:active {
-    background-color: rgb(148, 128, 94);
+    background-color: rgb(140, 140, 140);
+
 }
 
 #save-button-row {

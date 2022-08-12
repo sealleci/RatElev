@@ -1,5 +1,6 @@
 /* TODO: main
- * - [ ] save function
+ * - [x] save
+ * - [ ] jump to bottom
  */
 
 function sleep(time: number) {
@@ -33,6 +34,15 @@ function range(...args: number[]): number[] {
         arr.push(i)
     }
     return arr
+}
+
+type NestedArray<T> = Array<NestedArray<T> | T>
+
+function flattenNestArray<T>(nest_array: NestedArray<T>): T[] {
+    function flatten2DArray<S>(array: S[][]): S[] {
+        return ([] as S[]).concat(...array)
+    }
+    return flatten2DArray(nest_array.map(x => Array.isArray(x) ? flattenNestArray(x) : [x]))
 }
 
 function clearChildren(elem: HTMLElement) {
@@ -84,6 +94,7 @@ const qsa = function (selector: any): NodeListOf<HTMLElement> {
  */
 interface IdClass {
     id: string
+    toString: () => string
 }
 
 abstract class AbstractList<T extends IdClass>{
@@ -111,6 +122,9 @@ abstract class AbstractList<T extends IdClass>{
         }
         return null
     }
+    toString(): string {
+        return `[${this.data.map(s => s.toString()).join(',')}]`
+    }
 }
 
 /**
@@ -128,7 +142,7 @@ class LanguageList extends AbstractList<NaturalLanguage>{
         this.data = data
     }
     isKeyIn(id: string): boolean {
-        return id in this.data.map(value => value.id)
+        return this.data.map(x => x.id).indexOf(id) !== -1
     }
     indexOfKey(id: string): number {
         if (!this.isKeyIn(id)) {
@@ -193,7 +207,7 @@ class L10nText {
         this.data[key] = value
     }
     toString(): string {
-        return `{}`
+        return '{' + Object.keys(this.data).map(key => `"${key}":"${this.get(key)}"`).join(',') + '}'
     }
 }
 
@@ -202,6 +216,31 @@ enum SignatureStatus {
     ACTIVE = 'active'
 }
 
+/**
+ * @param id - string(/[^_]+_sig/)
+ * @param status - SignatureStatus
+ */
+interface SignatureObject {
+    /**
+     * regex: /[^_]+_sig/
+     */
+    id: string
+    status?: SignatureStatus
+}
+
+/**
+ * @param id - string(/[^_]+_sig/)
+ * @param status - string
+ */
+interface SignatureJSON {
+    /**
+     * regex: /[^_]+_sig/
+     */
+    id: string
+    status: string
+}
+
+// TODO: toString, fromJSON
 class Signature {
     /**
      * regex: /[^_]+_sig/
@@ -226,20 +265,11 @@ class Signature {
         return this.status === SignatureStatus.ACTIVE
     }
     toString(): string {
-        return `{}`
+        return `{"id":"${this.id}","status":"${this.status.toString()}"}`
     }
-}
-
-/**
- * @param id - string(/[^_]+_sig/)
- * @param status - SignatureStatus
- */
-interface SignatureObject {
-    /**
-     * regex: /[^_]+_sig/
-     */
-    id: string
-    status?: SignatureStatus
+    static convertStatus(status: string): SignatureStatus {
+        return status === 'active' ? SignatureStatus.ACTIVE : SignatureStatus.DEACTIVE
+    }
 }
 
 class SignatureList extends AbstractList<Signature>{
@@ -285,6 +315,32 @@ enum TaskStatus {
     FINISHED = 'finished'
 }
 
+/**
+ * @param id - string(/[^_]+_tsk/)
+ * @param description - L10nTextDict
+ * @param status - Optional(TaskStatus)
+ */
+interface GameTaskObject {
+    /**
+     * regex: /[^_]+_tsk/
+     */
+    id: string
+    description: L10nTextDict
+    status?: TaskStatus
+}
+
+/**
+ * @param id - string(/[^_]+_tsk/)
+ * @param status - string
+ */
+interface GameTaskJSON {
+    /**
+     * regex: /[^_]+_tsk/
+     */
+    id: string
+    status: string
+}
+
 class GameTask {
     /**
      * regex: /[^_]+_tsk/
@@ -314,20 +370,12 @@ class GameTask {
     deactiviate() {
         this.status = TaskStatus.DEACTIVE
     }
-}
-
-/**
- * @param id - string(/[^_]+_tsk/)
- * @param description - L10nTextDict
- * @param status - Optional(TaskStatus)
- */
-interface GameTaskObject {
-    /**
-     * regex: /[^_]+_tsk/
-     */
-    id: string
-    description: L10nTextDict
-    status?: TaskStatus
+    toString(): string {
+        return `{"id":"${this.id}","status":"${this.status.toString()}"}`
+    }
+    static convertStatus(status: string): TaskStatus {
+        return status === 'active' ? TaskStatus.ACTIVE : status === 'finished' ? TaskStatus.FINISHED : TaskStatus.DEACTIVE
+    }
 }
 
 class GameTaskList extends AbstractList<GameTask>{
@@ -441,9 +489,6 @@ class GameAction {
             fs.forEach(f => { f() })
         }
     }
-    toString(): string {
-        return `{}`
-    }
 }
 
 /**
@@ -485,9 +530,6 @@ class Passenger {
         this.avatar_font_color = avatar_font_color
         this.avatar_text = avatar_text
         this.is_diaplay = is_display
-    }
-    toString(): string {
-        return `{}`
     }
 }
 
@@ -699,6 +741,15 @@ interface SelectObject {
     options: OptionObject[]
 }
 
+/**
+ * @param id - string
+ * @param cur_item_index - number
+ */
+interface SaveDialogBlockJSON {
+    id: string
+    cur_item_index: number
+}
+
 class DialogBlock {
     /**
      * regex: /[^_]+_dbk/
@@ -787,7 +838,7 @@ class DialogBlock {
         return true
     }
     toString(): string {
-        return `{}`
+        return `{"id":"${this.id}","cur_item_index":${this.cur_item_index}}`
     }
 }
 
@@ -811,6 +862,18 @@ interface DialogBlockObject {
  */
 interface DialogInDict {
     [dialog_id: string]: string[]
+}
+
+/**
+ * @param cur_block_id - string
+ * @param visited_blocks - string[]
+ * @param dialog_blocks - SaveDialogBlockType[]
+ */
+interface SaveDialogSceneJSON {
+    id: string
+    cur_block_id: string
+    visited_blocks: string[]
+    dialog_blocks: SaveDialogBlockJSON[]
 }
 
 class DialogScene {
@@ -884,7 +947,7 @@ class DialogScene {
         this.visited_blocks.splice(index, 1)
     }
     toString(): string {
-        return `{}`
+        return `{"id":"${this.id}","cur_block_id":"${this.cur_block_id}","visited_blocks":[${this.visited_blocks.map(x => `"${x}"`).join(',')}],"dialog_blocks":[${this.dialog_blocks.map(x => x.toString()).join(',')}]}`
     }
 }
 
@@ -902,11 +965,20 @@ interface DialogSceneObject {
 
 /**
  * @param bg_color - string
- * @param bg_color - string
+ * @param inner_html - string
  */
 interface Background {
     bg_color: string
     inner_html: string
+}
+
+/**
+ * @param id -string
+ * @param dialog_scene - SaveDialogSceneType
+ */
+interface SaveFloorJSON {
+    id: string
+    dialog_scene: SaveDialogSceneJSON
 }
 
 class Floor {
@@ -962,6 +1034,9 @@ class Floor {
         if (this.dialog_scene.cur_block_id === '' || this.dialog_scene.getCurDialogBlock()?.isFinished()) {
             this.dialog_scene.setCurDialogBlock(selected_block_id)
         }
+    }
+    toString(): string {
+        return `{"id":"${this.id}","dialog_scene":${this.dialog_scene.toString()}}`
     }
 }
 
@@ -1098,7 +1173,6 @@ class PlotThread {
         if (this.cur_signature_index < this.signatures.length) {
             return false
         }
-
         for (let id of this.signatures) {
             const signature = game_signature_list.getById(id)
             if (signature !== null) {
@@ -1230,14 +1304,14 @@ class WaitingDotsAnimation {
 class FloorButton {
     public index: number
     public text: string
-    public available: boolean
-    public selected: boolean
+    public is_available: boolean
+    // public selected: boolean
 
-    constructor(index: number, text: string, available: boolean) {
+    constructor(index: number, text: string, is_available: boolean) {
         this.index = index
         this.text = text
-        this.available = available
-        this.selected = false
+        this.is_available = is_available
+        // this.selected = false
     }
 }
 
@@ -1338,6 +1412,9 @@ class PendingQueue {
     public data: PendingFloor[]
 
     constructor() {
+        this.data = []
+    }
+    clear() {
         this.data = []
     }
     sort() {
@@ -1666,6 +1743,12 @@ abstract class ListDisplay<T> {
         }
         this.data.splice(index, 1)
     }
+    toString(): string {
+        return `[${this.data.map(x => `"${x}"`).join(',')}]`
+    }
+    reset(data: string[]) {
+        this.data = data
+    }
     abstract getValidCount(): number
     abstract getByIndex(index: number): T | null
     abstract render(lang: string): void
@@ -1763,19 +1846,58 @@ interface UiStringDict {
 }
 
 /**
- * 
+ * @param index - number
+ * @param is_available - boolean
  */
-interface SaveDataType {
+interface SaveFloorButtonJSON {
+    index: number
+    is_available: boolean
+}
 
+/**
+ * @param lang - string
+ * @param cur_floor - number
+ * @param floor_buttons - SaveFloorButtonType[]
+ * @param passenger_display - string[]
+ * @param task_display - string[]
+ */
+interface SaveGameJSON {
+    lang: string
+    cur_floor: number
+    floor_buttons: SaveFloorButtonJSON[]
+    passenger_display: string[]
+    task_display: string[]
+}
+
+/**
+ * @param signatures - SignatureJSON[]
+ * @param tasks - GameTaskJSON[]
+ * @param floors - string[]
+ * @param game - SaveGameJSON
+ */
+interface SaveDataJSON {
+    signatures: SignatureJSON[]
+    tasks: GameTaskJSON[]
+    floors: SaveFloorJSON[]
+    game: SaveGameJSON
 }
 
 /**
  * @param status - boolean
  * @param data - SaveDataType
  */
-interface SaveRootType {
+interface SaveRootJSON {
     status: boolean
-    data: SaveDataType
+    data: SaveDataJSON
+}
+
+class EncryptTool {
+    static encrypt(raw: string): string {
+        return btoa(encodeURIComponent(raw))
+    }
+    static decipher(encrypted: string): string {
+        return decodeURIComponent(atob(encrypted))
+    }
 }
 
 class Game {
@@ -1964,9 +2086,14 @@ class Game {
     static stepDialog(block: DialogBlock, lang: string, is_do_action: boolean = true) {
         const item = block.getCurItem()
         if (item === null) {
-            Game.hideOptions()
-            block.stepIndex()
-            Game.showGoOnButton()
+            if (!block.isFinished()) {
+                Game.hideOptions()
+                block.stepIndex()
+                Game.showGoOnButton()
+            } else {
+                Game.hideOptions()
+                Game.hideGoOnButton()
+            }
             return
         }
         if (item.isSelect()) {
@@ -1979,7 +2106,11 @@ class Game {
                 (item as Dialog).doAction()
             }
             block.stepIndex()
-            Game.showGoOnButton()
+            if (!block.isFinished()) {
+                Game.showGoOnButton()
+            } else {
+                Game.hideGoOnButton()
+            }
         }
     }
     /**
@@ -1992,7 +2123,12 @@ class Game {
         for (let i = 0; i < block.data.length; ++i) {
             if (!is_render_all && i >= block.cur_item_index) {
                 if (i === 0) {
-                    Game.stepDialog(block, lang, false)
+                    // this block haven't been rendered, so render the first dialog
+                    // Game.stepDialog(block, lang)
+                    Game.hideOptions()
+                    if (!is_render_all) {
+                        Game.showGoOnButton()
+                    }
                 }
                 break
             }
@@ -2010,7 +2146,9 @@ class Game {
                 if (Game.renderDialog(item as Dialog, lang, pre_id === (item as Dialog).person_id)) {
                     pre_id = (item as Dialog).person_id
                 }
-                Game.showGoOnButton()
+                if (!is_render_all) {
+                    Game.showGoOnButton()
+                }
             }
         }
     }
@@ -2023,6 +2161,9 @@ class Game {
             return
         }
         floor.checkPlotThreads()
+        const bg: HTMLElement = qs('#background')
+        bg.style.backgroundColor = floor.background.bg_color
+        bg.innerHTML = floor.background.inner_html
         // render visited blocks
         for (let block_id of floor.dialog_scene.visited_blocks) {
             const vis_block = floor.dialog_scene.getDialogBlock(block_id)
@@ -2034,10 +2175,10 @@ class Game {
         const cur_block = floor.dialog_scene.getCurDialogBlock()
         if (cur_block !== null) {
             Game.renderBlock(cur_block, this.lang, false)
+            if (cur_block.isFinished()) {
+                Game.hideGoOnButton()
+            }
         }
-        const bg: HTMLElement = qs('#background')
-        bg.style.backgroundColor = floor.background.bg_color
-        bg.innerHTML = floor.background.inner_html
     }
     isLiftable(): boolean {
         return !(this.pending_queue.length() <= 0 ||
@@ -2159,7 +2300,7 @@ class Game {
             for (let button of button_row) {
                 let col = document.createElement('div')
                 col.classList.add('button-col', 'unselectable', 'number-button')
-                if (!button.available) {
+                if (!button.is_available) {
                     col.classList.add('invisible')
                 }
                 col.textContent = button.text
@@ -2169,18 +2310,87 @@ class Game {
             button_container.insertBefore(row, func_button_row)
         })
     }
-    encrypt() {
-
-    }
-    decipher() {
-
-    }
     serializate(): string {
-        return JSON.stringify({ status: true, data: {} })
+        return EncryptTool.encrypt(`{"signatures":${game_signature_list.toString()},"tasks":${game_task_list.toString()},"floors":${game_floor_list.toString()},"game":${this.toString()}}`)
     }
-    deserializate(data: string): boolean {
-        data = data
-        return false
+    deserializate(encrypted: string): boolean {
+        let is_catch = false
+        try {
+            if (this.door.is_open) {
+                this.door.syncStart(DoorDir.CLOSE)
+            }
+            Game.hideGoOnButton()
+            Game.hideOptions()
+            clearChildren(qs('#dialog-container') as HTMLElement)
+
+            const json_data = <SaveDataJSON>JSON.parse(EncryptTool.decipher(encrypted))
+            // console.log(json_data)
+            for (let sig_json of json_data.signatures) {
+                const sig = game_signature_list.getById(sig_json.id)
+                if (sig !== null) {
+                    sig.status = Signature.convertStatus(sig_json.status)
+                }
+            }
+            for (let tsk_json of json_data.tasks) {
+                const tsk = game_task_list.getById(tsk_json.id)
+                if (tsk !== null) {
+                    tsk.status = GameTask.convertStatus(tsk_json.status)
+                }
+            }
+            for (let f_json of json_data.floors) {
+                const flr = game_floor_list.getById(f_json.id)
+                if (flr === null) {
+                    continue
+                }
+                if (flr.dialog_scene.id !== f_json.dialog_scene.id) {
+                    continue
+                }
+                flr.dialog_scene.setCurDialogBlock(f_json.dialog_scene.cur_block_id)
+                flr.dialog_scene.visited_blocks = f_json.dialog_scene.visited_blocks
+                for (let b_json of f_json.dialog_scene.dialog_blocks) {
+                    const blk = flr.dialog_scene.getDialogBlock(b_json.id)
+                    if (blk === null) {
+                        continue
+                    }
+                    blk.cur_item_index = b_json.cur_item_index
+                }
+            }
+            this.lang = json_data.game.lang
+            for (let rows of this.floor_buttons) {
+                for (let btn of rows) {
+                    let pos = json_data.game.floor_buttons.map(x => x.index).indexOf(btn.index)
+                    if (pos === -1) {
+                        continue
+                    }
+                    btn.is_available = json_data.game.floor_buttons[pos].is_available
+                    const num_btn = qs(`.number-button[index="${btn.index}"]`)
+                    if (num_btn === null) {
+                        continue
+                    }
+                    if (btn.is_available) {
+                        num_btn.classList.remove('invisible')
+                    }
+                }
+            }
+            this.cur_floor = json_data.game.cur_floor
+            this.is_lifting = false
+            this.lift_direction = FloorLiftStatus.NONE
+            this.cur_dest = 0
+            this.pending_queue.clear()
+            this.floor_display.updateNumber(this.cur_floor)
+            this.passenger_display.reset(json_data.game.passenger_display)
+            this.task_display.reset(json_data.game.task_display)
+
+            this.language_display.set(this.lang)
+            this.switchUiLanguge()
+            this.passenger_display.render(this.lang)
+            this.task_display.render(this.lang)
+        }
+        catch (err) {
+            is_catch = true
+            console.log(`deserializate error: ${(err as Error).message}`)
+        }
+        return !is_catch
     }
     switchUiLanguge() {
         for (let e of qsa('.l10n-text-ui')) {
@@ -2227,6 +2437,7 @@ class Game {
     }
     async debug() {
         qs('#open-button').click()
+        qs('#top-arch').click()
         // this.renderFloor()
         // this.door.syncStart(DoorDir.OPEN);
         // this.save_panel.syncStart('open')
@@ -2234,6 +2445,9 @@ class Game {
         // Game.hideGoOnButton()
         // qs('#options-row').style.display = 'none';
         // (qs('#save-text-area') as HTMLTextAreaElement).value = ''
+    }
+    toString(): string {
+        return `{"lang":"${this.lang}","cur_floor": ${this.cur_floor},"floor_buttons": [${flattenNestArray(this.floor_buttons).map(x => `{"index":${x.index},"is_available":${x.is_available}}`).join(',')}],"passenger_display":${this.passenger_display.toString()},"task_display":${this.task_display.toString()}}`
     }
 }
 
@@ -2307,11 +2521,6 @@ const binding_buttons: BindingButton[] = [
         }
     },
     {
-        selector: '#go-on-button-row',
-        is_single: true,
-        func: () => { }
-    },
-    {
         selector: '#top-arch',
         is_single: true,
         func: async () => {
@@ -2330,11 +2539,13 @@ const binding_buttons: BindingButton[] = [
         func: () => {
             clearChildren(qs('#save-export-button'))
             clearChildren(qs('#save-import-button'))
-            const res = <SaveRootType>JSON.parse(game.serializate())
-            qs('#save-export-button').appendChild(Game.getTFIcon(res.status))
-            if (res.status) {
-                (qs('#save-text-area') as HTMLTextAreaElement).value = JSON.stringify(res.data)
-            }
+            // const res = <SaveRootJSON>JSON.parse(game.serializate())
+            // qs('#save-export-button').appendChild(Game.getTFIcon(res.status));
+            // if (res.status) {
+            //     (qs('#save-text-area') as HTMLTextAreaElement).value = JSON.stringify(res.data)
+            // }
+            qs('#save-export-button').appendChild(Game.getTFIcon(true));
+            (qs('#save-text-area') as HTMLTextAreaElement).value = game.serializate()
         }
     },
     {
@@ -2399,7 +2610,7 @@ function bindButtonFunctions() {
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize()
     bindButtonFunctions()
-    // game.debug()
+    game.debug()
 })
 
 const game_lang_list = new LanguageList([
@@ -2416,11 +2627,21 @@ const game_action_list = new GameActionList([
         id: 'to2_act',
         action: GameAction.polyActs(
             GameAction.genActivateSignatureAct('I1.1_sig'),
-            GameAction.genStepActionAct('I1_plt')
+            GameAction.genStepActionAct('I1_plt'),
+            GameAction.genFinishTaskAct('t1_tsk')
         )
+    },
+    {
+        id: 't1_act',
+        action: GameAction.genActiveTaskAct('t1_tsk')
     }
 ])
-const game_task_list = new GameTaskList([])
+const game_task_list = new GameTaskList([
+    {
+        id: 't1_tsk',
+        description: { zh_cn: '你好', en: 'hello' },
+    }
+])
 const game_plot_thread_list = new PlotThreadList([
     {
         id: 'I1_plt',
@@ -2436,14 +2657,14 @@ const game_passenger_list = new PassengerList([
     {
         id: 'me_psg',
         name: { zh_cn: '我', en: 'Me' },
-        avatar_color: 'black',
+        avatar_color: '#1F4690',
         avatar_font_color: 'white',
         avatar_text: { zh_cn: '我', en: 'ME' },
     },
     {
         id: 'jacob_psg',
         name: { zh_cn: '邓霜杰', en: 'Jacob Derek' },
-        avatar_color: 'black',
+        avatar_color: '#80558C',
         avatar_font_color: 'white',
         avatar_text: { zh_cn: '杰', en: 'JD' },
     },
@@ -2453,6 +2674,10 @@ const game_floor_list = new FloorList([
     {
         id: '1_flr',
         plot_id_list: ['I1_plt'],
+        background: {
+            bg_color: '#73A9AD',
+            inner_html: ''
+        },
         dialog_scene: {
             id: '1_dsc',
             blocks: [
@@ -2463,7 +2688,8 @@ const game_floor_list = new FloorList([
                         {
                             person_id: 'me_psg',
                             text: { zh_cn: '我超', en: 'ong' },
-                            layout: DialogLayout.RIGHT
+                            layout: DialogLayout.RIGHT,
+                            action_id: 't1_act'
 
                         },
                         {

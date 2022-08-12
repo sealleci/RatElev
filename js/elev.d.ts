@@ -1,5 +1,7 @@
 declare function sleep(time: number): Promise<unknown>;
 declare function range(...args: number[]): number[];
+declare type NestedArray<T> = Array<NestedArray<T> | T>;
+declare function flattenNestArray<T>(nest_array: NestedArray<T>): T[];
 declare function clearChildren(elem: HTMLElement): void;
 declare function toggleElementClass(elem: HTMLElement, class_name: string): void;
 declare function addElementClass(elem: HTMLElement, class_name: string): void;
@@ -10,6 +12,7 @@ declare const qs: (selector: any) => HTMLElement;
 declare const qsa: (selector: any) => NodeListOf<HTMLElement>;
 interface IdClass {
     id: string;
+    toString: () => string;
 }
 declare abstract class AbstractList<T extends IdClass> {
     protected data: T[];
@@ -17,6 +20,7 @@ declare abstract class AbstractList<T extends IdClass> {
     getLength(): number;
     isIncluding(id: string): boolean;
     getById(id: string): T | null;
+    toString(): string;
 }
 interface NaturalLanguage {
     id: string;
@@ -44,6 +48,14 @@ declare enum SignatureStatus {
     DEACTIVE = "deactive",
     ACTIVE = "active"
 }
+interface SignatureObject {
+    id: string;
+    status?: SignatureStatus;
+}
+interface SignatureJSON {
+    id: string;
+    status: string;
+}
 declare class Signature {
     id: string;
     status: SignatureStatus;
@@ -52,10 +64,7 @@ declare class Signature {
     deactiviate(): void;
     isActive(): boolean;
     toString(): string;
-}
-interface SignatureObject {
-    id: string;
-    status?: SignatureStatus;
+    static convertStatus(status: string): SignatureStatus;
 }
 declare class SignatureList extends AbstractList<Signature> {
     constructor(signatures: SignatureObject[]);
@@ -69,6 +78,15 @@ declare enum TaskStatus {
     ACTIVE = "active",
     FINISHED = "finished"
 }
+interface GameTaskObject {
+    id: string;
+    description: L10nTextDict;
+    status?: TaskStatus;
+}
+interface GameTaskJSON {
+    id: string;
+    status: string;
+}
 declare class GameTask {
     id: string;
     description: L10nText;
@@ -79,11 +97,8 @@ declare class GameTask {
     activiate(): void;
     finish(): void;
     deactiviate(): void;
-}
-interface GameTaskObject {
-    id: string;
-    description: L10nTextDict;
-    status?: TaskStatus;
+    toString(): string;
+    static convertStatus(status: string): TaskStatus;
 }
 declare class GameTaskList extends AbstractList<GameTask> {
     constructor(tasks: GameTaskObject[]);
@@ -107,7 +122,6 @@ declare class GameAction {
     static genRemovePassengerAct(id: string): () => void;
     static genStepActionAct(id: string): () => void;
     static polyActs(...fs: Array<() => void>): () => void;
-    toString(): string;
 }
 interface GameActionObject {
     id: string;
@@ -124,7 +138,6 @@ declare class Passenger {
     avatar_text: L10nText;
     is_diaplay: boolean;
     constructor(id: string, name: L10nText, avatar_color: string, avatar_font_color: string, avatar_text: L10nText, is_display?: boolean);
-    toString(): string;
 }
 interface PassengerObject {
     id: string;
@@ -190,6 +203,10 @@ interface DialogObject {
 interface SelectObject {
     options: OptionObject[];
 }
+interface SaveDialogBlockJSON {
+    id: string;
+    cur_item_index: number;
+}
 declare class DialogBlock {
     id: string;
     cur_item_index: number;
@@ -216,6 +233,12 @@ interface DialogBlockObject {
 interface DialogInDict {
     [dialog_id: string]: string[];
 }
+interface SaveDialogSceneJSON {
+    id: string;
+    cur_block_id: string;
+    visited_blocks: string[];
+    dialog_blocks: SaveDialogBlockJSON[];
+}
 declare class DialogScene {
     id: string;
     dialog_blocks: DialogBlock[];
@@ -239,6 +262,10 @@ interface Background {
     bg_color: string;
     inner_html: string;
 }
+interface SaveFloorJSON {
+    id: string;
+    dialog_scene: SaveDialogSceneJSON;
+}
 declare class Floor {
     id: string;
     dialog_scene: DialogScene;
@@ -246,6 +273,7 @@ declare class Floor {
     background: Background;
     constructor(id: string, scene: DialogSceneObject, plot_id_list: string[], background?: Background | null);
     checkPlotThreads(): void;
+    toString(): string;
 }
 interface FloorObject {
     id: string;
@@ -308,9 +336,8 @@ declare class WaitingDotsAnimation {
 declare class FloorButton {
     index: number;
     text: string;
-    available: boolean;
-    selected: boolean;
-    constructor(index: number, text: string, available: boolean);
+    is_available: boolean;
+    constructor(index: number, text: string, is_available: boolean);
 }
 declare enum DoorDir {
     OPEN = "open",
@@ -338,6 +365,7 @@ interface PendingFloor {
 declare class PendingQueue {
     data: PendingFloor[];
     constructor();
+    clear(): void;
     sort(): void;
     length(): number;
     indexOf(value: number): number;
@@ -408,6 +436,8 @@ declare abstract class ListDisplay<T> {
     constructor(id_list?: string[]);
     add(id: string): void;
     remove(id: string): void;
+    toString(): string;
+    reset(data: string[]): void;
     abstract getValidCount(): number;
     abstract getByIndex(index: number): T | null;
     abstract render(lang: string): void;
@@ -430,11 +460,30 @@ interface UiStringDictRaw {
 interface UiStringDict {
     [key: string]: L10nText;
 }
-interface SaveDataType {
+interface SaveFloorButtonJSON {
+    index: number;
+    is_available: boolean;
 }
-interface SaveRootType {
+interface SaveGameJSON {
+    lang: string;
+    cur_floor: number;
+    floor_buttons: SaveFloorButtonJSON[];
+    passenger_display: string[];
+    task_display: string[];
+}
+interface SaveDataJSON {
+    signatures: SignatureJSON[];
+    tasks: GameTaskJSON[];
+    floors: SaveFloorJSON[];
+    game: SaveGameJSON;
+}
+interface SaveRootJSON {
     status: boolean;
-    data: SaveDataType;
+    data: SaveDataJSON;
+}
+declare class EncryptTool {
+    static encrypt(raw: string): string;
+    static decipher(encrypted: string): string;
 }
 declare class Game {
     lang: string;
@@ -477,14 +526,13 @@ declare class Game {
     checkBeforeLift(): void;
     createFloorButtons(): void;
     renderFloorButtons(): void;
-    encrypt(): void;
-    decipher(): void;
     serializate(): string;
-    deserializate(data: string): boolean;
+    deserializate(encrypted: string): boolean;
     switchUiLanguge(): void;
     switchTextLanguage(): void;
     initialize(): void;
     debug(): Promise<void>;
+    toString(): string;
 }
 interface BindingButton {
     selector: string;

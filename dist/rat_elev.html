@@ -5,281 +5,281 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style type="text/css">
-body {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin: 0;
-    padding: 4px 0;
-    min-width: 1000px;
-    background-color: #343641;
-    /* background-color: rgb(14, 14, 14); */
-}
+    <style type="text/css">
+        body {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            margin: 0;
+            padding: 4px 0;
+            min-width: 1000px;
+            background-color: #343641;
+            /* background-color: rgb(14, 14, 14); */
+        }
 
-#elev-container {
-    display: flex;
-    position: absolute;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 750px;
-    height: 750px;
-    background-color: white;
-    overflow: hidden;
-}
+        #elev-container {
+            display: flex;
+            position: absolute;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 750px;
+            height: 750px;
+            background-color: white;
+            overflow: hidden;
+        }
 
-#elev-left {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 20%;
-    height: 100%;
-    background-color: #A0A0A0;
-    border-right: 4px solid #524A4E;
-    box-shadow: 4px 0 4px rgba(0, 0, 0, .2);
-    z-index: 50;
-}
+        #elev-left {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 20%;
+            height: 100%;
+            background-color: #A0A0A0;
+            border-right: 4px solid #524A4E;
+            box-shadow: 4px 0 4px rgba(0, 0, 0, .2);
+            z-index: 50;
+        }
 
-#elev-right {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    align-items: center;
-    width: 20%;
-    height: 100%;
-    background-color: #A0A0A0;
-    border-left: 4px solid #524A4E;
-    box-shadow: -4px 0 4px rgba(0, 0, 0, .2);
-    z-index: 50;
-}
+        #elev-right {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            width: 20%;
+            height: 100%;
+            background-color: #A0A0A0;
+            border-left: 4px solid #524A4E;
+            box-shadow: -4px 0 4px rgba(0, 0, 0, .2);
+            z-index: 50;
+        }
 
-#elev-center {
-    position: relative;
-    width: 60%;
-    height: 100%;
-}
+        #elev-center {
+            position: relative;
+            width: 60%;
+            height: 100%;
+        }
 
-#passenger-panel {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 70%;
-    margin: 80px 0 0 0;
-}
+        #passenger-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 70%;
+            margin: 80px 0 0 0;
+        }
 
-#passenger-display-number {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-    height: 30px;
-    width: 100%;
-    border-radius: 8px 8px 0 0;
-    background-color: black;
-    border-bottom: 2px solid rgba(38, 102, 207, .4);
-}
+        #passenger-display-number {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 30px;
+            width: 100%;
+            border-radius: 8px 8px 0 0;
+            background-color: black;
+            border-bottom: 2px solid rgba(38, 102, 207, .4);
+        }
 
-#passenger-display-text {
-    font-size: 14px;
-    margin: 0 0 4px 10px;
-    color: #2666CF;
-    opacity: .9;
-    max-width: 50%;
-    overflow-x: scroll;
-    font-family: Georgia;
-}
+        #passenger-display-text {
+            font-size: 14px;
+            margin: 0 0 4px 10px;
+            color: #2666CF;
+            opacity: .9;
+            max-width: 50%;
+            overflow-x: scroll;
+            font-family: Georgia;
+        }
 
-#passenger-display-count {
-    font-size: 20px;
-    margin: 0 10px 4px 0;
-    color: #2666CF;
-    font-family: Georgia;
-}
+        #passenger-display-count {
+            font-size: 20px;
+            margin: 0 10px 4px 0;
+            color: #2666CF;
+            font-family: Georgia;
+        }
 
-#passenger-list {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 100%;
-    height: 120px;
-    border-radius: 0 0 8px 8px;
-    background-color: black;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    padding: 4px 0;
-}
+        #passenger-list {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 100%;
+            height: 120px;
+            border-radius: 0 0 8px 8px;
+            background-color: black;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            padding: 4px 0;
+        }
 
-#passenger-list .passenger-item {
-    position: relative;
-    color: rgba(38, 102, 207, .9);
-    width: 65%;
-    min-height: 1.2rem;
-    padding: 0 0 4px 5px;
-    margin: 2px 0 2px 8px;
-    font-family: Verdana;
-    font-size: 14px;
-    border-bottom: 1px dotted #2666CF;
-    overflow-x: scroll;
-    scrollbar-width: none;
-    white-space: nowrap;
-}
+        #passenger-list .passenger-item {
+            position: relative;
+            color: rgba(38, 102, 207, .9);
+            width: 65%;
+            min-height: 1.2rem;
+            padding: 0 0 4px 5px;
+            margin: 2px 0 2px 8px;
+            font-family: Verdana;
+            font-size: 14px;
+            border-bottom: 1px dotted #2666CF;
+            overflow-x: scroll;
+            scrollbar-width: none;
+            white-space: nowrap;
+        }
 
-#passenger-list .passenger-item::before {
-    display: inline-block;
-    position: relative;
-    content: '';
-    height: 4px;
-    width: 4px;
-    left: -4px;
-    top: -2px;
-    border-radius: 50%;
-    background-color: #2666CF;
-    opacity: .75;
-}
+        #passenger-list .passenger-item::before {
+            display: inline-block;
+            position: relative;
+            content: '';
+            height: 4px;
+            width: 4px;
+            left: -4px;
+            top: -2px;
+            border-radius: 50%;
+            background-color: #2666CF;
+            opacity: .75;
+        }
 
-#task-list-warp {
-    width: 80%;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    margin-top: 50px;
-    filter: drop-shadow(rgba(0, 0, 0, .25) 0px 0px 3px);
-}
+        #task-list-warp {
+            width: 80%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            filter: drop-shadow(rgba(0, 0, 0, .25) 0px 0px 3px);
+        }
 
-#task-list {
-    width: 100%;
-    height: 150px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #F5F2E7;
-    border-radius: 2px;
-    padding: 12px 0;
-    clip-path: polygon(0 0, 100% 0, 100% 90%, 85% 100%, 0 100%);
-}
+        #task-list {
+            width: 100%;
+            height: 150px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #F5F2E7;
+            border-radius: 2px;
+            padding: 12px 0;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 85% 100%, 0 100%);
+        }
 
-#task-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    overflow-y: scroll;
-}
+        #task-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+        }
 
-#task-list-warp::before {
-    content: '';
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: #C84B31;
-    border-radius: 50%;
-    top: -4px;
-    box-shadow: rgba(0, 0, 0, .4) 0 0 2px;
-    z-index: 11;
-}
+        #task-list-warp::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #C84B31;
+            border-radius: 50%;
+            top: -4px;
+            box-shadow: rgba(0, 0, 0, .4) 0 0 2px;
+            z-index: 11;
+        }
 
-#task-list::after {
-    content: '';
-    position: absolute;
-    width: 15%;
-    height: 10%;
-    background-color: #C0A080;
-    border-radius: 2px;
-    bottom: 0px;
-    right: 0px;
-    box-shadow: rgba(0, 0, 0, .25) 0 0 2px;
-    z-index: 11;
-}
+        #task-list::after {
+            content: '';
+            position: absolute;
+            width: 15%;
+            height: 10%;
+            background-color: #C0A080;
+            border-radius: 2px;
+            bottom: 0px;
+            right: 0px;
+            box-shadow: rgba(0, 0, 0, .25) 0 0 2px;
+            z-index: 11;
+        }
 
-.task-item {
-    width: 86%;
-    margin-bottom: 4px;
-    font-size: 0.8rem;
-    flex-wrap: wrap;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    user-select: text;
-    word-wrap: break-word;
-    word-break: break-all;
-    font-family: "Palatino Linotype";
-    color: #2C3333;
-    border-bottom: 2px solid rgba(240, 84, 84, .4);
-}
+        .task-item {
+            width: 86%;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+            word-wrap: break-word;
+            word-break: break-all;
+            font-family: "Palatino Linotype";
+            color: #2C3333;
+            border-bottom: 2px solid rgba(240, 84, 84, .4);
+        }
 
-.task-item.task-done-item {
-    color: rgb(95, 95, 95);
-    text-decoration: line-through;
-    opacity: .6;
-    border-bottom-color: rgb(200, 200, 200);
-}
+        .task-item.task-done-item {
+            color: rgb(95, 95, 95);
+            text-decoration: line-through;
+            opacity: .6;
+            border-bottom-color: rgb(200, 200, 200);
+        }
 
-#floor-display {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 50%;
-    height: 160px;
-    margin: 80px 0 40px 0;
-    background-color: black;
-    border-radius: 60px;
-}
+        #floor-display {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 50%;
+            height: 160px;
+            margin: 80px 0 40px 0;
+            background-color: black;
+            border-radius: 60px;
+        }
 
-.direction-icon {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 20%;
-    overflow: hidden;
-}
+        .direction-icon {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 20%;
+            overflow: hidden;
+        }
 
-.direction-icon>div {
-    position: relative;
-    color: #4E9F3D;
-    background-color: #4E9F3D;
-    width: 20px;
-    border: 3px solid #4E9F3D;
-    border-radius: 5px;
-}
+        .direction-icon>div {
+            position: relative;
+            color: #4E9F3D;
+            background-color: #4E9F3D;
+            width: 20px;
+            border: 3px solid #4E9F3D;
+            border-radius: 5px;
+        }
 
-#up-icon>div:nth-child(1) {
-    transform: rotate(-45deg);
-    left: 5px;
-}
+        #up-icon>div:nth-child(1) {
+            transform: rotate(-45deg);
+            left: 5px;
+        }
 
-#up-icon>div:nth-child(2) {
-    transform: rotate(45deg);
-    left: -5px;
-}
+        #up-icon>div:nth-child(2) {
+            transform: rotate(45deg);
+            left: -5px;
+        }
 
-#down-icon>div:nth-child(1) {
-    transform: rotate(45deg);
-    left: 5px;
-}
+        #down-icon>div:nth-child(1) {
+            transform: rotate(45deg);
+            left: 5px;
+        }
 
-#down-icon>div:nth-child(2) {
-    transform: rotate(-45deg);
-    left: -5px;
-}
+        #down-icon>div:nth-child(2) {
+            transform: rotate(-45deg);
+            left: -5px;
+        }
 
 
-/* #up-icon>div {
+        /* #up-icon>div {
     animation: 1.2s linear 0s infinite normal icon-up;
 }
 
@@ -287,911 +287,912 @@ body {
     animation: 1.2s linear 0s infinite normal icon-down;
 } */
 
-@keyframes icon-up {
-    from {
-        top: 32px
-    }
-
-    to {
-        top: -32px
-    }
-}
-
-@keyframes icon-down {
-    from {
-        top: -32px
-    }
-
-    to {
-        top: 32px
-    }
-}
-
-#display-number {
-    width: 100%;
-    height: 40px;
-    color: #4E9F3D;
-    text-align: center;
-    line-height: 35px;
-    font-size: 2.25rem;
-    font-family: Georgia;
-}
-
-#floor-buttons {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    width: 80%;
-}
-
-#floor-buttons .button-row {
-    display: flex;
-    position: relative;
-    flex-direction: row;
-    justify-content: space-around;
-    width: 100%;
-    margin: 4px 0;
-}
-
-.unselectable {
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.invisible {
-    opacity: 0;
-    cursor: default !important;
-    pointer-events: none;
-}
-
-#floor-buttons .button-col {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    height: 36px;
-    width: 36px;
-    border: 4px solid #FDEFF4;
-    border-radius: 50%;
-    color: #FDEFF4;
-    background-color: black;
-    font-size: 1.25rem;
-    font-family: 'Lucida Console';
-    text-align: center;
-    line-height: 36px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, .4);
-}
-
-#floor-buttons .button-col:hover {
-    border-color: #FFC0D3;
-    color: #FFC0D3;
-}
-
-#floor-buttons .button-col.button-selected {
-    border-color: #FF5C8D;
-    color: #FF5C8D;
-}
-
-#floor-buttons #close-button:hover {
-    border-color: #90E0EF;
-    color: #90E0EF;
-}
-
-#floor-buttons #close-button:active {
-    border-color: #00B4D8;
-    color: #00B4D8;
-}
-
-#floor-buttons #open-button:hover {
-    border-color: #ffe5a7;
-    color: #ffe5a7;
-}
-
-#floor-buttons #open-button:active {
-    border-color: #ffbb1c;
-    color: #ffbb1c;
-}
-
-#close-button>div,
-#open-button>div {
-    position: relative;
-}
-
-#close-button>div:nth-child(1),
-#open-button>div:nth-child(3) {
-    height: 0;
-    width: 0;
-    border: 8px solid transparent;
-    border-left-color: #FDEFF4;
-    left: 5px;
-}
-
-#close-button>div:nth-child(2),
-#open-button>div:nth-child(2) {
-    width: 1px;
-    height: 18px;
-    border: 1px solid #FDEFF4;
-    border-radius: 4px;
-    background-color: #FDEFF4;
-}
-
-#close-button>div:nth-child(3),
-#open-button>div:nth-child(1) {
-    height: 0;
-    width: 0;
-    border: 8px solid transparent;
-    border-right-color: #FDEFF4;
-    left: -5px;
-}
-
-#close-button:hover>div:nth-child(1) {
-    border-left-color: #90E0EF;
-}
-
-#close-button:active>div:nth-child(1) {
-    border-left-color: #00B4D8;
-}
-
-#close-button:hover>div:nth-child(2) {
-    border-color: #90E0EF;
-    background-color: #90E0EF;
-}
-
-#close-button:active>div:nth-child(2) {
-    border-color: #00B4D8;
-    background-color: #00B4D8;
-}
-
-#close-button:hover>div:nth-child(3) {
-    border-right-color: #90E0EF;
-}
-
-#close-button:active>div:nth-child(3) {
-    border-right-color: #00B4D8;
-}
-
-#open-button:hover>div:nth-child(1) {
-    border-right-color: #ffe5a7;
-}
-
-#open-button:active>div:nth-child(1) {
-    border-right-color: #ffbb1c;
-}
-
-#open-button:hover>div:nth-child(2) {
-    border-color: #ffe5a7;
-    background-color: #ffe5a7;
-}
-
-#open-button:active>div:nth-child(2) {
-    border-color: #ffbb1c;
-    background-color: #ffbb1c;
-}
-
-#open-button:hover>div:nth-child(3) {
-    border-left-color: #ffe5a7;
-}
-
-#open-button:active>div:nth-child(3) {
-    border-left-color: #ffbb1c;
-}
-
-#men-mei {
-    position: relative;
-    width: 100%;
-    height: 10%;
-    background-color: #A0A0A0;
-    border-bottom: 4px solid #524A4E;
-    z-index: 100;
-    box-shadow: 0 4px 4px rgba(0, 0, 0, .2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#elev-door {
-    display: flex;
-    position: relative;
-    flex-direction: row;
-    width: 100%;
-    height: 90%;
-    z-index: 20;
-}
-
-#elev-door>div:nth-child(1) {
-    position: relative;
-    left: 0;
-    width: 50%;
-    height: 100%;
-    background-color: #A0A0A0;
-    border-right: 2px solid #524A4E;
-}
-
-#elev-door>div:nth-child(2) {
-    position: relative;
-    left: 0;
-    width: 50%;
-    height: 100%;
-    background-color: #A0A0A0;
-    border-left: 2px solid #524A4E;
-}
-
-.noscrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.noscrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-#scene {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    bottom: 0;
-    width: 100%;
-    height: 90%;
-    z-index: 10;
-}
-
-#background {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background-color: rgba(0, 0, 0, .7);
-    z-index: 5;
-}
-
-#dialog-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    top: 3px;
-    width: 100%;
-    height: 85%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    /* border: 1px solid red; */
-    padding-top: 5px;
-    z-index: 10;
-}
-
-.avatar {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100%;
-    width: 45px;
-    flex-shrink: 0;
-}
-
-.avatar>div {
-    width: 35px;
-    height: 35px;
-    /* margin-top: 3px; */
-    background-color: #ccaf0e;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    color: white;
-    justify-content: center;
-    align-items: center;
-    /* line-height: 35px; */
-    font-size: 1rem;
-    font-family: Georgia, '';
-    /* text-shadow: black 0 0 2px; */
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.dialog-row {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    margin: 6px 0;
-    /* border: 1px solid black; */
-}
-
-.dialog-box {
-    color: white;
-    font-family: "Palatino Linotype";
-    max-width: 70%;
-    min-height: 1.2rem;
-    padding: 6px 8px;
-    text-shadow: black 0 0 1px;
-    /* border: 1px solid red; */
-    flex-wrap: wrap;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    user-select: text;
-    word-wrap: break-word;
-    word-break: break-all;
-}
-
-.dialog-row.left-dialog-row {
-    justify-content: flex-start;
-}
-
-.dialog-box.left-dialog-box {
-    /* background: linear-gradient(90deg, rgba(125, 125, 125, .6) 50%, transparent 100%); */
-    background-color: rgba(125, 125, 125, .6);
-    border-left: 5px solid #398AB9;
-    border-radius: 0 15px 15px 0;
-}
-
-.left-not-first-line {
-    margin-left: 45px;
-}
-
-.dialog-row.right-dialog-row {
-    justify-content: flex-end;
-}
-
-.dialog-box.right-dialog-box {
-    /* background: linear-gradient(-90deg, rgba(125, 125, 125, .6) 0%, transparent 100%); */
-    background-color: rgba(125, 125, 125, .6);
-    border-right: 5px solid #8BDB81;
-    border-radius: 15px 0 0 15px;
-}
-
-.right-not-first-line {
-    margin-right: 45px;
-}
-
-.dialog-row.mid-dialog-row {
-    justify-content: center;
-}
-
-.dialog-box.mid-dialog-box {
-    /* background: linear-gradient(90deg, transparent 0%, rgba(125, 125, 125, .6) 50%, transparent 100%); */
-    max-width: 90%;
-    background-color: rgba(125, 125, 125, .6);
-    border-radius: 10px;
-}
-
-#sheng-lue-dots {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 5%;
-    z-index: 11;
-    opacity: .7;
-}
-
-.sl-dot {
-    height: 13px;
-    width: 13px;
-    border-radius: 50%;
-    margin: 0 12px;
-    z-index: 0;
-    border: 3px solid gray;
-}
-
-.dark-dot {
-    background-color: #323232;
-    border-color: #524A4E;
-}
-
-.light-dot {
-    background-color: #FF5C8D;
-    border-color: #FFC0D3;
-}
-
-#go-on-button-row {
-    cursor: pointer;
-    width: 100%;
-    height: 10%;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    /* background-color: blue; */
-    z-index: 11;
-    transition: background-color .2s;
-}
-
-#go-on-button-row:hover {
-    background-color: rgba(255, 255, 225, .1);
-}
-
-#go-on-button-row:hover>#go-on-button {
-    opacity: 1;
-}
-
-#go-on-button-row:active {
-    background-color: rgba(255, 255, 225, .25);
-}
-
-#go-on-button {
-    position: relative;
-    top: calc(12.5px*1.2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 50px;
-    height: 50px;
-    overflow: hidden;
-    transform: scale(1.2);
-    transition: opacity .2s;
-    opacity: .25;
-}
-
-#go-on-button>div {
-    position: relative;
-    top: -30.66px;
-    width: calc(50px/1.4142);
-    height: calc(50px/1.4142);
-    /*#787A91 #B2B1B9*/
-    background-color: #787A91;
-    border: 4px solid #B2B1B9;
-    border-radius: 4px;
-    transform: rotate(45deg);
-}
-
-#options-row {
-    width: 100%;
-    height: 15%;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 11;
-    overflow-y: hidden;
-}
-
-.option-button {
-    width: 18%;
-    height: 80%;
-    max-height: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    cursor: pointer;
-    font-size: 1rem;
-    font-family: "Palatino Linotype";
-    word-wrap: break-word;
-    word-break: break-all;
-    outline: 2px solid rgba(255, 255, 255, .6);
-    color: rgba(255, 255, 255, .8);
-    padding: 4px 5px;
-    transition: background-color .2s, color .2s, outline .2s;
-    border-radius: 15px 15px 15px 0;
-    text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
-    overflow-y: scroll;
-}
-
-.option-button>div {
-    margin: auto;
-}
-
-.option-button:hover {
-    outline-color: rgba(244, 115, 185, .6);
-    background-color: rgba(255, 255, 255, .05);
-    color: rgba(244, 115, 185, .9);
-}
-
-.option-button:active {
-    background-color: rgba(244, 115, 185, .6);
-    color: rgba(255, 255, 255, .75);
-}
-
-#save-panel {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 150px;
-    width: 90%;
-    margin-top: 120px;
-}
-
-#top-arch {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 25px;
-    width: 50px;
-    background-color: rgba(0, 0, 0, .05);
-    /* box-shadow: 0 0 3px rgba(0, 0, 0, .25); */
-    border-radius: 50px 50px 0 0;
-    cursor: pointer;
-}
-
-#save-open-button {
-    position: relative;
-    top: 2px;
-    height: 20px;
-    width: 20px;
-    background-color: rgba(255, 255, 255, .25);
-    border-radius: 50%;
-    transition: background-color .1s;
-    box-shadow: 0 0 2px rgba(0, 0, 0, .25);
-}
-
-#top-arch:hover>#save-open-button {
-    background-color: rgba(246, 137, 137, .75);
-}
-
-#top-arch:active>#save-open-button {
-    background-color: rgba(198, 93, 123, .75);
-}
-
-#save-panel-body {
-    position: relative;
-    width: 100%;
-    height: 120px;
-    /* border: 2px solid rgba(0, 0, 0, 0.2); */
-    background-color: #646464;
-    border-radius: 2px;
-    box-shadow: 0 0 2px rgba(0, 0, 0, .25);
-    overflow: hidden;
-}
-
-#save-panel-cover {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    border-radius: 2px;
-    background-color: #A0A0A0;
-    z-index: 30;
-}
-
-#cover-circle {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    height: 60px;
-    width: 60px;
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-#cover-circle>div {
-    width: 100%;
-    height: 4px;
-    background-color: rgba(127, 127, 127, .25);
-    border-radius: 20px;
-}
-
-#save-panel-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    width: 100%;
-    height: 100%;
-    /* background-color: #2C3333; */
-}
-
-#save-text-area-warp {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-#save-text-area {
-    width: 90%;
-    height: 50px;
-    resize: none;
-    border: 0;
-    margin: 0;
-    padding: 0;
-    font-size: 0.7rem;
-    font-family: "Consolas";
-    outline: 0;
-    border: 0;
-    border-radius: 2px 2px 0 0;
-    background-color: rgba(0, 0, 0, .35);
-    color: white;
-}
-
-#save-copy-button {
-    width: 90%;
-    height: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(150, 150, 150);
-    cursor: pointer;
-    border-radius: 0 0 2px 2px;
-    color: rgba(0, 0, 0, .6);
-    font-size: 14px;
-    font-family: Arial;
-    transition: background-color .1s;
-}
-
-#save-copy-button:hover {
-    background-color: rgb(151, 139, 119);
-}
-
-#save-copy-button:active {
-    background-color: rgb(148, 128, 94);
-}
-
-#save-button-row {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-}
-
-.save-button-warp {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    width: 46%;
-    height: 28px;
-    background-color: #323232;
-    border-radius: 24px;
-    cursor: pointer;
-    transition: outline .1s;
-    overflow: hiddens;
-}
-
-.save-button-warp:hover {
-    outline: 2px solid rgba(255, 255, 255, .25);
-}
-
-.save-button-warp:active {
-    outline: 2px solid rgba(255, 255, 255, .6);
-}
-
-.save-button-warp:active>#save-export-button {
-    background-color: #aaeefa;
-}
-
-.save-button-warp:active>#save-import-button {
-    background-color: #fde6b0;
-}
-
-.save-button {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: rgb(224, 224, 224);
-    margin: 0px 2px 0 2px;
-    box-shadow: inset 0 0 1px rgba(0, 0, 0, .4);
-    transition: background-color .1s;
-}
-
-.save-button-text {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    font-size: 12px;
-    color: rgb(224, 224, 224);
-    font-family: serif;
-}
-
-.save-opration-succ {
-    position: relative;
-    height: 100%;
-    width: 100%;
-}
-
-.save-opration-succ>div {
-    position: absolute;
-    background-color: #019267;
-    border-radius: 20px;
-}
-
-.save-opration-succ>div:nth-child(1) {
-    top: 10px;
-    left: 5px;
-    height: 10px;
-    width: 4px;
-    transform: rotate(-45deg);
-}
-
-.save-opration-succ>div:nth-child(2) {
-    top: 5px;
-    left: 12px;
-    height: 16px;
-    width: 4px;
-    transform: rotate(45deg);
-}
-
-.save-opration-fail {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-}
-
-.save-opration-fail>div {
-    position: absolute;
-    height: 16px;
-    width: 4px;
-    background-color: #D82148;
-    border-radius: 20px;
-}
-
-.save-opration-fail>div:nth-child(1) {
-    transform: rotate(-45deg);
-}
-
-.save-opration-fail>div:nth-child(2) {
-    transform: rotate(45deg);
-}
-
-#lang-display {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px;
-    width: 100px;
-    border-radius: 100px 100px 0 0;
-    border: 0px solid #A0A0A0;
-    z-index: 5;
-    overflow: hidden;
-}
-
-#lang-outer-circle {
-    position: absolute;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    height: 110px;
-    width: 110px;
-    border-radius: 50%;
-    background-image: linear-gradient(135deg, transparent 50%, #A0A0A0 50%), linear-gradient(45deg, #A0A0A0 50%, transparent 50%);
-    z-index: 15;
-    margin-top: 40px;
-}
-
-#lang-inner-circle {
-    background-color: #A0A0A0;
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    z-index: 100;
-    flex-shrink: 0;
-}
-
-.lang-switch-button-part {
-    position: relative;
-    top: -4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    background-color: #3e7c31;
-    z-index: 16;
-    overflow: hidden;
-    transition: background-color .1s;
-}
-
-.lang-switch-button-part:hover {
-    background-color: #549647;
-}
-
-.lang-switch-button-part:active {
-    background-color: rgb(48, 107, 36);
-}
-
-#lang-switch-button-l {
-    transform: rotate(-45deg);
-}
-
-#lang-switch-button-r {
-    transform: rotate(45deg);
-}
-
-.lang-switch-button-part>div {
-    position: relative;
-    top: -4px;
-    transform: scaleY(.8);
-    border: 8px solid transparent;
-}
-
-#lang-switch-button-l>div {
-    border-right-color: rgba(255, 255, 255, .75);
-    transform: rotate(45deg);
-}
-
-#lang-switch-button-r>div {
-    border-left-color: rgba(255, 255, 255, .75);
-    transform: rotate(-45deg);
-}
-
-@keyframes rot {
-    0% {
-        transform: rotate(-45deg);
-    }
-
-    100% {
-        transform: rotate(315deg);
-    }
-}
-
-#lang-name-body {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    height: 92px;
-    width: 92px;
-    border-radius: 50%;
-    overflow: hidden;
-    transform: rotate(-45deg);
-    background-color: black;
-    z-index: 10;
-    /* animation: 3s linear 0s infinite rot; */
-    margin-top: 40px;
-}
-
-.lang-name-row {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    height: 50%;
-    width: 100%;
-}
-
-.lang-name-block {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    /* outline: 1px solid black; */
-}
-
-.lang-name-text {
-    font-size: 13px;
-    transform: rotate(45deg);
-    color: #4E9F3D;
-    /* font-weight: bold; */
-    font-family: 'Lucida Sans';
-}
-
-#lang-name-prev>.lang-name-text {
-    transform: rotate(-45deg);
-}
-
-#lang-name-next>.lang-name-text {
-    transform: rotate(135deg);
-}</style>
+        @keyframes icon-up {
+            from {
+                top: 32px
+            }
+
+            to {
+                top: -32px
+            }
+        }
+
+        @keyframes icon-down {
+            from {
+                top: -32px
+            }
+
+            to {
+                top: 32px
+            }
+        }
+
+        #display-number {
+            width: 100%;
+            height: 40px;
+            color: #4E9F3D;
+            text-align: center;
+            line-height: 35px;
+            font-size: 2.25rem;
+            font-family: Georgia;
+        }
+
+        #floor-buttons {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            width: 80%;
+        }
+
+        #floor-buttons .button-row {
+            display: flex;
+            position: relative;
+            flex-direction: row;
+            justify-content: space-around;
+            width: 100%;
+            margin: 4px 0;
+        }
+
+        .unselectable {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .invisible {
+            opacity: 0;
+            cursor: default !important;
+            pointer-events: none;
+        }
+
+        #floor-buttons .button-col {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            height: 36px;
+            width: 36px;
+            border: 4px solid #FDEFF4;
+            border-radius: 50%;
+            color: #FDEFF4;
+            background-color: black;
+            font-size: 1.25rem;
+            font-family: 'Lucida Console';
+            text-align: center;
+            line-height: 36px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, .4);
+        }
+
+        #floor-buttons .button-col:hover {
+            border-color: #FFC0D3;
+            color: #FFC0D3;
+        }
+
+        #floor-buttons .button-col.button-selected {
+            border-color: #FF5C8D;
+            color: #FF5C8D;
+        }
+
+        #floor-buttons #close-button:hover {
+            border-color: #90E0EF;
+            color: #90E0EF;
+        }
+
+        #floor-buttons #close-button:active {
+            border-color: #00B4D8;
+            color: #00B4D8;
+        }
+
+        #floor-buttons #open-button:hover {
+            border-color: #ffe5a7;
+            color: #ffe5a7;
+        }
+
+        #floor-buttons #open-button:active {
+            border-color: #ffbb1c;
+            color: #ffbb1c;
+        }
+
+        #close-button>div,
+        #open-button>div {
+            position: relative;
+        }
+
+        #close-button>div:nth-child(1),
+        #open-button>div:nth-child(3) {
+            height: 0;
+            width: 0;
+            border: 8px solid transparent;
+            border-left-color: #FDEFF4;
+            left: 5px;
+        }
+
+        #close-button>div:nth-child(2),
+        #open-button>div:nth-child(2) {
+            width: 1px;
+            height: 18px;
+            border: 1px solid #FDEFF4;
+            border-radius: 4px;
+            background-color: #FDEFF4;
+        }
+
+        #close-button>div:nth-child(3),
+        #open-button>div:nth-child(1) {
+            height: 0;
+            width: 0;
+            border: 8px solid transparent;
+            border-right-color: #FDEFF4;
+            left: -5px;
+        }
+
+        #close-button:hover>div:nth-child(1) {
+            border-left-color: #90E0EF;
+        }
+
+        #close-button:active>div:nth-child(1) {
+            border-left-color: #00B4D8;
+        }
+
+        #close-button:hover>div:nth-child(2) {
+            border-color: #90E0EF;
+            background-color: #90E0EF;
+        }
+
+        #close-button:active>div:nth-child(2) {
+            border-color: #00B4D8;
+            background-color: #00B4D8;
+        }
+
+        #close-button:hover>div:nth-child(3) {
+            border-right-color: #90E0EF;
+        }
+
+        #close-button:active>div:nth-child(3) {
+            border-right-color: #00B4D8;
+        }
+
+        #open-button:hover>div:nth-child(1) {
+            border-right-color: #ffe5a7;
+        }
+
+        #open-button:active>div:nth-child(1) {
+            border-right-color: #ffbb1c;
+        }
+
+        #open-button:hover>div:nth-child(2) {
+            border-color: #ffe5a7;
+            background-color: #ffe5a7;
+        }
+
+        #open-button:active>div:nth-child(2) {
+            border-color: #ffbb1c;
+            background-color: #ffbb1c;
+        }
+
+        #open-button:hover>div:nth-child(3) {
+            border-left-color: #ffe5a7;
+        }
+
+        #open-button:active>div:nth-child(3) {
+            border-left-color: #ffbb1c;
+        }
+
+        #men-mei {
+            position: relative;
+            width: 100%;
+            height: 10%;
+            background-color: #A0A0A0;
+            border-bottom: 4px solid #524A4E;
+            z-index: 100;
+            box-shadow: 0 4px 4px rgba(0, 0, 0, .2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #elev-door {
+            display: flex;
+            position: relative;
+            flex-direction: row;
+            width: 100%;
+            height: 90%;
+            z-index: 20;
+        }
+
+        #elev-door>div:nth-child(1) {
+            position: relative;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background-color: #A0A0A0;
+            border-right: 2px solid #524A4E;
+        }
+
+        #elev-door>div:nth-child(2) {
+            position: relative;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background-color: #A0A0A0;
+            border-left: 2px solid #524A4E;
+        }
+
+        .noscrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .noscrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        #scene {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            bottom: 0;
+            width: 100%;
+            height: 90%;
+            z-index: 10;
+        }
+
+        #background {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(0, 0, 0, .7);
+            z-index: 5;
+        }
+
+        #dialog-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            top: 3px;
+            width: 100%;
+            height: 85%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            /* border: 1px solid red; */
+            padding-top: 5px;
+            z-index: 10;
+        }
+
+        .avatar {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+            width: 45px;
+            flex-shrink: 0;
+        }
+
+        .avatar>div {
+            width: 35px;
+            height: 35px;
+            /* margin-top: 3px; */
+            background-color: #ccaf0e;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            color: white;
+            justify-content: center;
+            align-items: center;
+            /* line-height: 35px; */
+            font-size: 1rem;
+            font-family: Georgia, '';
+            /* text-shadow: black 0 0 2px; */
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .dialog-row {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: 100%;
+            margin: 6px 0;
+            /* border: 1px solid black; */
+        }
+
+        .dialog-box {
+            color: white;
+            font-family: "Palatino Linotype";
+            max-width: 70%;
+            min-height: 1.2rem;
+            padding: 6px 8px;
+            text-shadow: black 0 0 1px;
+            /* border: 1px solid red; */
+            flex-wrap: wrap;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            user-select: text;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .dialog-row.left-dialog-row {
+            justify-content: flex-start;
+        }
+
+        .dialog-box.left-dialog-box {
+            /* background: linear-gradient(90deg, rgba(125, 125, 125, .6) 50%, transparent 100%); */
+            background-color: rgba(125, 125, 125, .6);
+            border-left: 5px solid #398AB9;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .left-not-first-line {
+            margin-left: 45px;
+        }
+
+        .dialog-row.right-dialog-row {
+            justify-content: flex-end;
+        }
+
+        .dialog-box.right-dialog-box {
+            /* background: linear-gradient(-90deg, rgba(125, 125, 125, .6) 0%, transparent 100%); */
+            background-color: rgba(125, 125, 125, .6);
+            border-right: 5px solid #8BDB81;
+            border-radius: 15px 0 0 15px;
+        }
+
+        .right-not-first-line {
+            margin-right: 45px;
+        }
+
+        .dialog-row.mid-dialog-row {
+            justify-content: center;
+        }
+
+        .dialog-box.mid-dialog-box {
+            /* background: linear-gradient(90deg, transparent 0%, rgba(125, 125, 125, .6) 50%, transparent 100%); */
+            max-width: 90%;
+            background-color: rgba(125, 125, 125, .6);
+            border-radius: 10px;
+        }
+
+        #sheng-lue-dots {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 5%;
+            z-index: 11;
+            opacity: .7;
+        }
+
+        .sl-dot {
+            height: 13px;
+            width: 13px;
+            border-radius: 50%;
+            margin: 0 12px;
+            z-index: 0;
+            border: 3px solid gray;
+        }
+
+        .dark-dot {
+            background-color: #323232;
+            border-color: #524A4E;
+        }
+
+        .light-dot {
+            background-color: #FF5C8D;
+            border-color: #FFC0D3;
+        }
+
+        #go-on-button-row {
+            cursor: pointer;
+            width: 100%;
+            height: 10%;
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            /* background-color: blue; */
+            z-index: 11;
+            transition: background-color .2s;
+        }
+
+        #go-on-button-row:hover {
+            background-color: rgba(255, 255, 225, .1);
+        }
+
+        #go-on-button-row:hover>#go-on-button {
+            opacity: 1;
+        }
+
+        #go-on-button-row:active {
+            background-color: rgba(255, 255, 225, .25);
+        }
+
+        #go-on-button {
+            position: relative;
+            top: calc(12.5px*1.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+            transform: scale(1.2);
+            transition: opacity .2s;
+            opacity: .25;
+        }
+
+        #go-on-button>div {
+            position: relative;
+            top: -30.66px;
+            width: calc(50px/1.4142);
+            height: calc(50px/1.4142);
+            /*#787A91 #B2B1B9*/
+            background-color: #787A91;
+            border: 4px solid #B2B1B9;
+            border-radius: 4px;
+            transform: rotate(45deg);
+        }
+
+        #options-row {
+            width: 100%;
+            height: 15%;
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 11;
+            overflow-y: hidden;
+        }
+
+        .option-button {
+            width: 18%;
+            height: 80%;
+            max-height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: "Palatino Linotype";
+            word-wrap: break-word;
+            word-break: break-all;
+            outline: 2px solid rgba(255, 255, 255, .6);
+            color: rgba(255, 255, 255, .8);
+            padding: 4px 5px;
+            transition: background-color .2s, color .2s, outline .2s;
+            border-radius: 15px 15px 15px 0;
+            text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
+            overflow-y: scroll;
+        }
+
+        .option-button>div {
+            margin: auto;
+        }
+
+        .option-button:hover {
+            outline-color: rgba(244, 115, 185, .6);
+            background-color: rgba(255, 255, 255, .05);
+            color: rgba(244, 115, 185, .9);
+        }
+
+        .option-button:active {
+            background-color: rgba(244, 115, 185, .6);
+            color: rgba(255, 255, 255, .75);
+        }
+
+        #save-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            width: 90%;
+            margin-top: 120px;
+        }
+
+        #top-arch {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 25px;
+            width: 50px;
+            background-color: rgba(0, 0, 0, .05);
+            /* box-shadow: 0 0 3px rgba(0, 0, 0, .25); */
+            border-radius: 50px 50px 0 0;
+            cursor: pointer;
+        }
+
+        #save-open-button {
+            position: relative;
+            top: 2px;
+            height: 20px;
+            width: 20px;
+            background-color: rgba(255, 255, 255, .25);
+            border-radius: 50%;
+            transition: background-color .1s;
+            box-shadow: 0 0 2px rgba(0, 0, 0, .25);
+        }
+
+        #top-arch:hover>#save-open-button {
+            background-color: rgba(246, 137, 137, .75);
+        }
+
+        #top-arch:active>#save-open-button {
+            background-color: rgba(198, 93, 123, .75);
+        }
+
+        #save-panel-body {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            /* border: 2px solid rgba(0, 0, 0, 0.2); */
+            background-color: #646464;
+            border-radius: 2px;
+            box-shadow: 0 0 2px rgba(0, 0, 0, .25);
+            overflow: hidden;
+        }
+
+        #save-panel-cover {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 2px;
+            background-color: #A0A0A0;
+            z-index: 30;
+        }
+
+        #cover-circle {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            height: 60px;
+            width: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        #cover-circle>div {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(127, 127, 127, .25);
+            border-radius: 20px;
+        }
+
+        #save-panel-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            height: 100%;
+            /* background-color: #2C3333; */
+        }
+
+        #save-text-area-warp {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #save-text-area {
+            width: 90%;
+            height: 50px;
+            resize: none;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            font-size: 0.7rem;
+            font-family: "Consolas";
+            outline: 0;
+            border: 0;
+            border-radius: 2px 2px 0 0;
+            background-color: rgba(0, 0, 0, .35);
+            color: white;
+        }
+
+        #save-copy-button {
+            width: 90%;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(150, 150, 150);
+            cursor: pointer;
+            border-radius: 0 0 2px 2px;
+            color: rgba(0, 0, 0, .6);
+            font-size: 14px;
+            font-family: Arial;
+            transition: background-color .1s;
+        }
+
+        #save-copy-button:hover {
+            background-color: rgb(151, 139, 119);
+        }
+
+        #save-copy-button:active {
+            background-color: rgb(148, 128, 94);
+        }
+
+        #save-button-row {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+
+        .save-button-warp {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            width: 46%;
+            height: 28px;
+            background-color: #323232;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: outline .1s;
+            overflow: hiddens;
+        }
+
+        .save-button-warp:hover {
+            outline: 2px solid rgba(255, 255, 255, .25);
+        }
+
+        .save-button-warp:active {
+            outline: 2px solid rgba(255, 255, 255, .6);
+        }
+
+        .save-button-warp:active>#save-export-button {
+            background-color: #aaeefa;
+        }
+
+        .save-button-warp:active>#save-import-button {
+            background-color: #fde6b0;
+        }
+
+        .save-button {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: rgb(224, 224, 224);
+            margin: 0px 2px 0 2px;
+            box-shadow: inset 0 0 1px rgba(0, 0, 0, .4);
+            transition: background-color .1s;
+        }
+
+        .save-button-text {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: rgb(224, 224, 224);
+            font-family: serif;
+        }
+
+        .save-opration-succ {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .save-opration-succ>div {
+            position: absolute;
+            background-color: #019267;
+            border-radius: 20px;
+        }
+
+        .save-opration-succ>div:nth-child(1) {
+            top: 10px;
+            left: 5px;
+            height: 10px;
+            width: 4px;
+            transform: rotate(-45deg);
+        }
+
+        .save-opration-succ>div:nth-child(2) {
+            top: 5px;
+            left: 12px;
+            height: 16px;
+            width: 4px;
+            transform: rotate(45deg);
+        }
+
+        .save-opration-fail {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .save-opration-fail>div {
+            position: absolute;
+            height: 16px;
+            width: 4px;
+            background-color: #D82148;
+            border-radius: 20px;
+        }
+
+        .save-opration-fail>div:nth-child(1) {
+            transform: rotate(-45deg);
+        }
+
+        .save-opration-fail>div:nth-child(2) {
+            transform: rotate(45deg);
+        }
+
+        #lang-display {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            width: 100px;
+            border-radius: 100px 100px 0 0;
+            border: 0px solid #A0A0A0;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        #lang-outer-circle {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 110px;
+            width: 110px;
+            border-radius: 50%;
+            background-image: linear-gradient(135deg, transparent 50%, #A0A0A0 50%), linear-gradient(45deg, #A0A0A0 50%, transparent 50%);
+            z-index: 15;
+            margin-top: 40px;
+        }
+
+        #lang-inner-circle {
+            background-color: #A0A0A0;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .lang-switch-button-part {
+            position: relative;
+            top: -4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            background-color: #3e7c31;
+            z-index: 16;
+            overflow: hidden;
+            transition: background-color .1s;
+        }
+
+        .lang-switch-button-part:hover {
+            background-color: #549647;
+        }
+
+        .lang-switch-button-part:active {
+            background-color: rgb(48, 107, 36);
+        }
+
+        #lang-switch-button-l {
+            transform: rotate(-45deg);
+        }
+
+        #lang-switch-button-r {
+            transform: rotate(45deg);
+        }
+
+        .lang-switch-button-part>div {
+            position: relative;
+            top: -4px;
+            transform: scaleY(.8);
+            border: 8px solid transparent;
+        }
+
+        #lang-switch-button-l>div {
+            border-right-color: rgba(255, 255, 255, .75);
+            transform: rotate(45deg);
+        }
+
+        #lang-switch-button-r>div {
+            border-left-color: rgba(255, 255, 255, .75);
+            transform: rotate(-45deg);
+        }
+
+        @keyframes rot {
+            0% {
+                transform: rotate(-45deg);
+            }
+
+            100% {
+                transform: rotate(315deg);
+            }
+        }
+
+        #lang-name-body {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            height: 92px;
+            width: 92px;
+            border-radius: 50%;
+            overflow: hidden;
+            transform: rotate(-45deg);
+            background-color: black;
+            z-index: 10;
+            /* animation: 3s linear 0s infinite rot; */
+            margin-top: 40px;
+        }
+
+        .lang-name-row {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            height: 50%;
+            width: 100%;
+        }
+
+        .lang-name-block {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            /* outline: 1px solid black; */
+        }
+
+        .lang-name-text {
+            font-size: 13px;
+            transform: rotate(45deg);
+            color: #4E9F3D;
+            /* font-weight: bold; */
+            font-family: 'Lucida Sans';
+        }
+
+        #lang-name-prev>.lang-name-text {
+            transform: rotate(-45deg);
+        }
+
+        #lang-name-next>.lang-name-text {
+            transform: rotate(135deg);
+        }
+    </style>
     <title>Rat Elevator</title>
 </head>
 
@@ -1378,910 +1379,907 @@ body {
     </div>
 </body>
 <script>
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-function sleep(time) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, time);
-    });
-}
-function range(...args) {
-    let start = 0;
-    let end = 0;
-    if (args.length <= 0) {
-        return [];
+    "use strict";
+    var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+    function sleep(time) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, time);
+        });
     }
-    else if (args.length === 1) {
-        if (args[0] <= 0) {
+    function range(...args) {
+        let start = 0;
+        let end = 0;
+        if (args.length <= 0) {
             return [];
         }
-        start = 0;
-        end = args[0] - 1;
-    }
-    else {
-        start = args[0];
-        end = args[1];
-    }
-    if (start > end) {
-        let tmp = end;
-        end = start;
-        start = tmp;
-    }
-    let arr = [];
-    for (let i = start; i <= end; ++i) {
-        arr.push(i);
-    }
-    return arr;
-}
-function clearChildren(elem) {
-    for (let child of Array.from(elem.childNodes)) {
-        elem.removeChild(child);
-    }
-}
-function toggleElementClass(elem, class_name) {
-    if (elem.classList.contains(class_name)) {
-        elem.classList.remove(class_name);
-    }
-    else {
-        elem.classList.add(class_name);
-    }
-}
-function addElementClass(elem, class_name) {
-    if (!elem.classList.contains(class_name)) {
-        elem.classList.add(class_name);
-    }
-}
-function removeElementClass(elem, class_name) {
-    if (elem.classList.contains(class_name)) {
-        elem.classList.remove(class_name);
-    }
-}
-function padLeftZero(num) {
-    let num_s = num.toString();
-    return /^[0-9]$/.test(num_s) ? '0' + num_s : num_s;
-}
-function getNumFromId(id) {
-    let num = id.match(/[^_]+/);
-    return num === null || num.length <= 0 ? '' : num[0];
-}
-const qs = function (selector) {
-    return document.querySelector(selector);
-};
-const qsa = function (selector) {
-    return document.querySelectorAll(selector);
-};
-class AbstractList {
-    constructor() {
-        this.data = [];
-    }
-    getLength() {
-        return this.data.length;
-    }
-    isIncluding(id) {
-        for (let i = 0; i < this.data.length; ++i) {
-            if (this.data[i].id === id) {
-                return true;
+        else if (args.length === 1) {
+            if (args[0] <= 0) {
+                return [];
             }
+            start = 0;
+            end = args[0] - 1;
         }
-        return false;
+        else {
+            start = args[0];
+            end = args[1];
+        }
+        if (start > end) {
+            let tmp = end;
+            end = start;
+            start = tmp;
+        }
+        let arr = [];
+        for (let i = start; i <= end; ++i) {
+            arr.push(i);
+        }
+        return arr;
     }
-    getById(id) {
-        for (let item of this.data) {
-            if (item.id === id) {
-                return item;
+    function clearChildren(elem) {
+        for (let child of Array.from(elem.childNodes)) {
+            elem.removeChild(child);
+        }
+    }
+    function toggleElementClass(elem, class_name) {
+        if (elem.classList.contains(class_name)) {
+            elem.classList.remove(class_name);
+        }
+        else {
+            elem.classList.add(class_name);
+        }
+    }
+    function addElementClass(elem, class_name) {
+        if (!elem.classList.contains(class_name)) {
+            elem.classList.add(class_name);
+        }
+    }
+    function removeElementClass(elem, class_name) {
+        if (elem.classList.contains(class_name)) {
+            elem.classList.remove(class_name);
+        }
+    }
+    function padLeftZero(num) {
+        let num_s = num.toString();
+        return /^[0-9]$/.test(num_s) ? '0' + num_s : num_s;
+    }
+    function getNumFromId(id) {
+        let num = id.match(/[^_]+/);
+        return num === null || num.length <= 0 ? '' : num[0];
+    }
+    const qs = function (selector) {
+        return document.querySelector(selector);
+    };
+    const qsa = function (selector) {
+        return document.querySelectorAll(selector);
+    };
+    class AbstractList {
+        constructor() {
+            this.data = [];
+        }
+        getLength() {
+            return this.data.length;
+        }
+        isIncluding(id) {
+            for (let i = 0; i < this.data.length; ++i) {
+                if (this.data[i].id === id) {
+                    return true;
+                }
             }
-        }
-        return null;
-    }
-}
-class LanguageList extends AbstractList {
-    constructor(data) {
-        super();
-        this.data = data;
-    }
-    isKeyIn(id) {
-        return id in this.data.map(value => value.id);
-    }
-    indexOfKey(id) {
-        if (!this.isKeyIn(id)) {
-            return -1;
-        }
-        for (let i of range(this.getLength())) {
-            if (this.data[i].id === id) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    getItemByIndex(index) {
-        if (index < 0) {
-            index = 0;
-        }
-        if (index >= this.getLength()) {
-            index = this.getLength() - 1;
-        }
-        return this.data[index];
-    }
-    getItemByKey(id) {
-        for (let item of this.data) {
-            if (id === item.id) {
-                return item;
-            }
-        }
-        return null;
-    }
-    getNameByKey(id) {
-        if (!this.isKeyIn(id)) {
-            return '';
-        }
-        const item = this.getItemByKey(id);
-        return item !== null ? item.name : '';
-    }
-}
-class L10nText {
-    constructor(data) {
-        this.data = data;
-    }
-    get(key) {
-        if (key in this.data) {
-            return this.data[key];
-        }
-        return '';
-    }
-    set(key, value) {
-        if (!game_lang_list.isKeyIn(key)) {
-            return;
-        }
-        this.data[key] = value;
-    }
-    toString() {
-        return `{}`;
-    }
-}
-var SignatureStatus;
-(function (SignatureStatus) {
-    SignatureStatus["DEACTIVE"] = "deactive";
-    SignatureStatus["ACTIVE"] = "active";
-})(SignatureStatus || (SignatureStatus = {}));
-class Signature {
-    constructor(id, status = SignatureStatus.DEACTIVE) {
-        this.id = id;
-        this.status = status;
-    }
-    activiate() {
-        this.status = SignatureStatus.ACTIVE;
-    }
-    deactiviate() {
-        this.status = SignatureStatus.DEACTIVE;
-    }
-    isActive() {
-        return this.status === SignatureStatus.ACTIVE;
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class SignatureList extends AbstractList {
-    constructor(signatures) {
-        var _a;
-        super();
-        for (let signature of signatures) {
-            this.data.push(new Signature(signature.id, (_a = signature.status) !== null && _a !== void 0 ? _a : SignatureStatus.DEACTIVE));
-        }
-    }
-    initialize() {
-        for (let signarue of this.data) {
-            signarue.deactiviate();
-        }
-    }
-    isActiveById(id) {
-        const signature = this.getById(id);
-        return signature !== null && signature.status === SignatureStatus.ACTIVE;
-    }
-    activateById(id) {
-        const signature = this.getById(id);
-        if (signature !== null) {
-            signature.activiate();
-            return true;
-        }
-        return false;
-    }
-    deactivateById(id) {
-        const signature = this.getById(id);
-        if (signature !== null) {
-            signature.deactiviate();
-            return true;
-        }
-        return false;
-    }
-}
-var TaskStatus;
-(function (TaskStatus) {
-    TaskStatus["DEACTIVE"] = "deactive";
-    TaskStatus["ACTIVE"] = "active";
-    TaskStatus["FINISHED"] = "finished";
-})(TaskStatus || (TaskStatus = {}));
-class GameTask {
-    constructor(id, description, status = TaskStatus.DEACTIVE) {
-        this.id = id;
-        this.description = description;
-        this.status = status !== null && status !== void 0 ? status : TaskStatus.DEACTIVE;
-    }
-    isActive() {
-        return this.status === TaskStatus.ACTIVE;
-    }
-    isFinished() {
-        return this.status === TaskStatus.FINISHED;
-    }
-    activiate() {
-        this.status = TaskStatus.ACTIVE;
-    }
-    finish() {
-        this.status = TaskStatus.FINISHED;
-    }
-    deactiviate() {
-        this.status = TaskStatus.DEACTIVE;
-    }
-}
-class GameTaskList extends AbstractList {
-    constructor(tasks) {
-        super();
-        for (let task of tasks) {
-            this.data.push(new GameTask(task.id, new L10nText(task.description), task.status));
-        }
-    }
-    isActiveById(id) {
-        const task = this.getById(id);
-        return task !== null && task.status === TaskStatus.ACTIVE;
-    }
-    isFinishedById(id) {
-        const task = this.getById(id);
-        return task !== null && task.status === TaskStatus.FINISHED;
-    }
-    activateById(id) {
-        const task = this.getById(id);
-        if (task !== null) {
-            task.activiate();
-            return true;
-        }
-        return false;
-    }
-    deactivateById(id) {
-        const task = this.getById(id);
-        if (task !== null) {
-            task.deactiviate();
-            return true;
-        }
-        return false;
-    }
-    finishById(id) {
-        const task = this.getById(id);
-        if (task !== null) {
-            task.finish();
-            return true;
-        }
-        return false;
-    }
-}
-class GameAction {
-    constructor(id, f = () => { }) {
-        this.id = id;
-        this.action = f;
-    }
-    do() {
-        this.action();
-    }
-    static genDeactivateSignatureAct(id) {
-        return () => {
-            game_signature_list.deactivateById(id);
-        };
-    }
-    static genActivateSignatureAct(id) {
-        return () => {
-            game_signature_list.activateById(id);
-        };
-    }
-    static genDeactivateTaskAct(id) {
-        return () => {
-            game_task_list.deactivateById(id);
-            game.task_display.remove(id);
-            game.task_display.render(game.lang);
-        };
-    }
-    static genActiveTaskAct(id) {
-        return () => {
-            game_task_list.activateById(id);
-            game.task_display.add(id);
-            game.task_display.render(game.lang);
-        };
-    }
-    static genFinishTaskAct(id) {
-        return () => {
-            game_task_list.finishById(id);
-            game.task_display.render(game.lang);
-        };
-    }
-    static genAddPassengerAct(id) {
-        return () => {
-            game.passenger_display.add(id);
-            game.passenger_display.render(game.lang);
-        };
-    }
-    static genRemovePassengerAct(id) {
-        return () => {
-            game.passenger_display.remove(id);
-            game.passenger_display.render(game.lang);
-        };
-    }
-    static genStepActionAct(id) {
-        return () => {
-            var _a;
-            (_a = game_plot_thread_list.getById(id)) === null || _a === void 0 ? void 0 : _a.step();
-        };
-    }
-    static polyActs(...fs) {
-        return () => {
-            fs.forEach(f => { f(); });
-        };
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class GameActionList extends AbstractList {
-    constructor(actions) {
-        super();
-        for (let action of actions) {
-            this.data.push(new GameAction(action.id, action.action));
-        }
-    }
-}
-class Passenger {
-    constructor(id, name, avatar_color, avatar_font_color, avatar_text, is_display = true) {
-        this.id = id;
-        this.name = name;
-        this.avatar_color = avatar_color;
-        this.avatar_font_color = avatar_font_color;
-        this.avatar_text = avatar_text;
-        this.is_diaplay = is_display;
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class PassengerList extends AbstractList {
-    constructor(passengers) {
-        var _a;
-        super();
-        for (let passenger of passengers) {
-            this.data.push(new Passenger(passenger.id, new L10nText(passenger.name), passenger.avatar_color, passenger.avatar_font_color, new L10nText(passenger.avatar_text), (_a = passenger.is_display) !== null && _a !== void 0 ? _a : true));
-        }
-    }
-}
-var DialogBlockItemType;
-(function (DialogBlockItemType) {
-    DialogBlockItemType["DIALOG"] = "dialog";
-    DialogBlockItemType["SELECT"] = "select";
-})(DialogBlockItemType || (DialogBlockItemType = {}));
-class DialogBlockItem {
-    constructor(id, type = DialogBlockItemType.DIALOG) {
-        this.id = id;
-        this.item_type = type;
-    }
-    isSelect() {
-        return this.item_type === DialogBlockItemType.SELECT;
-    }
-}
-class SelectOption {
-    constructor(id, next_id, text) {
-        this.id = id;
-        this.next_dialog_block_id = next_id;
-        this.text = text;
-    }
-    static splitId(id) {
-        let arr = id.match(/^([^_]+)_([^_]+)_opt$/);
-        let id1 = '';
-        let id2 = '';
-        if (arr !== null) {
-            if (arr.length > 1) {
-                id1 = arr[1];
-            }
-            if (arr.length > 2) {
-                id2 = arr[2];
-            }
-        }
-        return [id1, id2];
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class BranchSelect extends DialogBlockItem {
-    constructor(id, options = []) {
-        super(id, DialogBlockItemType.SELECT);
-        this.options = [];
-        for (let i = 0; i < options.length; ++i) {
-            this.options.push(new SelectOption(`${padLeftZero(i)}_${getNumFromId(this.id)}_opt`, options[i].next, new L10nText(options[i].text)));
-        }
-    }
-    getOptionById(id) {
-        for (let opt of this.options) {
-            if (opt.id === id) {
-                return opt;
-            }
-        }
-        return null;
-    }
-    toString() {
-        return `{}`;
-    }
-}
-var DialogLayout;
-(function (DialogLayout) {
-    DialogLayout["LEFT"] = "left";
-    DialogLayout["MIDDLE"] = "middle";
-    DialogLayout["RIGHT"] = "right";
-})(DialogLayout || (DialogLayout = {}));
-class Dialog extends DialogBlockItem {
-    constructor(id, person_id, text, layout, action_id = '') {
-        super(id);
-        this.person_id = person_id;
-        this.text = text;
-        this.layout = layout;
-        this.action_id = action_id;
-        this.is_having_action = action_id === '' ? false : true;
-    }
-    static splitId(id) {
-        let arr = id.match(/^([^_]+)_([^_]+)_dlg$/);
-        let id1 = '';
-        let id2 = '';
-        if (arr !== null) {
-            if (arr.length > 1) {
-                id1 = arr[1];
-            }
-            if (arr.length > 2) {
-                id2 = arr[2];
-            }
-        }
-        return [id1, id2];
-    }
-    doAction() {
-        var _a;
-        if (this.is_having_action) {
-            (_a = game_action_list.getById(this.action_id)) === null || _a === void 0 ? void 0 : _a.do();
-        }
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class DialogBlock {
-    constructor(id, in_signatures, dialogs, select = null) {
-        var _a;
-        this.id = id;
-        this.in_signatures = in_signatures;
-        this.data = [];
-        for (let i = 0; i < dialogs.length; ++i) {
-            this.data.push(new Dialog(`${padLeftZero(i)}_${getNumFromId(this.id)}_dlg`, dialogs[i].person_id, new L10nText(dialogs[i].text), dialogs[i].layout, (_a = dialogs[i].action_id) !== null && _a !== void 0 ? _a : ''));
-        }
-        if (select !== null) {
-            this.data.push(new BranchSelect(`${getNumFromId(this.id)}$_slt`, select.options));
-        }
-        this.cur_item_index = 0;
-    }
-    getItemByIndex(index) {
-        return index < 0 || index >= this.data.length ? null : this.data[index];
-    }
-    getItemById(id) {
-        for (let item of this.data) {
-            if (item.id === id) {
-                return item;
-            }
-        }
-        return null;
-    }
-    getCurItem() {
-        return this.getItemByIndex(this.cur_item_index);
-    }
-    resetIndex() {
-        this.cur_item_index = 0;
-    }
-    setIndexToEnd() {
-        this.cur_item_index = this.data.length;
-    }
-    stepIndex() {
-        this.cur_item_index += 1;
-        if (this.cur_item_index < 0) {
-            this.cur_item_index = 0;
-        }
-        if (this.cur_item_index > this.data.length) {
-            this.cur_item_index = this.data.length;
-        }
-    }
-    isNotFirstLine() {
-        if (this.cur_item_index <= 0 || this.cur_item_index >= this.data.length) {
             return false;
         }
-        const cur = this.getCurItem();
-        const pre = this.getItemByIndex(this.cur_item_index - 1);
-        if (cur !== null && pre !== null &&
-            !cur.isSelect() && !pre.isSelect() &&
-            cur.person_id === pre.person_id) {
-            return true;
-        }
-        return false;
-    }
-    isFinished() {
-        return this.cur_item_index >= this.data.length;
-    }
-    isUnlocked() {
-        for (let id of this.in_signatures) {
-            const sig = game_signature_list.getById(id);
-            if (!(sig === null || sig === void 0 ? void 0 : sig.isActive())) {
-                return false;
-            }
-        }
-        return true;
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class DialogScene {
-    constructor(id, blocks) {
-        var _a;
-        this.id = id;
-        this.dialog_in_dict = {};
-        this.dialog_blocks = [];
-        for (let i = 0; i < blocks.length; ++i) {
-            this.dialog_blocks.push(new DialogBlock(blocks[i].id, blocks[i].in_signatures, blocks[i].dialogs, (_a = blocks[i].select) !== null && _a !== void 0 ? _a : null));
-            this.dialog_in_dict[blocks[i].id] = blocks[i].in_signatures;
-        }
-        this.cur_block_id = '';
-        this.visited_blocks = [];
-    }
-    isInclduingBlock(id) {
-        for (let block of this.dialog_blocks) {
-            if (block.id === id) {
-                return true;
-            }
-        }
-        return false;
-    }
-    setCurDialogBlock(id) {
-        if (this.isInclduingBlock(id)) {
-            this.cur_block_id = id;
-        }
-    }
-    getCurDialogBlock() {
-        for (let block of this.dialog_blocks) {
-            if (block.id === this.cur_block_id) {
-                return block;
-            }
-        }
-        return null;
-    }
-    getDialogBlock(id) {
-        for (let block of this.dialog_blocks) {
-            if (block.id === id) {
-                return block;
-            }
-        }
-        return null;
-    }
-    addVisitedBlock(id) {
-        if (this.visited_blocks.indexOf(id) !== -1) {
-            return;
-        }
-        this.visited_blocks.push(id);
-    }
-    removeVisitedBlock(id) {
-        const index = this.visited_blocks.indexOf(id);
-        if (index === -1) {
-            return;
-        }
-        this.visited_blocks.splice(index, 1);
-    }
-    toString() {
-        return `{}`;
-    }
-}
-class Floor {
-    constructor(id, scene, plot_id_list, background = null) {
-        this.id = id;
-        this.dialog_scene = new DialogScene(scene.id, scene.blocks);
-        this.plot_id_list = plot_id_list;
-        this.background = background !== null && background !== void 0 ? background : { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' };
-    }
-    checkPlotThreads() {
-        var _a, _b;
-        let selected_block_id = '';
-        let max_prioeity = -Infinity;
-        for (let plot_id of this.plot_id_list) {
-            const plot = game_plot_thread_list.getById(plot_id);
-            if (plot === null || !plot.isUnlocked() || plot.isFinished() || plot.getCurFloorId() !== this.id) {
-                continue;
-            }
-            let sig_id = plot.getCurSignatureId();
-            let is_set = false;
-            for (let block_id of Object.keys(this.dialog_scene.dialog_in_dict)) {
-                if (this.dialog_scene.dialog_in_dict[block_id].indexOf(sig_id) === -1) {
-                    continue;
-                }
-                const block = this.dialog_scene.getDialogBlock(block_id);
-                if (block === null || !block.isUnlocked() || this.dialog_scene.cur_block_id === block.id) {
-                    continue;
-                }
-                if (block.isFinished()) {
-                    plot.step();
-                    continue;
-                }
-                if (plot.priority > max_prioeity && !is_set) {
-                    selected_block_id = block.id;
-                    max_prioeity = plot.priority;
-                    is_set = true;
+        getById(id) {
+            for (let item of this.data) {
+                if (item.id === id) {
+                    return item;
                 }
             }
-        }
-        console.log(`slt: ${selected_block_id},\ncur: ${this.dialog_scene.cur_block_id},\nis_cur_finish: ${(_a = this.dialog_scene.getCurDialogBlock()) === null || _a === void 0 ? void 0 : _a.isFinished()}`);
-        if (this.dialog_scene.cur_block_id === '' || ((_b = this.dialog_scene.getCurDialogBlock()) === null || _b === void 0 ? void 0 : _b.isFinished())) {
-            this.dialog_scene.setCurDialogBlock(selected_block_id);
-        }
-    }
-}
-class FloorList extends AbstractList {
-    constructor(floors) {
-        var _a;
-        super();
-        for (let floor of floors) {
-            this.data.push(new Floor(floor.id, floor.dialog_scene, floor.plot_id_list, (_a = floor.background) !== null && _a !== void 0 ? _a : null));
-        }
-    }
-}
-class PlotThread {
-    constructor(id, priority, signature_floor_list, in_signatures = []) {
-        this.id = id;
-        this.priority = priority;
-        this.signature_floor_dict = {};
-        this.signatures = [];
-        for (let item of signature_floor_list) {
-            this.signature_floor_dict[item.signature] = item.floor;
-            this.signatures.push(item.signature);
-        }
-        this.in_signatures = in_signatures;
-        this.cur_signature_index = 0;
-    }
-    step() {
-        this.cur_signature_index += 1;
-        if (this.cur_signature_index < 0) {
-            this.cur_signature_index = 0;
-        }
-        if (this.cur_signature_index > this.signatures.length) {
-            this.cur_signature_index = this.signatures.length;
-        }
-    }
-    getCurFloorId() {
-        if (this.cur_signature_index < 0 ||
-            this.cur_signature_index >= this.signatures.length ||
-            Object.keys(this.signature_floor_dict).indexOf(this.signatures[this.cur_signature_index]) === -1) {
-            return '';
-        }
-        return this.signature_floor_dict[this.signatures[this.cur_signature_index]];
-    }
-    getCurSignatureId() {
-        if (this.cur_signature_index < 0 ||
-            this.cur_signature_index >= this.signatures.length) {
-            return '';
-        }
-        return this.signatures[this.cur_signature_index];
-    }
-    getSignatureById(index) {
-        if (index < 0 || index >= this.signatures.length) {
             return null;
         }
-        return game_signature_list.getById(this.signatures[index]);
     }
-    getCurSignature() {
-        return this.getSignatureById(this.cur_signature_index);
-    }
-    isUnlocked() {
-        if (this.in_signatures.length <= 0) {
-            return true;
+    class LanguageList extends AbstractList {
+        constructor(data) {
+            super();
+            this.data = data;
         }
-        for (let id of this.in_signatures) {
-            const signature = game_signature_list.getById(id);
-            if (signature !== null) {
-                if (!signature.isActive()) {
-                    return false;
+        isKeyIn(id) {
+            return id in this.data.map(value => value.id);
+        }
+        indexOfKey(id) {
+            if (!this.isKeyIn(id)) {
+                return -1;
+            }
+            for (let i of range(this.getLength())) {
+                if (this.data[i].id === id) {
+                    return i;
                 }
             }
+            return -1;
         }
-        return true;
+        getItemByIndex(index) {
+            if (index < 0) {
+                index = 0;
+            }
+            if (index >= this.getLength()) {
+                index = this.getLength() - 1;
+            }
+            return this.data[index];
+        }
+        getItemByKey(id) {
+            for (let item of this.data) {
+                if (id === item.id) {
+                    return item;
+                }
+            }
+            return null;
+        }
+        getNameByKey(id) {
+            if (!this.isKeyIn(id)) {
+                return '';
+            }
+            const item = this.getItemByKey(id);
+            return item !== null ? item.name : '';
+        }
     }
-    isFinished() {
-        if (this.signatures.length <= 0) {
-            return true;
+    class L10nText {
+        constructor(data) {
+            this.data = data;
         }
-        if (this.cur_signature_index < this.signatures.length) {
+        get(key) {
+            if (key in this.data) {
+                return this.data[key];
+            }
+            return '';
+        }
+        set(key, value) {
+            if (!game_lang_list.isKeyIn(key)) {
+                return;
+            }
+            this.data[key] = value;
+        }
+        toString() {
+            return '{' + Object.keys(this.data).map(key => `"${key}":"${this.get(key)}"`).join(',') + '}';
+        }
+    }
+    var SignatureStatus;
+    (function (SignatureStatus) {
+        SignatureStatus["DEACTIVE"] = "deactive";
+        SignatureStatus["ACTIVE"] = "active";
+    })(SignatureStatus || (SignatureStatus = {}));
+    class Signature {
+        constructor(id, status = SignatureStatus.DEACTIVE) {
+            this.id = id;
+            this.status = status;
+        }
+        activiate() {
+            this.status = SignatureStatus.ACTIVE;
+        }
+        deactiviate() {
+            this.status = SignatureStatus.DEACTIVE;
+        }
+        isActive() {
+            return this.status === SignatureStatus.ACTIVE;
+        }
+        toString() {
+            return `{"id":"${this.id}","status":"${this.status.toString()}"}`;
+        }
+        static convertStatus(status) {
+            return status === 'active' ? SignatureStatus.ACTIVE : SignatureStatus.DEACTIVE;
+        }
+        static fromJSON(obj) {
+            return new Signature(obj.id, Signature.convertStatus(obj.status));
+        }
+    }
+    class SignatureList extends AbstractList {
+        constructor(signatures) {
+            var _a;
+            super();
+            for (let signature of signatures) {
+                this.data.push(new Signature(signature.id, (_a = signature.status) !== null && _a !== void 0 ? _a : SignatureStatus.DEACTIVE));
+            }
+        }
+        initialize() {
+            for (let signarue of this.data) {
+                signarue.deactiviate();
+            }
+        }
+        isActiveById(id) {
+            const signature = this.getById(id);
+            return signature !== null && signature.status === SignatureStatus.ACTIVE;
+        }
+        activateById(id) {
+            const signature = this.getById(id);
+            if (signature !== null) {
+                signature.activiate();
+                return true;
+            }
             return false;
         }
-        for (let id of this.signatures) {
-            const signature = game_signature_list.getById(id);
+        deactivateById(id) {
+            const signature = this.getById(id);
             if (signature !== null) {
-                if (!signature.isActive()) {
+                signature.deactiviate();
+                return true;
+            }
+            return false;
+        }
+        toString() {
+            return '[' + this.data.map(s => s.toString).join(',') + ']';
+        }
+    }
+    var TaskStatus;
+    (function (TaskStatus) {
+        TaskStatus["DEACTIVE"] = "deactive";
+        TaskStatus["ACTIVE"] = "active";
+        TaskStatus["FINISHED"] = "finished";
+    })(TaskStatus || (TaskStatus = {}));
+    class GameTask {
+        constructor(id, description, status = TaskStatus.DEACTIVE) {
+            this.id = id;
+            this.description = description;
+            this.status = status !== null && status !== void 0 ? status : TaskStatus.DEACTIVE;
+        }
+        isActive() {
+            return this.status === TaskStatus.ACTIVE;
+        }
+        isFinished() {
+            return this.status === TaskStatus.FINISHED;
+        }
+        activiate() {
+            this.status = TaskStatus.ACTIVE;
+        }
+        finish() {
+            this.status = TaskStatus.FINISHED;
+        }
+        deactiviate() {
+            this.status = TaskStatus.DEACTIVE;
+        }
+    }
+    class GameTaskList extends AbstractList {
+        constructor(tasks) {
+            super();
+            for (let task of tasks) {
+                this.data.push(new GameTask(task.id, new L10nText(task.description), task.status));
+            }
+        }
+        isActiveById(id) {
+            const task = this.getById(id);
+            return task !== null && task.status === TaskStatus.ACTIVE;
+        }
+        isFinishedById(id) {
+            const task = this.getById(id);
+            return task !== null && task.status === TaskStatus.FINISHED;
+        }
+        activateById(id) {
+            const task = this.getById(id);
+            if (task !== null) {
+                task.activiate();
+                return true;
+            }
+            return false;
+        }
+        deactivateById(id) {
+            const task = this.getById(id);
+            if (task !== null) {
+                task.deactiviate();
+                return true;
+            }
+            return false;
+        }
+        finishById(id) {
+            const task = this.getById(id);
+            if (task !== null) {
+                task.finish();
+                return true;
+            }
+            return false;
+        }
+    }
+    class GameAction {
+        constructor(id, f = () => { }) {
+            this.id = id;
+            this.action = f;
+        }
+        do() {
+            this.action();
+        }
+        static genDeactivateSignatureAct(id) {
+            return () => {
+                game_signature_list.deactivateById(id);
+            };
+        }
+        static genActivateSignatureAct(id) {
+            return () => {
+                game_signature_list.activateById(id);
+            };
+        }
+        static genDeactivateTaskAct(id) {
+            return () => {
+                game_task_list.deactivateById(id);
+                game.task_display.remove(id);
+                game.task_display.render(game.lang);
+            };
+        }
+        static genActiveTaskAct(id) {
+            return () => {
+                game_task_list.activateById(id);
+                game.task_display.add(id);
+                game.task_display.render(game.lang);
+            };
+        }
+        static genFinishTaskAct(id) {
+            return () => {
+                game_task_list.finishById(id);
+                game.task_display.render(game.lang);
+            };
+        }
+        static genAddPassengerAct(id) {
+            return () => {
+                game.passenger_display.add(id);
+                game.passenger_display.render(game.lang);
+            };
+        }
+        static genRemovePassengerAct(id) {
+            return () => {
+                game.passenger_display.remove(id);
+                game.passenger_display.render(game.lang);
+            };
+        }
+        static genStepActionAct(id) {
+            return () => {
+                var _a;
+                (_a = game_plot_thread_list.getById(id)) === null || _a === void 0 ? void 0 : _a.step();
+            };
+        }
+        static polyActs(...fs) {
+            return () => {
+                fs.forEach(f => { f(); });
+            };
+        }
+        toString() {
+            return `{}`;
+        }
+    }
+    class GameActionList extends AbstractList {
+        constructor(actions) {
+            super();
+            for (let action of actions) {
+                this.data.push(new GameAction(action.id, action.action));
+            }
+        }
+    }
+    class Passenger {
+        constructor(id, name, avatar_color, avatar_font_color, avatar_text, is_display = true) {
+            this.id = id;
+            this.name = name;
+            this.avatar_color = avatar_color;
+            this.avatar_font_color = avatar_font_color;
+            this.avatar_text = avatar_text;
+            this.is_diaplay = is_display;
+        }
+        toString() {
+            return `{}`;
+        }
+    }
+    class PassengerList extends AbstractList {
+        constructor(passengers) {
+            var _a;
+            super();
+            for (let passenger of passengers) {
+                this.data.push(new Passenger(passenger.id, new L10nText(passenger.name), passenger.avatar_color, passenger.avatar_font_color, new L10nText(passenger.avatar_text), (_a = passenger.is_display) !== null && _a !== void 0 ? _a : true));
+            }
+        }
+    }
+    var DialogBlockItemType;
+    (function (DialogBlockItemType) {
+        DialogBlockItemType["DIALOG"] = "dialog";
+        DialogBlockItemType["SELECT"] = "select";
+    })(DialogBlockItemType || (DialogBlockItemType = {}));
+    class DialogBlockItem {
+        constructor(id, type = DialogBlockItemType.DIALOG) {
+            this.id = id;
+            this.item_type = type;
+        }
+        isSelect() {
+            return this.item_type === DialogBlockItemType.SELECT;
+        }
+    }
+    class SelectOption {
+        constructor(id, next_id, text) {
+            this.id = id;
+            this.next_dialog_block_id = next_id;
+            this.text = text;
+        }
+        static splitId(id) {
+            let arr = id.match(/^([^_]+)_([^_]+)_opt$/);
+            let id1 = '';
+            let id2 = '';
+            if (arr !== null) {
+                if (arr.length > 1) {
+                    id1 = arr[1];
+                }
+                if (arr.length > 2) {
+                    id2 = arr[2];
+                }
+            }
+            return [id1, id2];
+        }
+        toString() {
+            return `{}`;
+        }
+    }
+    class BranchSelect extends DialogBlockItem {
+        constructor(id, options = []) {
+            super(id, DialogBlockItemType.SELECT);
+            this.options = [];
+            for (let i = 0; i < options.length; ++i) {
+                this.options.push(new SelectOption(`${padLeftZero(i)}_${getNumFromId(this.id)}_opt`, options[i].next, new L10nText(options[i].text)));
+            }
+        }
+        getOptionById(id) {
+            for (let opt of this.options) {
+                if (opt.id === id) {
+                    return opt;
+                }
+            }
+            return null;
+        }
+        toString() {
+            return `{}`;
+        }
+    }
+    var DialogLayout;
+    (function (DialogLayout) {
+        DialogLayout["LEFT"] = "left";
+        DialogLayout["MIDDLE"] = "middle";
+        DialogLayout["RIGHT"] = "right";
+    })(DialogLayout || (DialogLayout = {}));
+    class Dialog extends DialogBlockItem {
+        constructor(id, person_id, text, layout, action_id = '') {
+            super(id);
+            this.person_id = person_id;
+            this.text = text;
+            this.layout = layout;
+            this.action_id = action_id;
+            this.is_having_action = action_id === '' ? false : true;
+        }
+        static splitId(id) {
+            let arr = id.match(/^([^_]+)_([^_]+)_dlg$/);
+            let id1 = '';
+            let id2 = '';
+            if (arr !== null) {
+                if (arr.length > 1) {
+                    id1 = arr[1];
+                }
+                if (arr.length > 2) {
+                    id2 = arr[2];
+                }
+            }
+            return [id1, id2];
+        }
+        doAction() {
+            var _a;
+            if (this.is_having_action) {
+                console.log('!');
+                (_a = game_action_list.getById(this.action_id)) === null || _a === void 0 ? void 0 : _a.do();
+            }
+        }
+        toString() {
+            return `{}`;
+        }
+    }
+    class DialogBlock {
+        constructor(id, in_signatures, dialogs, select = null) {
+            var _a;
+            this.id = id;
+            this.in_signatures = in_signatures;
+            this.data = [];
+            for (let i = 0; i < dialogs.length; ++i) {
+                this.data.push(new Dialog(`${padLeftZero(i)}_${getNumFromId(this.id)}_dlg`, dialogs[i].person_id, new L10nText(dialogs[i].text), dialogs[i].layout, (_a = dialogs[i].action_id) !== null && _a !== void 0 ? _a : ''));
+            }
+            if (select !== null) {
+                this.data.push(new BranchSelect(`${getNumFromId(this.id)}$_slt`, select.options));
+            }
+            this.cur_item_index = 0;
+        }
+        getItemByIndex(index) {
+            return index < 0 || index >= this.data.length ? null : this.data[index];
+        }
+        getItemById(id) {
+            for (let item of this.data) {
+                if (item.id === id) {
+                    return item;
+                }
+            }
+            return null;
+        }
+        getCurItem() {
+            return this.getItemByIndex(this.cur_item_index);
+        }
+        resetIndex() {
+            this.cur_item_index = 0;
+        }
+        setIndexToEnd() {
+            this.cur_item_index = this.data.length;
+        }
+        stepIndex() {
+            this.cur_item_index += 1;
+            if (this.cur_item_index < 0) {
+                this.cur_item_index = 0;
+            }
+            if (this.cur_item_index > this.data.length) {
+                this.cur_item_index = this.data.length;
+            }
+        }
+        isNotFirstLine() {
+            if (this.cur_item_index <= 0 || this.cur_item_index >= this.data.length) {
+                return false;
+            }
+            const cur = this.getCurItem();
+            const pre = this.getItemByIndex(this.cur_item_index - 1);
+            if (cur !== null && pre !== null &&
+                !cur.isSelect() && !pre.isSelect() &&
+                cur.person_id === pre.person_id) {
+                return true;
+            }
+            return false;
+        }
+        isFinished() {
+            return this.cur_item_index >= this.data.length;
+        }
+        isUnlocked() {
+            for (let id of this.in_signatures) {
+                const sig = game_signature_list.getById(id);
+                if (!(sig === null || sig === void 0 ? void 0 : sig.isActive())) {
                     return false;
                 }
             }
+            return true;
         }
-        return true;
-    }
-}
-class PlotThreadList extends AbstractList {
-    constructor(threads) {
-        super();
-        this.data = [];
-        for (let thread of threads) {
-            this.data.push(new PlotThread(thread.id, thread.priority, thread.signature_floor_list, thread.in_signatures));
+        toString() {
+            return `{}`;
         }
     }
-    getById(id) {
-        for (let thread of this.data) {
-            if (thread.id === id) {
-                return thread;
+    class DialogScene {
+        constructor(id, blocks) {
+            var _a;
+            this.id = id;
+            this.dialog_in_dict = {};
+            this.dialog_blocks = [];
+            for (let i = 0; i < blocks.length; ++i) {
+                this.dialog_blocks.push(new DialogBlock(blocks[i].id, blocks[i].in_signatures, blocks[i].dialogs, (_a = blocks[i].select) !== null && _a !== void 0 ? _a : null));
+                this.dialog_in_dict[blocks[i].id] = blocks[i].in_signatures;
+            }
+            this.cur_block_id = '';
+            this.visited_blocks = [];
+        }
+        isInclduingBlock(id) {
+            for (let block of this.dialog_blocks) {
+                if (block.id === id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        setCurDialogBlock(id) {
+            if (this.isInclduingBlock(id)) {
+                this.cur_block_id = id;
             }
         }
-        return null;
-    }
-}
-var DotColor;
-(function (DotColor) {
-    DotColor["DARK"] = "dark";
-    DotColor["LIGHT"] = "light";
-})(DotColor || (DotColor = {}));
-class WaitingDotsAnimation {
-    constructor() {
-        this.dots = [];
-        this.orders = [];
-        this.step = 0;
-        this.timer = undefined;
-        this.interval = 250;
-    }
-    generateOrders(num) {
-        if (num === 0) {
-            return [];
-        }
-        let res = [];
-        for (let i of range(num * 2)) {
-            if (i === 0) {
-                res.push(Array(num).fill(0));
+        getCurDialogBlock() {
+            for (let block of this.dialog_blocks) {
+                if (block.id === this.cur_block_id) {
+                    return block;
+                }
             }
-            else {
-                let order = [...res[i - 1]];
-                let is_all_same = true;
-                for (let j of range(order.length)) {
-                    if (j !== 0) {
-                        if (order[j - 1] !== order[j]) {
-                            order[j] = order[j - 1];
-                            is_all_same = false;
-                            break;
-                        }
+            return null;
+        }
+        getDialogBlock(id) {
+            for (let block of this.dialog_blocks) {
+                if (block.id === id) {
+                    return block;
+                }
+            }
+            return null;
+        }
+        addVisitedBlock(id) {
+            if (this.visited_blocks.indexOf(id) !== -1) {
+                return;
+            }
+            this.visited_blocks.push(id);
+        }
+        removeVisitedBlock(id) {
+            const index = this.visited_blocks.indexOf(id);
+            if (index === -1) {
+                return;
+            }
+            this.visited_blocks.splice(index, 1);
+        }
+        toString() {
+            return `{}`;
+        }
+    }
+    class Floor {
+        constructor(id, scene, plot_id_list, background = null) {
+            this.id = id;
+            this.dialog_scene = new DialogScene(scene.id, scene.blocks);
+            this.plot_id_list = plot_id_list;
+            this.background = background !== null && background !== void 0 ? background : { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' };
+        }
+        checkPlotThreads() {
+            var _a, _b;
+            let selected_block_id = '';
+            let max_prioeity = -Infinity;
+            for (let plot_id of this.plot_id_list) {
+                const plot = game_plot_thread_list.getById(plot_id);
+                if (plot === null || !plot.isUnlocked() || plot.isFinished() || plot.getCurFloorId() !== this.id) {
+                    continue;
+                }
+                let sig_id = plot.getCurSignatureId();
+                let is_set = false;
+                for (let block_id of Object.keys(this.dialog_scene.dialog_in_dict)) {
+                    if (this.dialog_scene.dialog_in_dict[block_id].indexOf(sig_id) === -1) {
+                        continue;
+                    }
+                    const block = this.dialog_scene.getDialogBlock(block_id);
+                    if (block === null || !block.isUnlocked() || this.dialog_scene.cur_block_id === block.id) {
+                        continue;
+                    }
+                    if (block.isFinished()) {
+                        plot.step();
+                        continue;
+                    }
+                    if (plot.priority > max_prioeity && !is_set) {
+                        selected_block_id = block.id;
+                        max_prioeity = plot.priority;
+                        is_set = true;
                     }
                 }
-                if (is_all_same) {
-                    order[0] ^= 1;
+            }
+            console.log(`slt: ${selected_block_id},\ncur: ${this.dialog_scene.cur_block_id},\nis_cur_finish: ${(_a = this.dialog_scene.getCurDialogBlock()) === null || _a === void 0 ? void 0 : _a.isFinished()}`);
+            if (this.dialog_scene.cur_block_id === '' || ((_b = this.dialog_scene.getCurDialogBlock()) === null || _b === void 0 ? void 0 : _b.isFinished())) {
+                this.dialog_scene.setCurDialogBlock(selected_block_id);
+            }
+        }
+    }
+    class FloorList extends AbstractList {
+        constructor(floors) {
+            var _a;
+            super();
+            for (let floor of floors) {
+                this.data.push(new Floor(floor.id, floor.dialog_scene, floor.plot_id_list, (_a = floor.background) !== null && _a !== void 0 ? _a : null));
+            }
+        }
+    }
+    class PlotThread {
+        constructor(id, priority, signature_floor_list, in_signatures = []) {
+            this.id = id;
+            this.priority = priority;
+            this.signature_floor_dict = {};
+            this.signatures = [];
+            for (let item of signature_floor_list) {
+                this.signature_floor_dict[item.signature] = item.floor;
+                this.signatures.push(item.signature);
+            }
+            this.in_signatures = in_signatures;
+            this.cur_signature_index = 0;
+        }
+        step() {
+            this.cur_signature_index += 1;
+            if (this.cur_signature_index < 0) {
+                this.cur_signature_index = 0;
+            }
+            if (this.cur_signature_index > this.signatures.length) {
+                this.cur_signature_index = this.signatures.length;
+            }
+        }
+        getCurFloorId() {
+            if (this.cur_signature_index < 0 ||
+                this.cur_signature_index >= this.signatures.length ||
+                Object.keys(this.signature_floor_dict).indexOf(this.signatures[this.cur_signature_index]) === -1) {
+                return '';
+            }
+            return this.signature_floor_dict[this.signatures[this.cur_signature_index]];
+        }
+        getCurSignatureId() {
+            if (this.cur_signature_index < 0 ||
+                this.cur_signature_index >= this.signatures.length) {
+                return '';
+            }
+            return this.signatures[this.cur_signature_index];
+        }
+        getSignatureById(index) {
+            if (index < 0 || index >= this.signatures.length) {
+                return null;
+            }
+            return game_signature_list.getById(this.signatures[index]);
+        }
+        getCurSignature() {
+            return this.getSignatureById(this.cur_signature_index);
+        }
+        isUnlocked() {
+            if (this.in_signatures.length <= 0) {
+                return true;
+            }
+            for (let id of this.in_signatures) {
+                const signature = game_signature_list.getById(id);
+                if (signature !== null) {
+                    if (!signature.isActive()) {
+                        return false;
+                    }
                 }
-                res.push(order);
+            }
+            return true;
+        }
+        isFinished() {
+            if (this.signatures.length <= 0) {
+                return true;
+            }
+            if (this.cur_signature_index < this.signatures.length) {
+                return false;
+            }
+            for (let id of this.signatures) {
+                const signature = game_signature_list.getById(id);
+                if (signature !== null) {
+                    if (!signature.isActive()) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+    }
+    class PlotThreadList extends AbstractList {
+        constructor(threads) {
+            super();
+            this.data = [];
+            for (let thread of threads) {
+                this.data.push(new PlotThread(thread.id, thread.priority, thread.signature_floor_list, thread.in_signatures));
             }
         }
-        return res.map(i => i.map(j => j === 0 ? DotColor.DARK : DotColor.LIGHT));
-    }
-    toggle(dot, color_type) {
-        switch (color_type) {
-            case DotColor.DARK:
-                removeElementClass(dot, 'light-dot');
-                addElementClass(dot, 'dark-dot');
-                break;
-            case DotColor.LIGHT:
-                removeElementClass(dot, 'dark-dot');
-                addElementClass(dot, 'light-dot');
-                break;
-            default:
-                break;
-        }
-    }
-    start() {
-        this.dots = Array.from(qsa('#sheng-lue-dots .sl-dot'));
-        this.orders = this.generateOrders(this.dots.length);
-        clearInterval(this.timer);
-        this.timer = setInterval(() => {
-            for (let i of range(this.orders[this.step].length)) {
-                this.toggle(this.dots[i], this.orders[this.step][i]);
+        getById(id) {
+            for (let thread of this.data) {
+                if (thread.id === id) {
+                    return thread;
+                }
             }
-            this.step = (this.step + 1) % this.orders.length;
-        }, this.interval);
-    }
-    stop() {
-        clearInterval(this.timer);
-    }
-}
-class FloorButton {
-    constructor(index, text, available) {
-        this.index = index;
-        this.text = text;
-        this.available = available;
-        this.selected = false;
-    }
-}
-var DoorDir;
-(function (DoorDir) {
-    DoorDir["OPEN"] = "open";
-    DoorDir["CLOSE"] = "close";
-})(DoorDir || (DoorDir = {}));
-class Door {
-    constructor() {
-        this.is_moving = false;
-        this.is_open = false;
-        this.direction = DoorDir.OPEN;
-        this.timer_count = 20;
-        this.sleep_time = 6;
-        this.l_part = {};
-        this.r_part = {};
-        this.step = 0;
-    }
-    stop() {
-        this.is_moving = false;
-        switch (this.direction) {
-            case DoorDir.OPEN:
-                this.is_open = true;
-                this.direction = DoorDir.CLOSE;
-                qs('#elev-door').style.display = 'none';
-                break;
-            case DoorDir.CLOSE:
-                this.is_open = false;
-                this.direction = DoorDir.OPEN;
-                break;
-            default:
-                break;
+            return null;
         }
     }
-    move() {
-        const l_part_left = parseInt(this.l_part.style.left);
-        const r_part_left = parseInt(this.r_part.style.left);
-        switch (this.direction) {
-            case DoorDir.OPEN:
-                this.l_part.style.left = `${l_part_left - this.step}px`;
-                this.r_part.style.left = `${r_part_left + this.step}px`;
-                break;
-            case DoorDir.CLOSE:
-                this.l_part.style.left = `${l_part_left + this.step}px`;
-                this.r_part.style.left = `${r_part_left - this.step}px`;
-                break;
-            default:
-                break;
+    var DotColor;
+    (function (DotColor) {
+        DotColor["DARK"] = "dark";
+        DotColor["LIGHT"] = "light";
+    })(DotColor || (DotColor = {}));
+    class WaitingDotsAnimation {
+        constructor() {
+            this.dots = [];
+            this.orders = [];
+            this.step = 0;
+            this.timer = undefined;
+            this.interval = 250;
+        }
+        generateOrders(num) {
+            if (num === 0) {
+                return [];
+            }
+            let res = [];
+            for (let i of range(num * 2)) {
+                if (i === 0) {
+                    res.push(Array(num).fill(0));
+                }
+                else {
+                    let order = [...res[i - 1]];
+                    let is_all_same = true;
+                    for (let j of range(order.length)) {
+                        if (j !== 0) {
+                            if (order[j - 1] !== order[j]) {
+                                order[j] = order[j - 1];
+                                is_all_same = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (is_all_same) {
+                        order[0] ^= 1;
+                    }
+                    res.push(order);
+                }
+            }
+            return res.map(i => i.map(j => j === 0 ? DotColor.DARK : DotColor.LIGHT));
+        }
+        toggle(dot, color_type) {
+            switch (color_type) {
+                case DotColor.DARK:
+                    removeElementClass(dot, 'light-dot');
+                    addElementClass(dot, 'dark-dot');
+                    break;
+                case DotColor.LIGHT:
+                    removeElementClass(dot, 'dark-dot');
+                    addElementClass(dot, 'light-dot');
+                    break;
+                default:
+                    break;
+            }
+        }
+        start() {
+            this.dots = Array.from(qsa('#sheng-lue-dots .sl-dot'));
+            this.orders = this.generateOrders(this.dots.length);
+            clearInterval(this.timer);
+            this.timer = setInterval(() => {
+                for (let i of range(this.orders[this.step].length)) {
+                    this.toggle(this.dots[i], this.orders[this.step][i]);
+                }
+                this.step = (this.step + 1) % this.orders.length;
+            }, this.interval);
+        }
+        stop() {
+            clearInterval(this.timer);
         }
     }
-    syncStart(direction) {
-        this.direction = direction;
-        this.is_moving = true;
-        this.l_part = qs('#elev-door>div:nth-child(1)');
-        this.r_part = qs('#elev-door>div:nth-child(2)');
-        qs('#elev-door').style.display = 'flex';
-        this.step = Math.ceil(this.l_part.clientWidth / this.timer_count);
-        for (let _ in range(this.timer_count)) {
-            this.move();
+    class FloorButton {
+        constructor(index, text, available) {
+            this.index = index;
+            this.text = text;
+            this.available = available;
+            this.selected = false;
         }
-        this.stop();
     }
-    start(direction) {
-        return __awaiter(this, void 0, void 0, function* () {
+    var DoorDir;
+    (function (DoorDir) {
+        DoorDir["OPEN"] = "open";
+        DoorDir["CLOSE"] = "close";
+    })(DoorDir || (DoorDir = {}));
+    class Door {
+        constructor() {
+            this.is_moving = false;
+            this.is_open = false;
+            this.direction = DoorDir.OPEN;
+            this.timer_count = 20;
+            this.sleep_time = 6;
+            this.l_part = {};
+            this.r_part = {};
+            this.step = 0;
+        }
+        stop() {
+            this.is_moving = false;
+            switch (this.direction) {
+                case DoorDir.OPEN:
+                    this.is_open = true;
+                    this.direction = DoorDir.CLOSE;
+                    qs('#elev-door').style.display = 'none';
+                    break;
+                case DoorDir.CLOSE:
+                    this.is_open = false;
+                    this.direction = DoorDir.OPEN;
+                    break;
+                default:
+                    break;
+            }
+        }
+        move() {
+            const l_part_left = parseInt(this.l_part.style.left);
+            const r_part_left = parseInt(this.r_part.style.left);
+            switch (this.direction) {
+                case DoorDir.OPEN:
+                    this.l_part.style.left = `${l_part_left - this.step}px`;
+                    this.r_part.style.left = `${r_part_left + this.step}px`;
+                    break;
+                case DoorDir.CLOSE:
+                    this.l_part.style.left = `${l_part_left + this.step}px`;
+                    this.r_part.style.left = `${r_part_left - this.step}px`;
+                    break;
+                default:
+                    break;
+            }
+        }
+        syncStart(direction) {
             this.direction = direction;
             this.is_moving = true;
             this.l_part = qs('#elev-door>div:nth-child(1)');
@@ -2290,255 +2288,243 @@ class Door {
             this.step = Math.ceil(this.l_part.clientWidth / this.timer_count);
             for (let _ in range(this.timer_count)) {
                 this.move();
-                yield sleep(this.sleep_time);
             }
             this.stop();
-        });
-    }
-}
-class PendingQueue {
-    constructor() {
-        this.data = [];
-    }
-    sort() {
-        for (let i = 0; i < this.data.length; i++) {
-            this.data[i].index = i;
+        }
+        start(direction) {
+            return __awaiter(this, void 0, void 0, function* () {
+                this.direction = direction;
+                this.is_moving = true;
+                this.l_part = qs('#elev-door>div:nth-child(1)');
+                this.r_part = qs('#elev-door>div:nth-child(2)');
+                qs('#elev-door').style.display = 'flex';
+                this.step = Math.ceil(this.l_part.clientWidth / this.timer_count);
+                for (let _ in range(this.timer_count)) {
+                    this.move();
+                    yield sleep(this.sleep_time);
+                }
+                this.stop();
+            });
         }
     }
-    length() {
-        return this.data.length;
-    }
-    indexOf(value) {
-        for (let i = 0; i < this.data.length; i++) {
-            if (this.data[i].floor === value) {
-                return i;
+    class PendingQueue {
+        constructor() {
+            this.data = [];
+        }
+        sort() {
+            for (let i = 0; i < this.data.length; i++) {
+                this.data[i].index = i;
             }
         }
-        return -1;
-    }
-    add(value) {
-        if (this.indexOf(value) === -1) {
-            this.data.push({ floor: value, index: this.data.length });
-            this.sort();
+        length() {
+            return this.data.length;
         }
-    }
-    remove(value) {
-        const i = this.indexOf(value);
-        if (i !== -1) {
-            this.data.splice(i, 1);
-            this.sort();
+        indexOf(value) {
+            for (let i = 0; i < this.data.length; i++) {
+                if (this.data[i].floor === value) {
+                    return i;
+                }
+            }
+            return -1;
         }
-    }
-    getMax() {
-        if (this.data.length <= 0) {
-            return { floor: 0, index: -1 };
-        }
-        let k = 0;
-        for (let i = 0; i < this.data.length; i++) {
-            if (this.data[i].floor > this.data[k].floor) {
-                k = i;
+        add(value) {
+            if (this.indexOf(value) === -1) {
+                this.data.push({ floor: value, index: this.data.length });
+                this.sort();
             }
         }
-        return this.data[k];
-    }
-    getMin() {
-        if (this.data.length <= 0) {
-            return { floor: 0, index: -1 };
-        }
-        let k = 0;
-        for (let i = 0; i < this.data.length; i++) {
-            if (this.data[i].floor < this.data[k].floor) {
-                k = i;
+        remove(value) {
+            const i = this.indexOf(value);
+            if (i !== -1) {
+                this.data.splice(i, 1);
+                this.sort();
             }
         }
-        return this.data[k];
-    }
-}
-var FloorLiftStatus;
-(function (FloorLiftStatus) {
-    FloorLiftStatus["UP"] = "up";
-    FloorLiftStatus["DOWN"] = "down";
-    FloorLiftStatus["NONE"] = "none";
-    FloorLiftStatus["BOTH"] = "both";
-})(FloorLiftStatus || (FloorLiftStatus = {}));
-class FloorDisplay {
-    constructor() {
-        this.display_number = {};
-        this.up_icon = {};
-        this.down_icon = {};
-    }
-    updateIcon(status) {
-        if (this.up_icon !== {}) {
-            this.up_icon = qs('#up-icon');
+        getMax() {
+            if (this.data.length <= 0) {
+                return { floor: 0, index: -1 };
+            }
+            let k = 0;
+            for (let i = 0; i < this.data.length; i++) {
+                if (this.data[i].floor > this.data[k].floor) {
+                    k = i;
+                }
+            }
+            return this.data[k];
         }
-        if (this.down_icon !== {}) {
-            this.down_icon = qs('#down-icon');
-        }
-        const class_name = 'invisible';
-        switch (status) {
-            case FloorLiftStatus.UP:
-                removeElementClass(this.up_icon, class_name);
-                addElementClass(this.down_icon, class_name);
-                break;
-            case FloorLiftStatus.DOWN:
-                removeElementClass(this.down_icon, class_name);
-                addElementClass(this.up_icon, class_name);
-                break;
-            case FloorLiftStatus.NONE:
-                addElementClass(this.up_icon, class_name);
-                addElementClass(this.down_icon, class_name);
-                break;
-            case FloorLiftStatus.BOTH:
-                removeElementClass(this.up_icon, class_name);
-                removeElementClass(this.down_icon, class_name);
-                break;
-            default:
-                break;
+        getMin() {
+            if (this.data.length <= 0) {
+                return { floor: 0, index: -1 };
+            }
+            let k = 0;
+            for (let i = 0; i < this.data.length; i++) {
+                if (this.data[i].floor < this.data[k].floor) {
+                    k = i;
+                }
+            }
+            return this.data[k];
         }
     }
-    updateNumber(num) {
-        if (this.display_number !== {}) {
-            this.display_number = qs('#display-number');
+    var FloorLiftStatus;
+    (function (FloorLiftStatus) {
+        FloorLiftStatus["UP"] = "up";
+        FloorLiftStatus["DOWN"] = "down";
+        FloorLiftStatus["NONE"] = "none";
+        FloorLiftStatus["BOTH"] = "both";
+    })(FloorLiftStatus || (FloorLiftStatus = {}));
+    class FloorDisplay {
+        constructor() {
+            this.display_number = {};
+            this.up_icon = {};
+            this.down_icon = {};
         }
-        this.display_number.textContent = num.toString();
-    }
-}
-var SavePanelDir;
-(function (SavePanelDir) {
-    SavePanelDir["OPEN"] = "open";
-    SavePanelDir["CLOSE"] = "close";
-})(SavePanelDir || (SavePanelDir = {}));
-class SavePanel {
-    constructor() {
-        this.is_moving = false;
-        this.is_open = false;
-        this.direction = SavePanelDir.OPEN;
-        this.timer_count = 15;
-        this.sleep_time = 5;
-        this.cover = {};
-        this.step = 0;
-    }
-    stop() {
-        this.is_moving = false;
-        switch (this.direction) {
-            case SavePanelDir.OPEN:
-                this.is_open = true;
-                this.direction = SavePanelDir.CLOSE;
-                break;
-            case SavePanelDir.CLOSE:
-                this.is_open = false;
-                this.direction = SavePanelDir.OPEN;
-                break;
-            default:
-                break;
+        updateIcon(status) {
+            if (this.up_icon !== {}) {
+                this.up_icon = qs('#up-icon');
+            }
+            if (this.down_icon !== {}) {
+                this.down_icon = qs('#down-icon');
+            }
+            const class_name = 'invisible';
+            switch (status) {
+                case FloorLiftStatus.UP:
+                    removeElementClass(this.up_icon, class_name);
+                    addElementClass(this.down_icon, class_name);
+                    break;
+                case FloorLiftStatus.DOWN:
+                    removeElementClass(this.down_icon, class_name);
+                    addElementClass(this.up_icon, class_name);
+                    break;
+                case FloorLiftStatus.NONE:
+                    addElementClass(this.up_icon, class_name);
+                    addElementClass(this.down_icon, class_name);
+                    break;
+                case FloorLiftStatus.BOTH:
+                    removeElementClass(this.up_icon, class_name);
+                    removeElementClass(this.down_icon, class_name);
+                    break;
+                default:
+                    break;
+            }
+        }
+        updateNumber(num) {
+            if (this.display_number !== {}) {
+                this.display_number = qs('#display-number');
+            }
+            this.display_number.textContent = num.toString();
         }
     }
-    move() {
-        const cover_top = parseInt(this.cover.style.top);
-        switch (this.direction) {
-            case SavePanelDir.OPEN:
-                this.cover.style.top = `${cover_top - this.step}px`;
-                break;
-            case SavePanelDir.CLOSE:
-                this.cover.style.top = `${cover_top + this.step}px`;
-                break;
-            default:
-                break;
+    var SavePanelDir;
+    (function (SavePanelDir) {
+        SavePanelDir["OPEN"] = "open";
+        SavePanelDir["CLOSE"] = "close";
+    })(SavePanelDir || (SavePanelDir = {}));
+    class SavePanel {
+        constructor() {
+            this.is_moving = false;
+            this.is_open = false;
+            this.direction = SavePanelDir.OPEN;
+            this.timer_count = 15;
+            this.sleep_time = 5;
+            this.cover = {};
+            this.step = 0;
         }
-    }
-    syncStart(direction) {
-        this.direction = direction;
-        this.is_moving = true;
-        this.cover = qs('#save-panel-cover');
-        this.step = Math.ceil(this.cover.clientHeight / this.timer_count);
-        for (let _ in range(this.timer_count)) {
-            this.move();
+        stop() {
+            this.is_moving = false;
+            switch (this.direction) {
+                case SavePanelDir.OPEN:
+                    this.is_open = true;
+                    this.direction = SavePanelDir.CLOSE;
+                    break;
+                case SavePanelDir.CLOSE:
+                    this.is_open = false;
+                    this.direction = SavePanelDir.OPEN;
+                    break;
+                default:
+                    break;
+            }
         }
-        this.stop();
-    }
-    start(direction) {
-        return __awaiter(this, void 0, void 0, function* () {
+        move() {
+            const cover_top = parseInt(this.cover.style.top);
+            switch (this.direction) {
+                case SavePanelDir.OPEN:
+                    this.cover.style.top = `${cover_top - this.step}px`;
+                    break;
+                case SavePanelDir.CLOSE:
+                    this.cover.style.top = `${cover_top + this.step}px`;
+                    break;
+                default:
+                    break;
+            }
+        }
+        syncStart(direction) {
             this.direction = direction;
             this.is_moving = true;
             this.cover = qs('#save-panel-cover');
             this.step = Math.ceil(this.cover.clientHeight / this.timer_count);
             for (let _ in range(this.timer_count)) {
                 this.move();
-                yield sleep(this.sleep_time);
             }
             this.stop();
-        });
-    }
-}
-var LangBtnDir;
-(function (LangBtnDir) {
-    LangBtnDir["LEFT"] = "left";
-    LangBtnDir["RIGHT"] = "right";
-    LangBtnDir["NONE"] = "none";
-})(LangBtnDir || (LangBtnDir = {}));
-class LanguageDisplay {
-    constructor() {
-        this.index = 0;
-        this.next_index = 0;
-        this.is_moving = false;
-        this.direction = LangBtnDir.NONE;
-        this.angle = 90;
-        this.ori_angle = -45;
-        this.timer_count = 15;
-        this.sleep_time = 8;
-        this.spin = {};
-        this.step = 0;
-        this.counter = 0;
-    }
-    stop() {
-        this.is_moving = false;
-        this.direction = LangBtnDir.NONE;
-        this.counter = 0;
-        this.index = this.next_index;
-        qs('#lang-name-prev>.lang-name-text').textContent = '';
-        qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name;
-        qs('#lang-name-next>.lang-name-text').textContent = '';
-        this.spin.style.transform = `rotate(${this.ori_angle}deg)`;
-    }
-    move() {
-        this.counter += 1;
-        switch (this.direction) {
-            case LangBtnDir.LEFT:
-                this.spin.style.transform = `rotate(${this.ori_angle - this.step * this.counter}deg)`;
-                break;
-            case LangBtnDir.RIGHT:
-                this.spin.style.transform = `rotate(${this.ori_angle + this.step * this.counter}deg)`;
-                break;
-            default:
-                break;
+        }
+        start(direction) {
+            return __awaiter(this, void 0, void 0, function* () {
+                this.direction = direction;
+                this.is_moving = true;
+                this.cover = qs('#save-panel-cover');
+                this.step = Math.ceil(this.cover.clientHeight / this.timer_count);
+                for (let _ in range(this.timer_count)) {
+                    this.move();
+                    yield sleep(this.sleep_time);
+                }
+                this.stop();
+            });
         }
     }
-    syncStart(direction) {
-        this.direction = direction;
-        this.is_moving = true;
-        this.spin = qs('#lang-name-body');
-        this.step = Math.ceil(this.angle / this.timer_count);
-        switch (this.direction) {
-            case LangBtnDir.LEFT:
-                this.next_index = (this.index + 1) % game_lang_list.getLength();
-                qs('#lang-name-prev>.lang-name-text').textContent = '';
-                qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
-                break;
-            case LangBtnDir.RIGHT:
-                this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
-                qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
-                qs('#lang-name-next>.lang-name-text').textContent = '';
-                break;
-            default:
-                break;
+    var LangBtnDir;
+    (function (LangBtnDir) {
+        LangBtnDir["LEFT"] = "left";
+        LangBtnDir["RIGHT"] = "right";
+        LangBtnDir["NONE"] = "none";
+    })(LangBtnDir || (LangBtnDir = {}));
+    class LanguageDisplay {
+        constructor() {
+            this.index = 0;
+            this.next_index = 0;
+            this.is_moving = false;
+            this.direction = LangBtnDir.NONE;
+            this.angle = 90;
+            this.ori_angle = -45;
+            this.timer_count = 15;
+            this.sleep_time = 8;
+            this.spin = {};
+            this.step = 0;
+            this.counter = 0;
         }
-        for (let _ in range(this.timer_count)) {
-            this.move();
+        stop() {
+            this.is_moving = false;
+            this.direction = LangBtnDir.NONE;
+            this.counter = 0;
+            this.index = this.next_index;
+            qs('#lang-name-prev>.lang-name-text').textContent = '';
+            qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name;
+            qs('#lang-name-next>.lang-name-text').textContent = '';
+            this.spin.style.transform = `rotate(${this.ori_angle}deg)`;
         }
-        this.stop();
-    }
-    start(direction) {
-        return __awaiter(this, void 0, void 0, function* () {
+        move() {
+            this.counter += 1;
+            switch (this.direction) {
+                case LangBtnDir.LEFT:
+                    this.spin.style.transform = `rotate(${this.ori_angle - this.step * this.counter}deg)`;
+                    break;
+                case LangBtnDir.RIGHT:
+                    this.spin.style.transform = `rotate(${this.ori_angle + this.step * this.counter}deg)`;
+                    break;
+                default:
+                    break;
+            }
+        }
+        syncStart(direction) {
             this.direction = direction;
             this.is_moving = true;
             this.spin = qs('#lang-name-body');
@@ -2559,818 +2545,854 @@ class LanguageDisplay {
             }
             for (let _ in range(this.timer_count)) {
                 this.move();
-                yield sleep(this.sleep_time);
             }
             this.stop();
-        });
-    }
-    set(id) {
-        let i = game_lang_list.indexOfKey(id);
-        if (i === -1) {
-            i = 0;
         }
-        this.index = i;
-        qs('#lang-name-prev>.lang-name-text').textContent = '';
-        qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name;
-        qs('#lang-name-next>.lang-name-text').textContent = '';
-    }
-    get() {
-        return game_lang_list.getItemByIndex(this.index).id;
-    }
-}
-class ListDisplay {
-    constructor(id_list = []) {
-        this.data = id_list;
-    }
-    add(id) {
-        if (this.data.indexOf(id) !== -1) {
-            return;
-        }
-        this.data.push(id);
-    }
-    remove(id) {
-        const index = this.data.indexOf(id);
-        if (index === -1) {
-            return;
-        }
-        this.data.splice(index, 1);
-    }
-}
-class PassengerDisplay extends ListDisplay {
-    constructor(id_list = []) {
-        super(id_list);
-    }
-    getValidCount() {
-        let count = 0;
-        for (let id of this.data) {
-            const psg = game_passenger_list.getById(id);
-            if (psg !== null && psg.is_diaplay) {
-                count += 1;
-            }
-        }
-        return count;
-    }
-    getByIndex(index) {
-        if (index < 0 || index >= this.data.length) {
-            return null;
-        }
-        return game_passenger_list.getById(this.data[index]);
-    }
-    render(lang) {
-        const psg_list = qs('#passenger-list');
-        const psg_count = qs('#passenger-display-count');
-        psg_count.innerHTML = this.getValidCount().toString();
-        clearChildren(psg_list);
-        for (let id of this.data) {
-            const psg = game_passenger_list.getById(id);
-            if (psg !== null && psg.is_diaplay) {
-                let div = document.createElement('div');
-                div.classList.add('passenger-item', 'noscrollbar');
-                div.innerHTML = psg.name.get(lang);
-                psg_list.appendChild(div);
-            }
-        }
-    }
-}
-class TaskDisplay extends ListDisplay {
-    constructor(id_list = []) {
-        super(id_list);
-    }
-    getValidCount() {
-        let count = 0;
-        for (let id of this.data) {
-            const tsk = game_task_list.getById(id);
-            if (tsk !== null && (tsk.isActive() || tsk.isFinished())) {
-                count += 1;
-            }
-        }
-        return count;
-    }
-    getByIndex(index) {
-        if (index < 0 || index >= this.data.length) {
-            return null;
-        }
-        return game_task_list.getById(this.data[index]);
-    }
-    render(lang) {
-        const tsk_container = qs('#task-container');
-        clearChildren(tsk_container);
-        for (let id of this.data) {
-            const tsk = game_task_list.getById(id);
-            if (tsk !== null && (tsk.isActive() || tsk.isFinished)) {
-                let div = document.createElement('div');
-                div.classList.add('task-item');
-                if (tsk.isFinished()) {
-                    div.classList.add('task-done-item');
+        start(direction) {
+            return __awaiter(this, void 0, void 0, function* () {
+                this.direction = direction;
+                this.is_moving = true;
+                this.spin = qs('#lang-name-body');
+                this.step = Math.ceil(this.angle / this.timer_count);
+                switch (this.direction) {
+                    case LangBtnDir.LEFT:
+                        this.next_index = (this.index + 1) % game_lang_list.getLength();
+                        qs('#lang-name-prev>.lang-name-text').textContent = '';
+                        qs('#lang-name-next>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
+                        break;
+                    case LangBtnDir.RIGHT:
+                        this.next_index = (this.index - 1 + game_lang_list.getLength()) % game_lang_list.getLength();
+                        qs('#lang-name-prev>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.next_index).name;
+                        qs('#lang-name-next>.lang-name-text').textContent = '';
+                        break;
+                    default:
+                        break;
                 }
-                div.innerHTML = tsk.description.get(lang);
-                tsk_container.appendChild(div);
+                for (let _ in range(this.timer_count)) {
+                    this.move();
+                    yield sleep(this.sleep_time);
+                }
+                this.stop();
+            });
+        }
+        set(id) {
+            let i = game_lang_list.indexOfKey(id);
+            if (i === -1) {
+                i = 0;
             }
+            this.index = i;
+            qs('#lang-name-prev>.lang-name-text').textContent = '';
+            qs('#lang-name-cur>.lang-name-text').textContent = game_lang_list.getItemByIndex(this.index).name;
+            qs('#lang-name-next>.lang-name-text').textContent = '';
+        }
+        get() {
+            return game_lang_list.getItemByIndex(this.index).id;
         }
     }
-}
-class Game {
-    constructor() {
-        this.lang = game_default_lang;
-        this.floor_buttons = [];
-        this.cur_floor = 1;
-        this.max_floor = 6;
-        this.min_floor = -2;
-        this.is_lifting = false;
-        this.lift_interval = 200;
-        this.lift_direction = FloorLiftStatus.NONE;
-        this.cur_dest = 0;
-        this.pending_queue = new PendingQueue();
-        this.door = new Door();
-        this.dots_animation = new WaitingDotsAnimation();
-        this.floor_display = new FloorDisplay();
-        this.save_panel = new SavePanel();
-        this.language_display = new LanguageDisplay();
-        this.ui_string = {};
-        for (let key of Object.keys(game_ui_string_raw)) {
-            this.ui_string[key] = new L10nText(game_ui_string_raw[key]);
+    class ListDisplay {
+        constructor(id_list = []) {
+            this.data = id_list;
         }
-        this.passenger_display = new PassengerDisplay([]);
-        this.task_display = new TaskDisplay([]);
-    }
-    static hideGoOnButton() {
-        qs('#sheng-lue-dots').style.display = 'none';
-        qs('#go-on-button-row').style.display = 'none';
-    }
-    static showGoOnButton() {
-        qs('#sheng-lue-dots').style.display = 'flex';
-        qs('#go-on-button-row').style.display = 'flex';
-    }
-    static hideOptions() {
-        qs('#options-row').style.display = 'none';
-    }
-    static showOptions() {
-        qs('#options-row').style.display = 'flex';
-    }
-    getCurrentFloor() {
-        return game_floor_list.getById(`${this.cur_floor}_flr`);
-    }
-    static getTFIcon(icon_type) {
-        if (icon_type) {
-            let icon_t = document.createElement('div');
-            icon_t.classList.add('save-opration-succ');
-            for (let _ in range(2)) {
-                icon_t.appendChild(document.createElement('div'));
+        add(id) {
+            if (this.data.indexOf(id) !== -1) {
+                return;
             }
-            return icon_t;
+            this.data.push(id);
         }
-        else {
-            let icon_f = document.createElement('div');
-            icon_f.classList.add('save-opration-fail');
-            for (let _ in range(2)) {
-                icon_f.appendChild(document.createElement('div'));
+        remove(id) {
+            const index = this.data.indexOf(id);
+            if (index === -1) {
+                return;
             }
-            return icon_f;
+            this.data.splice(index, 1);
         }
     }
-    static createAvatar(psg_id, lang) {
-        const psg = game_passenger_list.getById(psg_id);
-        let pfp = document.createElement('div');
-        pfp.classList.add('avatar');
-        let pfp_text = document.createElement('div');
-        pfp_text.classList.add('unselectable');
-        if (psg !== null) {
-            pfp_text.style.backgroundColor = psg.avatar_color;
-            pfp_text.style.color = psg.avatar_font_color;
-            pfp_text.innerHTML = psg.avatar_text.get(lang);
-            pfp_text.setAttribute('lkey', psg.id);
+    class PassengerDisplay extends ListDisplay {
+        constructor(id_list = []) {
+            super(id_list);
         }
-        pfp.appendChild(pfp_text);
-        return pfp;
-    }
-    static createDialogElement(dialog, lang, is_not_first = true) {
-        switch (dialog.layout) {
-            case DialogLayout.LEFT:
-                let l = document.createElement('div');
-                l.classList.add('dialog-row', 'left-dialog-row');
-                let l_box = document.createElement('div');
-                l_box.classList.add('dialog-box', 'left-dialog-box');
-                if (is_not_first) {
-                    l_box.classList.add('left-not-first-line');
+        getValidCount() {
+            let count = 0;
+            for (let id of this.data) {
+                const psg = game_passenger_list.getById(id);
+                if (psg !== null && psg.is_diaplay) {
+                    count += 1;
                 }
-                l_box.innerHTML = dialog.text.get(lang);
-                l_box.setAttribute('lkey', dialog.id);
-                if (!is_not_first) {
-                    l.append(Game.createAvatar(dialog.person_id, lang));
-                }
-                l.append(l_box);
-                return l;
-            case DialogLayout.RIGHT:
-                let r = document.createElement('div');
-                r.classList.add('dialog-row', 'right-dialog-row');
-                let r_box = document.createElement('div');
-                r_box.classList.add('dialog-box', 'right-dialog-box');
-                if (is_not_first) {
-                    r_box.classList.add('right-not-first-line');
-                }
-                r_box.innerHTML = dialog.text.get(lang);
-                r_box.setAttribute('lkey', dialog.id);
-                r.append(r_box);
-                if (!is_not_first) {
-                    r.append(Game.createAvatar(dialog.person_id, lang));
-                }
-                return r;
-            case DialogLayout.MIDDLE:
-                let m = document.createElement('div');
-                m.classList.add('dialog-row', 'mid-dialog-row');
-                let m_box = document.createElement('div');
-                m_box.classList.add('dialog-box', 'mid-dialog-box');
-                m_box.innerHTML = dialog.text.get(lang);
-                m_box.setAttribute('lkey', dialog.id);
-                m.appendChild(m_box);
-                return m;
-            default:
+            }
+            return count;
+        }
+        getByIndex(index) {
+            if (index < 0 || index >= this.data.length) {
                 return null;
-        }
-    }
-    static createOptionElement(opt, lang) {
-        let opt_btn = document.createElement('div');
-        opt_btn.classList.add('option-button', 'noscrollbar');
-        opt_btn.setAttribute('next', opt.next_dialog_block_id);
-        let opt_text = document.createElement('div');
-        opt_text.classList.add('unselectable');
-        opt_text.innerHTML = opt.text.get(lang);
-        opt_text.setAttribute('lkey', opt.id);
-        opt_btn.appendChild(opt_text);
-        opt_btn.addEventListener('click', () => {
-            Game.hideOptions();
-            const next = opt_btn.getAttribute('next');
-            const floor = game.getCurrentFloor();
-            if (floor === null || next === null) {
-                return;
             }
-            floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id);
-            floor.dialog_scene.setCurDialogBlock(next);
-            const block = floor.dialog_scene.getCurDialogBlock();
-            if (block === null) {
-                return;
-            }
-            block.resetIndex();
-            Game.stepDialog(block, game.lang);
-        });
-        return opt_btn;
-    }
-    static renderDialog(dialog, lang, is_not_first = true) {
-        const dialog_container = qs('#dialog-container');
-        const dialog_ele = Game.createDialogElement(dialog, lang, is_not_first);
-        if (dialog_ele !== null) {
-            dialog_container.appendChild(dialog_ele);
-            return true;
+            return game_passenger_list.getById(this.data[index]);
         }
-        return false;
-    }
-    static renderSelect(select, lang) {
-        Game.hideGoOnButton();
-        const opt_row = qs('#options-row');
-        clearChildren(opt_row);
-        for (let opt of select.options) {
-            opt_row.appendChild(Game.createOptionElement(opt, lang));
-        }
-        Game.showOptions();
-    }
-    static stepDialog(block, lang, is_do_action = true) {
-        const item = block.getCurItem();
-        if (item === null) {
-            Game.hideOptions();
-            block.stepIndex();
-            Game.showGoOnButton();
-            return;
-        }
-        if (item.isSelect()) {
-            Game.renderSelect(item, lang);
-            block.setIndexToEnd();
-        }
-        else {
-            Game.hideOptions();
-            Game.renderDialog(item, lang, block.isNotFirstLine());
-            if (is_do_action) {
-                item.doAction();
-            }
-            block.stepIndex();
-            Game.showGoOnButton();
-        }
-    }
-    static renderBlock(block, lang, is_render_all = true) {
-        let pre_id = '';
-        for (let i = 0; i < block.data.length; ++i) {
-            if (!is_render_all && i >= block.cur_item_index) {
-                if (i === 0) {
-                    Game.stepDialog(block, lang, false);
+        render(lang) {
+            const psg_list = qs('#passenger-list');
+            const psg_count = qs('#passenger-display-count');
+            psg_count.innerHTML = this.getValidCount().toString();
+            clearChildren(psg_list);
+            for (let id of this.data) {
+                const psg = game_passenger_list.getById(id);
+                if (psg !== null && psg.is_diaplay) {
+                    let div = document.createElement('div');
+                    div.classList.add('passenger-item', 'noscrollbar');
+                    div.innerHTML = psg.name.get(lang);
+                    psg_list.appendChild(div);
                 }
-                break;
             }
-            const item = block.getItemByIndex(i);
+        }
+    }
+    class TaskDisplay extends ListDisplay {
+        constructor(id_list = []) {
+            super(id_list);
+        }
+        getValidCount() {
+            let count = 0;
+            for (let id of this.data) {
+                const tsk = game_task_list.getById(id);
+                if (tsk !== null && (tsk.isActive() || tsk.isFinished())) {
+                    count += 1;
+                }
+            }
+            return count;
+        }
+        getByIndex(index) {
+            if (index < 0 || index >= this.data.length) {
+                return null;
+            }
+            return game_task_list.getById(this.data[index]);
+        }
+        render(lang) {
+            const tsk_container = qs('#task-container');
+            clearChildren(tsk_container);
+            for (let id of this.data) {
+                const tsk = game_task_list.getById(id);
+                if (tsk !== null && (tsk.isActive() || tsk.isFinished)) {
+                    let div = document.createElement('div');
+                    div.classList.add('task-item');
+                    if (tsk.isFinished()) {
+                        div.classList.add('task-done-item');
+                    }
+                    div.innerHTML = tsk.description.get(lang);
+                    tsk_container.appendChild(div);
+                }
+            }
+        }
+    }
+    class Game {
+        constructor() {
+            this.lang = game_default_lang;
+            this.floor_buttons = [];
+            this.cur_floor = 1;
+            this.max_floor = 6;
+            this.min_floor = -2;
+            this.is_lifting = false;
+            this.lift_interval = 200;
+            this.lift_direction = FloorLiftStatus.NONE;
+            this.cur_dest = 0;
+            this.pending_queue = new PendingQueue();
+            this.door = new Door();
+            this.dots_animation = new WaitingDotsAnimation();
+            this.floor_display = new FloorDisplay();
+            this.save_panel = new SavePanel();
+            this.language_display = new LanguageDisplay();
+            this.ui_string = {};
+            for (let key of Object.keys(game_ui_string_raw)) {
+                this.ui_string[key] = new L10nText(game_ui_string_raw[key]);
+            }
+            this.passenger_display = new PassengerDisplay([]);
+            this.task_display = new TaskDisplay([]);
+        }
+        static hideGoOnButton() {
+            qs('#sheng-lue-dots').style.display = 'none';
+            qs('#go-on-button-row').style.display = 'none';
+        }
+        static showGoOnButton() {
+            qs('#sheng-lue-dots').style.display = 'flex';
+            qs('#go-on-button-row').style.display = 'flex';
+        }
+        static hideOptions() {
+            qs('#options-row').style.display = 'none';
+        }
+        static showOptions() {
+            qs('#options-row').style.display = 'flex';
+        }
+        getCurrentFloor() {
+            return game_floor_list.getById(`${this.cur_floor}_flr`);
+        }
+        static getTFIcon(icon_type) {
+            if (icon_type) {
+                let icon_t = document.createElement('div');
+                icon_t.classList.add('save-opration-succ');
+                for (let _ in range(2)) {
+                    icon_t.appendChild(document.createElement('div'));
+                }
+                return icon_t;
+            }
+            else {
+                let icon_f = document.createElement('div');
+                icon_f.classList.add('save-opration-fail');
+                for (let _ in range(2)) {
+                    icon_f.appendChild(document.createElement('div'));
+                }
+                return icon_f;
+            }
+        }
+        static createAvatar(psg_id, lang) {
+            const psg = game_passenger_list.getById(psg_id);
+            let pfp = document.createElement('div');
+            pfp.classList.add('avatar');
+            let pfp_text = document.createElement('div');
+            pfp_text.classList.add('unselectable');
+            if (psg !== null) {
+                pfp_text.style.backgroundColor = psg.avatar_color;
+                pfp_text.style.color = psg.avatar_font_color;
+                pfp_text.innerHTML = psg.avatar_text.get(lang);
+                pfp_text.setAttribute('lkey', psg.id);
+            }
+            pfp.appendChild(pfp_text);
+            return pfp;
+        }
+        static createDialogElement(dialog, lang, is_not_first = true) {
+            switch (dialog.layout) {
+                case DialogLayout.LEFT:
+                    let l = document.createElement('div');
+                    l.classList.add('dialog-row', 'left-dialog-row');
+                    let l_box = document.createElement('div');
+                    l_box.classList.add('dialog-box', 'left-dialog-box');
+                    if (is_not_first) {
+                        l_box.classList.add('left-not-first-line');
+                    }
+                    l_box.innerHTML = dialog.text.get(lang);
+                    l_box.setAttribute('lkey', dialog.id);
+                    if (!is_not_first) {
+                        l.append(Game.createAvatar(dialog.person_id, lang));
+                    }
+                    l.append(l_box);
+                    return l;
+                case DialogLayout.RIGHT:
+                    let r = document.createElement('div');
+                    r.classList.add('dialog-row', 'right-dialog-row');
+                    let r_box = document.createElement('div');
+                    r_box.classList.add('dialog-box', 'right-dialog-box');
+                    if (is_not_first) {
+                        r_box.classList.add('right-not-first-line');
+                    }
+                    r_box.innerHTML = dialog.text.get(lang);
+                    r_box.setAttribute('lkey', dialog.id);
+                    r.append(r_box);
+                    if (!is_not_first) {
+                        r.append(Game.createAvatar(dialog.person_id, lang));
+                    }
+                    return r;
+                case DialogLayout.MIDDLE:
+                    let m = document.createElement('div');
+                    m.classList.add('dialog-row', 'mid-dialog-row');
+                    let m_box = document.createElement('div');
+                    m_box.classList.add('dialog-box', 'mid-dialog-box');
+                    m_box.innerHTML = dialog.text.get(lang);
+                    m_box.setAttribute('lkey', dialog.id);
+                    m.appendChild(m_box);
+                    return m;
+                default:
+                    return null;
+            }
+        }
+        static createOptionElement(opt, lang) {
+            let opt_btn = document.createElement('div');
+            opt_btn.classList.add('option-button', 'noscrollbar');
+            opt_btn.setAttribute('next', opt.next_dialog_block_id);
+            let opt_text = document.createElement('div');
+            opt_text.classList.add('unselectable');
+            opt_text.innerHTML = opt.text.get(lang);
+            opt_text.setAttribute('lkey', opt.id);
+            opt_btn.appendChild(opt_text);
+            opt_btn.addEventListener('click', () => {
+                Game.hideOptions();
+                const next = opt_btn.getAttribute('next');
+                const floor = game.getCurrentFloor();
+                if (floor === null || next === null) {
+                    return;
+                }
+                floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id);
+                floor.dialog_scene.setCurDialogBlock(next);
+                const block = floor.dialog_scene.getCurDialogBlock();
+                if (block === null) {
+                    return;
+                }
+                block.resetIndex();
+                Game.stepDialog(block, game.lang);
+            });
+            return opt_btn;
+        }
+        static renderDialog(dialog, lang, is_not_first = true) {
+            const dialog_container = qs('#dialog-container');
+            const dialog_ele = Game.createDialogElement(dialog, lang, is_not_first);
+            if (dialog_ele !== null) {
+                dialog_container.appendChild(dialog_ele);
+                return true;
+            }
+            return false;
+        }
+        static renderSelect(select, lang) {
+            Game.hideGoOnButton();
+            const opt_row = qs('#options-row');
+            clearChildren(opt_row);
+            for (let opt of select.options) {
+                opt_row.appendChild(Game.createOptionElement(opt, lang));
+            }
+            Game.showOptions();
+        }
+        static stepDialog(block, lang, is_do_action = true) {
+            const item = block.getCurItem();
             if (item === null) {
-                break;
+                Game.hideOptions();
+                block.stepIndex();
+                Game.showGoOnButton();
+                return;
             }
             if (item.isSelect()) {
-                if (!is_render_all) {
-                    Game.renderSelect(item, lang);
-                    break;
-                }
+                Game.renderSelect(item, lang);
+                block.setIndexToEnd();
             }
             else {
                 Game.hideOptions();
-                if (Game.renderDialog(item, lang, pre_id === item.person_id)) {
-                    pre_id = item.person_id;
+                Game.renderDialog(item, lang, block.isNotFirstLine());
+                if (is_do_action) {
+                    item.doAction();
                 }
+                block.stepIndex();
                 Game.showGoOnButton();
             }
         }
-    }
-    renderFloor() {
-        Game.hideGoOnButton();
-        Game.hideOptions();
-        clearChildren(qs('#dialog-container'));
-        const floor = this.getCurrentFloor();
-        if (floor === null) {
-            return;
-        }
-        floor.checkPlotThreads();
-        for (let block_id of floor.dialog_scene.visited_blocks) {
-            const vis_block = floor.dialog_scene.getDialogBlock(block_id);
-            if (vis_block !== null) {
-                Game.renderBlock(vis_block, this.lang);
+        static renderBlock(block, lang, is_render_all = true) {
+            let pre_id = '';
+            for (let i = 0; i < block.data.length; ++i) {
+                if (!is_render_all && i >= block.cur_item_index) {
+                    if (i === 0) {
+                        Game.stepDialog(block, lang, false);
+                    }
+                    break;
+                }
+                const item = block.getItemByIndex(i);
+                if (item === null) {
+                    break;
+                }
+                if (item.isSelect()) {
+                    if (!is_render_all) {
+                        Game.renderSelect(item, lang);
+                        break;
+                    }
+                }
+                else {
+                    Game.hideOptions();
+                    if (Game.renderDialog(item, lang, pre_id === item.person_id)) {
+                        pre_id = item.person_id;
+                    }
+                    Game.showGoOnButton();
+                }
             }
         }
-        const cur_block = floor.dialog_scene.getCurDialogBlock();
-        if (cur_block !== null) {
-            Game.renderBlock(cur_block, this.lang, false);
-        }
-        const bg = qs('#background');
-        bg.style.backgroundColor = floor.background.bg_color;
-        bg.innerHTML = floor.background.inner_html;
-    }
-    isLiftable() {
-        return !(this.pending_queue.length() <= 0 ||
-            this.lift_direction !== FloorLiftStatus.UP && this.lift_direction !== FloorLiftStatus.DOWN ||
-            this.cur_dest > this.max_floor ||
-            this.cur_dest < this.min_floor ||
-            this.cur_dest === 0 ||
-            this.cur_dest === this.cur_floor);
-    }
-    calcLiftDirection() {
-        if (this.pending_queue.length() > 0) {
-            if (this.pending_queue.length() === 1) {
-                const dest = this.pending_queue.getMax().floor;
-                this.lift_direction = dest > this.cur_floor ? FloorLiftStatus.UP : (dest < this.cur_floor ? FloorLiftStatus.DOWN : FloorLiftStatus.NONE);
-                this.cur_dest = dest;
+        renderFloor() {
+            Game.hideGoOnButton();
+            Game.hideOptions();
+            clearChildren(qs('#dialog-container'));
+            const floor = this.getCurrentFloor();
+            if (floor === null) {
+                return;
             }
-            else {
-                const top = this.pending_queue.getMax();
-                const bottom = this.pending_queue.getMin();
-                if (top.floor >= this.cur_floor &&
-                    this.cur_floor >= bottom.floor) {
-                    if (top.index <= bottom.index) {
+            floor.checkPlotThreads();
+            for (let block_id of floor.dialog_scene.visited_blocks) {
+                const vis_block = floor.dialog_scene.getDialogBlock(block_id);
+                if (vis_block !== null) {
+                    Game.renderBlock(vis_block, this.lang);
+                }
+            }
+            const cur_block = floor.dialog_scene.getCurDialogBlock();
+            if (cur_block !== null) {
+                Game.renderBlock(cur_block, this.lang, false);
+            }
+            const bg = qs('#background');
+            bg.style.backgroundColor = floor.background.bg_color;
+            bg.innerHTML = floor.background.inner_html;
+        }
+        isLiftable() {
+            return !(this.pending_queue.length() <= 0 ||
+                this.lift_direction !== FloorLiftStatus.UP && this.lift_direction !== FloorLiftStatus.DOWN ||
+                this.cur_dest > this.max_floor ||
+                this.cur_dest < this.min_floor ||
+                this.cur_dest === 0 ||
+                this.cur_dest === this.cur_floor);
+        }
+        calcLiftDirection() {
+            if (this.pending_queue.length() > 0) {
+                if (this.pending_queue.length() === 1) {
+                    const dest = this.pending_queue.getMax().floor;
+                    this.lift_direction = dest > this.cur_floor ? FloorLiftStatus.UP : (dest < this.cur_floor ? FloorLiftStatus.DOWN : FloorLiftStatus.NONE);
+                    this.cur_dest = dest;
+                }
+                else {
+                    const top = this.pending_queue.getMax();
+                    const bottom = this.pending_queue.getMin();
+                    if (top.floor >= this.cur_floor &&
+                        this.cur_floor >= bottom.floor) {
+                        if (top.index <= bottom.index) {
+                            this.lift_direction = FloorLiftStatus.UP;
+                            this.cur_dest = top.floor;
+                        }
+                        else {
+                            this.lift_direction = FloorLiftStatus.DOWN;
+                            this.cur_dest = bottom.floor;
+                        }
+                    }
+                    else if (bottom.floor >= this.cur_floor) {
                         this.lift_direction = FloorLiftStatus.UP;
                         this.cur_dest = top.floor;
                     }
-                    else {
+                    else if (top.floor <= this.cur_floor) {
                         this.lift_direction = FloorLiftStatus.DOWN;
                         this.cur_dest = bottom.floor;
                     }
-                }
-                else if (bottom.floor >= this.cur_floor) {
-                    this.lift_direction = FloorLiftStatus.UP;
-                    this.cur_dest = top.floor;
-                }
-                else if (top.floor <= this.cur_floor) {
-                    this.lift_direction = FloorLiftStatus.DOWN;
-                    this.cur_dest = bottom.floor;
-                }
-                else {
-                    this.lift_direction = FloorLiftStatus.NONE;
-                    this.cur_dest = 0;
-                }
-            }
-        }
-        else {
-            this.lift_direction = FloorLiftStatus.NONE;
-            this.cur_dest = 0;
-        }
-    }
-    checkPassingFloor() {
-        return this.pending_queue.indexOf(this.cur_floor) !== -1;
-    }
-    lift() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.lift_direction !== FloorLiftStatus.UP && this.lift_direction !== FloorLiftStatus.DOWN) {
-                return;
-            }
-            this.floor_display.updateIcon(this.lift_direction);
-            this.is_lifting = true;
-            lift_loop: do {
-                switch (this.lift_direction) {
-                    case FloorLiftStatus.UP:
-                        this.cur_floor = Math.min(this.cur_floor + 1 === 0 ? 1 : this.cur_floor + 1, this.max_floor);
-                        break;
-                    case FloorLiftStatus.DOWN:
-                        this.cur_floor = Math.max(this.cur_floor - 1 === 0 ? -1 : this.cur_floor - 1, this.min_floor);
-                        break;
-                    default:
-                        break lift_loop;
-                }
-                this.floor_display.updateNumber(this.cur_floor);
-                if (this.cur_floor === this.cur_dest) {
-                    break;
-                }
-                if (this.cur_floor >= this.max_floor || this.cur_floor <= this.min_floor) {
-                    break;
-                }
-                yield sleep(this.lift_interval);
-            } while (!this.checkPassingFloor());
-            this.pending_queue.remove(this.cur_floor);
-            removeElementClass(qs(`.number-button[index="${this.cur_floor}"]`), 'button-selected');
-            this.is_lifting = false;
-            this.floor_display.updateIcon(FloorLiftStatus.NONE);
-        });
-    }
-    checkBeforeLift() {
-        this.pending_queue.remove(this.cur_floor);
-        this.calcLiftDirection();
-        if (this.isLiftable()) {
-            this.lift();
-        }
-    }
-    createFloorButtons() {
-        this.floor_buttons = [];
-        for (let i = this.max_floor - 1; i >= 1; i -= 2) {
-            this.floor_buttons.push([
-                new FloorButton(i, i.toString(), true),
-                new FloorButton(i + 1, (i + 1) === this.max_floor ? '∞' : (i + 1).toString(), (i + 1) !== this.max_floor)
-            ]);
-        }
-        for (let i = -2; i >= this.min_floor; i -= 2) {
-            this.floor_buttons.push([
-                new FloorButton(i + 1, (i + 1).toString(), true),
-                new FloorButton(i, i === this.min_floor ? '-∞' : i.toString(), i !== this.min_floor)
-            ]);
-        }
-    }
-    renderFloorButtons() {
-        const func_button_row = qs('#func-buttons');
-        const button_container = qs('#floor-buttons');
-        for (let child of Array.from(button_container.children)) {
-            if (child.id !== 'func-buttons') {
-                button_container.removeChild(child);
-            }
-        }
-        this.floor_buttons.forEach(button_row => {
-            let row = document.createElement('div');
-            row.classList.add('button-row');
-            for (let button of button_row) {
-                let col = document.createElement('div');
-                col.classList.add('button-col', 'unselectable', 'number-button');
-                if (!button.available) {
-                    col.classList.add('invisible');
-                }
-                col.textContent = button.text;
-                col.setAttribute('index', button.index.toString());
-                row.appendChild(col);
-            }
-            button_container.insertBefore(row, func_button_row);
-        });
-    }
-    encrypt() {
-    }
-    decipher() {
-    }
-    serializate() {
-        return JSON.stringify({ status: true, data: {} });
-    }
-    deserializate(data) {
-        data = data;
-        return false;
-    }
-    switchUiLanguge() {
-        for (let e of qsa('.l10n-text-ui')) {
-            e.textContent = this.ui_string[e.getAttribute('lkey')].get(this.lang);
-        }
-    }
-    switchTextLanguage() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-        for (let e of qsa('.avatar>div[lkey]')) {
-            e.innerHTML = (_c = (_b = game_passenger_list.getById((_a = e.getAttribute('lkey')) !== null && _a !== void 0 ? _a : '')) === null || _b === void 0 ? void 0 : _b.avatar_text.get(game.lang)) !== null && _c !== void 0 ? _c : '';
-        }
-        for (let e of qsa('.dialog-box[lkey]')) {
-            const dlg_id = (_d = e.getAttribute('lkey')) !== null && _d !== void 0 ? _d : '';
-            const [_, dbk_num] = Dialog.splitId(dlg_id);
-            e.innerHTML =
-                (_h = (_g = (_f = (_e = game.getCurrentFloor()) === null || _e === void 0 ? void 0 : _e.dialog_scene.getDialogBlock(`${dbk_num}_dbk`)) === null || _f === void 0 ? void 0 : _f.getItemById(dlg_id)) === null || _g === void 0 ? void 0 : _g.text.get(game.lang)) !== null && _h !== void 0 ? _h : '';
-        }
-        for (let e of qsa('.option-button>div[lkey]')) {
-            const opt_id = (_j = e.getAttribute('lkey')) !== null && _j !== void 0 ? _j : '';
-            const [_, slt_num] = SelectOption.splitId(opt_id);
-            e.innerHTML =
-                (_p = (_o = (_m = (_l = (_k = game.getCurrentFloor()) === null || _k === void 0 ? void 0 : _k.dialog_scene.getCurDialogBlock()) === null || _l === void 0 ? void 0 : _l.getItemById(`${slt_num}_slt`)) === null || _m === void 0 ? void 0 : _m.getOptionById(opt_id)) === null || _o === void 0 ? void 0 : _o.text.get(game.lang)) !== null && _p !== void 0 ? _p : '';
-        }
-        this.passenger_display.render(this.lang);
-        this.task_display.render(this.lang);
-    }
-    initialize() {
-        this.createFloorButtons();
-        this.renderFloorButtons();
-        this.language_display.set(this.lang);
-        this.switchUiLanguge();
-        this.passenger_display.add(game_passenger_me);
-        this.passenger_display.render(this.lang);
-        this.dots_animation.start();
-    }
-    debug() {
-        return __awaiter(this, void 0, void 0, function* () {
-            qs('#open-button').click();
-        });
-    }
-}
-function clickSwitchLangButton(dir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!game.language_display.is_moving) {
-            yield game.language_display.start(dir);
-            game.lang = game.language_display.get();
-            game.switchUiLanguge();
-            game.switchTextLanguage();
-        }
-    });
-}
-const binding_buttons = [
-    {
-        selector: '.number-button',
-        is_single: false,
-        func: (event) => {
-            const class_name = 'button-selected';
-            const index = parseInt(event.target.getAttribute('index'));
-            if (!game.is_lifting && index === game.cur_floor) {
-                return;
-            }
-            if (event.target.classList.contains(class_name)) {
-                event.target.classList.remove(class_name);
-                game.pending_queue.remove(index);
-                if (index === game.cur_dest) {
-                    game.calcLiftDirection();
+                    else {
+                        this.lift_direction = FloorLiftStatus.NONE;
+                        this.cur_dest = 0;
+                    }
                 }
             }
             else {
-                event.target.classList.add(class_name);
-                game.pending_queue.add(index);
-            }
-            if (!game.is_lifting && !game.door.is_open) {
-                game.checkBeforeLift();
+                this.lift_direction = FloorLiftStatus.NONE;
+                this.cur_dest = 0;
             }
         }
-    },
-    {
-        selector: '#close-button',
-        is_single: true,
-        func: () => __awaiter(void 0, void 0, void 0, function* () {
-            if (!game.is_lifting &&
-                game.door.is_open &&
-                !game.door.is_moving) {
-                yield game.door.start(DoorDir.CLOSE);
-                game.checkBeforeLift();
+        checkPassingFloor() {
+            return this.pending_queue.indexOf(this.cur_floor) !== -1;
+        }
+        lift() {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (this.lift_direction !== FloorLiftStatus.UP && this.lift_direction !== FloorLiftStatus.DOWN) {
+                    return;
+                }
+                this.floor_display.updateIcon(this.lift_direction);
+                this.is_lifting = true;
+                lift_loop: do {
+                    switch (this.lift_direction) {
+                        case FloorLiftStatus.UP:
+                            this.cur_floor = Math.min(this.cur_floor + 1 === 0 ? 1 : this.cur_floor + 1, this.max_floor);
+                            break;
+                        case FloorLiftStatus.DOWN:
+                            this.cur_floor = Math.max(this.cur_floor - 1 === 0 ? -1 : this.cur_floor - 1, this.min_floor);
+                            break;
+                        default:
+                            break lift_loop;
+                    }
+                    this.floor_display.updateNumber(this.cur_floor);
+                    if (this.cur_floor === this.cur_dest) {
+                        break;
+                    }
+                    if (this.cur_floor >= this.max_floor || this.cur_floor <= this.min_floor) {
+                        break;
+                    }
+                    yield sleep(this.lift_interval);
+                } while (!this.checkPassingFloor());
+                this.pending_queue.remove(this.cur_floor);
+                removeElementClass(qs(`.number-button[index="${this.cur_floor}"]`), 'button-selected');
+                this.is_lifting = false;
+                this.floor_display.updateIcon(FloorLiftStatus.NONE);
+            });
+        }
+        checkBeforeLift() {
+            this.pending_queue.remove(this.cur_floor);
+            this.calcLiftDirection();
+            if (this.isLiftable()) {
+                this.lift();
             }
-        })
-    },
-    {
-        selector: '#open-button',
-        is_single: true,
-        func: () => __awaiter(void 0, void 0, void 0, function* () {
-            if (!game.is_lifting &&
-                !game.door.is_open &&
-                !game.door.is_moving) {
-                game.renderFloor();
-                yield game.door.start(DoorDir.OPEN);
+        }
+        createFloorButtons() {
+            this.floor_buttons = [];
+            for (let i = this.max_floor - 1; i >= 1; i -= 2) {
+                this.floor_buttons.push([
+                    new FloorButton(i, i.toString(), true),
+                    new FloorButton(i + 1, (i + 1) === this.max_floor ? '∞' : (i + 1).toString(), (i + 1) !== this.max_floor)
+                ]);
             }
-        })
-    },
-    {
-        selector: '#go-on-button-row',
-        is_single: true,
-        func: () => { }
-    },
-    {
-        selector: '#top-arch',
-        is_single: true,
-        func: () => __awaiter(void 0, void 0, void 0, function* () {
-            if (!game.save_panel.is_moving) {
-                if (game.save_panel.is_open) {
-                    game.save_panel.start(SavePanelDir.CLOSE);
+            for (let i = -2; i >= this.min_floor; i -= 2) {
+                this.floor_buttons.push([
+                    new FloorButton(i + 1, (i + 1).toString(), true),
+                    new FloorButton(i, i === this.min_floor ? '-∞' : i.toString(), i !== this.min_floor)
+                ]);
+            }
+        }
+        renderFloorButtons() {
+            const func_button_row = qs('#func-buttons');
+            const button_container = qs('#floor-buttons');
+            for (let child of Array.from(button_container.children)) {
+                if (child.id !== 'func-buttons') {
+                    button_container.removeChild(child);
+                }
+            }
+            this.floor_buttons.forEach(button_row => {
+                let row = document.createElement('div');
+                row.classList.add('button-row');
+                for (let button of button_row) {
+                    let col = document.createElement('div');
+                    col.classList.add('button-col', 'unselectable', 'number-button');
+                    if (!button.available) {
+                        col.classList.add('invisible');
+                    }
+                    col.textContent = button.text;
+                    col.setAttribute('index', button.index.toString());
+                    row.appendChild(col);
+                }
+                button_container.insertBefore(row, func_button_row);
+            });
+        }
+        encrypt() {
+        }
+        decipher() {
+        }
+        serializate() {
+            return JSON.stringify({ status: true, data: {} });
+        }
+        deserializate(data) {
+            data = data;
+            return false;
+        }
+        switchUiLanguge() {
+            for (let e of qsa('.l10n-text-ui')) {
+                e.textContent = this.ui_string[e.getAttribute('lkey')].get(this.lang);
+            }
+        }
+        switchTextLanguage() {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
+            for (let e of qsa('.avatar>div[lkey]')) {
+                e.innerHTML = (_c = (_b = game_passenger_list.getById((_a = e.getAttribute('lkey')) !== null && _a !== void 0 ? _a : '')) === null || _b === void 0 ? void 0 : _b.avatar_text.get(game.lang)) !== null && _c !== void 0 ? _c : '';
+            }
+            for (let e of qsa('.dialog-box[lkey]')) {
+                const dlg_id = (_d = e.getAttribute('lkey')) !== null && _d !== void 0 ? _d : '';
+                const [_, dbk_num] = Dialog.splitId(dlg_id);
+                e.innerHTML =
+                    (_h = (_g = (_f = (_e = game.getCurrentFloor()) === null || _e === void 0 ? void 0 : _e.dialog_scene.getDialogBlock(`${dbk_num}_dbk`)) === null || _f === void 0 ? void 0 : _f.getItemById(dlg_id)) === null || _g === void 0 ? void 0 : _g.text.get(game.lang)) !== null && _h !== void 0 ? _h : '';
+            }
+            for (let e of qsa('.option-button>div[lkey]')) {
+                const opt_id = (_j = e.getAttribute('lkey')) !== null && _j !== void 0 ? _j : '';
+                const [_, slt_num] = SelectOption.splitId(opt_id);
+                e.innerHTML =
+                    (_p = (_o = (_m = (_l = (_k = game.getCurrentFloor()) === null || _k === void 0 ? void 0 : _k.dialog_scene.getCurDialogBlock()) === null || _l === void 0 ? void 0 : _l.getItemById(`${slt_num}_slt`)) === null || _m === void 0 ? void 0 : _m.getOptionById(opt_id)) === null || _o === void 0 ? void 0 : _o.text.get(game.lang)) !== null && _p !== void 0 ? _p : '';
+            }
+            this.passenger_display.render(this.lang);
+            this.task_display.render(this.lang);
+        }
+        initialize() {
+            this.createFloorButtons();
+            this.renderFloorButtons();
+            this.language_display.set(this.lang);
+            this.switchUiLanguge();
+            this.passenger_display.add(game_passenger_me);
+            this.passenger_display.render(this.lang);
+            this.dots_animation.start();
+        }
+        debug() {
+            return __awaiter(this, void 0, void 0, function* () {
+                qs('#open-button').click();
+            });
+        }
+    }
+    function clickSwitchLangButton(dir) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!game.language_display.is_moving) {
+                yield game.language_display.start(dir);
+                game.lang = game.language_display.get();
+                game.switchUiLanguge();
+                game.switchTextLanguage();
+            }
+        });
+    }
+    const binding_buttons = [
+        {
+            selector: '.number-button',
+            is_single: false,
+            func: (event) => {
+                const class_name = 'button-selected';
+                const index = parseInt(event.target.getAttribute('index'));
+                if (!game.is_lifting && index === game.cur_floor) {
+                    return;
+                }
+                if (event.target.classList.contains(class_name)) {
+                    event.target.classList.remove(class_name);
+                    game.pending_queue.remove(index);
+                    if (index === game.cur_dest) {
+                        game.calcLiftDirection();
+                    }
                 }
                 else {
-                    game.save_panel.start(SavePanelDir.OPEN);
+                    event.target.classList.add(class_name);
+                    game.pending_queue.add(index);
+                }
+                if (!game.is_lifting && !game.door.is_open) {
+                    game.checkBeforeLift();
                 }
             }
-        })
-    },
-    {
-        selector: '#save-export-button-warp',
-        is_single: true,
-        func: () => {
-            clearChildren(qs('#save-export-button'));
-            clearChildren(qs('#save-import-button'));
-            const res = JSON.parse(game.serializate());
-            qs('#save-export-button').appendChild(Game.getTFIcon(res.status));
-            if (res.status) {
-                qs('#save-text-area').value = JSON.stringify(res.data);
+        },
+        {
+            selector: '#close-button',
+            is_single: true,
+            func: () => __awaiter(void 0, void 0, void 0, function* () {
+                if (!game.is_lifting &&
+                    game.door.is_open &&
+                    !game.door.is_moving) {
+                    yield game.door.start(DoorDir.CLOSE);
+                    game.checkBeforeLift();
+                }
+            })
+        },
+        {
+            selector: '#open-button',
+            is_single: true,
+            func: () => __awaiter(void 0, void 0, void 0, function* () {
+                if (!game.is_lifting &&
+                    !game.door.is_open &&
+                    !game.door.is_moving) {
+                    game.renderFloor();
+                    yield game.door.start(DoorDir.OPEN);
+                }
+            })
+        },
+        {
+            selector: '#go-on-button-row',
+            is_single: true,
+            func: () => { }
+        },
+        {
+            selector: '#top-arch',
+            is_single: true,
+            func: () => __awaiter(void 0, void 0, void 0, function* () {
+                if (!game.save_panel.is_moving) {
+                    if (game.save_panel.is_open) {
+                        game.save_panel.start(SavePanelDir.CLOSE);
+                    }
+                    else {
+                        game.save_panel.start(SavePanelDir.OPEN);
+                    }
+                }
+            })
+        },
+        {
+            selector: '#save-export-button-warp',
+            is_single: true,
+            func: () => {
+                clearChildren(qs('#save-export-button'));
+                clearChildren(qs('#save-import-button'));
+                const res = JSON.parse(game.serializate());
+                qs('#save-export-button').appendChild(Game.getTFIcon(res.status));
+                if (res.status) {
+                    qs('#save-text-area').value = JSON.stringify(res.data);
+                }
+            }
+        },
+        {
+            selector: '#save-import-button-warp',
+            is_single: true,
+            func: () => {
+                clearChildren(qs('#save-export-button'));
+                clearChildren(qs('#save-import-button'));
+                const text = qs('#save-text-area').value;
+                qs('#save-import-button').appendChild(Game.getTFIcon(game.deserializate(text)));
+            }
+        },
+        {
+            selector: '#save-copy-button',
+            is_single: true,
+            func: () => __awaiter(void 0, void 0, void 0, function* () {
+                yield navigator.clipboard.writeText(qs('#save-text-area').value);
+            })
+        },
+        {
+            selector: '#lang-switch-button-l',
+            is_single: true,
+            func: () => __awaiter(void 0, void 0, void 0, function* () {
+                yield clickSwitchLangButton(LangBtnDir.LEFT);
+            })
+        },
+        {
+            selector: '#lang-switch-button-r',
+            is_single: true,
+            func: () => __awaiter(void 0, void 0, void 0, function* () {
+                yield clickSwitchLangButton(LangBtnDir.RIGHT);
+            })
+        },
+        {
+            selector: '#go-on-button-row',
+            is_single: true,
+            func: () => {
+                var _a;
+                const block = (_a = game.getCurrentFloor()) === null || _a === void 0 ? void 0 : _a.dialog_scene.getCurDialogBlock();
+                if (!block) {
+                    return;
+                }
+                Game.stepDialog(block, game.lang);
             }
         }
-    },
-    {
-        selector: '#save-import-button-warp',
-        is_single: true,
-        func: () => {
-            clearChildren(qs('#save-export-button'));
-            clearChildren(qs('#save-import-button'));
-            const text = qs('#save-text-area').value;
-            qs('#save-import-button').appendChild(Game.getTFIcon(game.deserializate(text)));
-        }
-    },
-    {
-        selector: '#save-copy-button',
-        is_single: true,
-        func: () => __awaiter(void 0, void 0, void 0, function* () {
-            yield navigator.clipboard.writeText(qs('#save-text-area').value);
-        })
-    },
-    {
-        selector: '#lang-switch-button-l',
-        is_single: true,
-        func: () => __awaiter(void 0, void 0, void 0, function* () {
-            yield clickSwitchLangButton(LangBtnDir.LEFT);
-        })
-    },
-    {
-        selector: '#lang-switch-button-r',
-        is_single: true,
-        func: () => __awaiter(void 0, void 0, void 0, function* () {
-            yield clickSwitchLangButton(LangBtnDir.RIGHT);
-        })
-    },
-    {
-        selector: '#go-on-button-row',
-        is_single: true,
-        func: () => {
-            var _a;
-            const block = (_a = game.getCurrentFloor()) === null || _a === void 0 ? void 0 : _a.dialog_scene.getCurDialogBlock();
-            if (!block) {
-                return;
+    ];
+    function bindButtonFunctions() {
+        for (let bind of binding_buttons) {
+            if (bind.is_single) {
+                qs(bind.selector).addEventListener('click', bind.func);
             }
-            Game.stepDialog(block, game.lang);
-        }
-    }
-];
-function bindButtonFunctions() {
-    for (let bind of binding_buttons) {
-        if (bind.is_single) {
-            qs(bind.selector).addEventListener('click', bind.func);
-        }
-        else {
-            for (let button of Array.from(qsa(bind.selector))) {
-                button.addEventListener('click', bind.func);
+            else {
+                for (let button of Array.from(qsa(bind.selector))) {
+                    button.addEventListener('click', bind.func);
+                }
             }
         }
     }
-}
-document.addEventListener('DOMContentLoaded', () => {
-    game.initialize();
-    bindButtonFunctions();
-});
-const game_lang_list = new LanguageList([
-    { id: 'zh_cn', name: '中文' },
-    { id: 'en', name: 'EN' }
-]);
-const game_default_lang = 'zh_cn';
-const game_signature_list = new SignatureList([
-    { id: 'I1_sig', status: SignatureStatus.ACTIVE },
-    { id: 'I1.1_sig' }
-]);
-const game_action_list = new GameActionList([
-    {
-        id: 'to2_act',
-        action: GameAction.polyActs(GameAction.genActivateSignatureAct('I1.1_sig'), GameAction.genStepActionAct('I1_plt'))
-    }
-]);
-const game_task_list = new GameTaskList([]);
-const game_plot_thread_list = new PlotThreadList([
-    {
-        id: 'I1_plt',
-        priority: 1,
-        signature_floor_list: [
-            { signature: 'I1_sig', floor: '1_flr' },
-            { signature: 'I1.1_sig', floor: '2_flr' },
-        ],
-        in_signatures: []
-    }
-]);
-const game_passenger_list = new PassengerList([
-    {
-        id: 'me_psg',
-        name: { zh_cn: '我', en: 'Me' },
-        avatar_color: 'black',
-        avatar_font_color: 'white',
-        avatar_text: { zh_cn: '我', en: 'ME' },
-    },
-    {
-        id: 'jacob_psg',
-        name: { zh_cn: '邓霜杰', en: 'Jacob Derek' },
-        avatar_color: 'black',
-        avatar_font_color: 'white',
-        avatar_text: { zh_cn: '杰', en: 'JD' },
-    },
-]);
-const game_passenger_me = 'me_psg';
-const game_floor_list = new FloorList([
-    {
-        id: '1_flr',
-        plot_id_list: ['I1_plt'],
-        dialog_scene: {
-            id: '1_dsc',
-            blocks: [
-                {
-                    id: 'A01_dbk',
-                    in_signatures: ['I1_sig'],
-                    dialogs: [
-                        {
-                            person_id: 'me_psg',
-                            text: { zh_cn: '我超', en: 'ong' },
-                            layout: DialogLayout.RIGHT
-                        },
-                        {
-                            person_id: 'me_psg',
-                            text: { zh_cn: '什么情况', en: 'wat happened' },
-                            layout: DialogLayout.RIGHT,
-                        },
-                        {
-                            person_id: 'me_psg',
-                            text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
-                            layout: DialogLayout.RIGHT
-                        },
-                        {
-                            person_id: 'me_psg',
-                            text: { zh_cn: '哦草', en: 'f word' },
-                            layout: DialogLayout.RIGHT
-                        },
-                    ],
-                    select: {
-                        options: [
+    document.addEventListener('DOMContentLoaded', () => {
+        game.initialize();
+        bindButtonFunctions();
+        game.debug();
+    });
+    const game_lang_list = new LanguageList([
+        { id: 'zh_cn', name: '中文' },
+        { id: 'en', name: 'EN' }
+    ]);
+    const game_default_lang = 'zh_cn';
+    const game_signature_list = new SignatureList([
+        { id: 'I1_sig', status: SignatureStatus.ACTIVE },
+        { id: 'I1.1_sig' }
+    ]);
+    const game_action_list = new GameActionList([
+        {
+            id: 'to2_act',
+            action: GameAction.polyActs(GameAction.genActivateSignatureAct('I1.1_sig'), GameAction.genStepActionAct('I1_plt'), GameAction.genFinishTaskAct('t1_tsk'))
+        },
+        {
+            id: 't1_act',
+            action: GameAction.genActiveTaskAct('t1_tsk')
+        }
+    ]);
+    const game_task_list = new GameTaskList([
+        {
+            id: 't1_tsk',
+            description: { zh_cn: '你好', en: 'hello' },
+        }
+    ]);
+    const game_plot_thread_list = new PlotThreadList([
+        {
+            id: 'I1_plt',
+            priority: 1,
+            signature_floor_list: [
+                { signature: 'I1_sig', floor: '1_flr' },
+                { signature: 'I1.1_sig', floor: '2_flr' },
+            ],
+            in_signatures: []
+        }
+    ]);
+    const game_passenger_list = new PassengerList([
+        {
+            id: 'me_psg',
+            name: { zh_cn: '我', en: 'Me' },
+            avatar_color: 'black',
+            avatar_font_color: 'white',
+            avatar_text: { zh_cn: '我', en: 'ME' },
+        },
+        {
+            id: 'jacob_psg',
+            name: { zh_cn: '邓霜杰', en: 'Jacob Derek' },
+            avatar_color: 'black',
+            avatar_font_color: 'white',
+            avatar_text: { zh_cn: '杰', en: 'JD' },
+        },
+    ]);
+    const game_passenger_me = 'me_psg';
+    const game_floor_list = new FloorList([
+        {
+            id: '1_flr',
+            plot_id_list: ['I1_plt'],
+            dialog_scene: {
+                id: '1_dsc',
+                blocks: [
+                    {
+                        id: 'A01_dbk',
+                        in_signatures: ['I1_sig'],
+                        dialogs: [
                             {
-                                next: 'A02_dbk',
-                                text: { zh_cn: '打胶', en: 'fap' }
+                                person_id: 'me_psg',
+                                text: { zh_cn: '我超', en: 'ong' },
+                                layout: DialogLayout.RIGHT,
+                                action_id: 't1_act'
                             },
                             {
-                                next: 'A02_dbk',
-                                text: { zh_cn: '炉管', en: 'jerk' }
+                                person_id: 'me_psg',
+                                text: { zh_cn: '什么情况', en: 'wat happened' },
+                                layout: DialogLayout.RIGHT,
+                            },
+                            {
+                                person_id: 'me_psg',
+                                text: { zh_cn: '电脑爆炸力', en: 'my pc folded' },
+                                layout: DialogLayout.RIGHT
+                            },
+                            {
+                                person_id: 'me_psg',
+                                text: { zh_cn: '哦草', en: 'f word' },
+                                layout: DialogLayout.RIGHT
+                            },
+                        ],
+                        select: {
+                            options: [
+                                {
+                                    next: 'A02_dbk',
+                                    text: { zh_cn: '打胶', en: 'fap' }
+                                },
+                                {
+                                    next: 'A02_dbk',
+                                    text: { zh_cn: '炉管', en: 'jerk' }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        id: 'A02_dbk',
+                        in_signatures: [],
+                        dialogs: [
+                            {
+                                person_id: 'jacob_psg',
+                                text: { zh_cn: '好似喵', en: 'nice dead' },
+                                layout: DialogLayout.LEFT,
+                                action_id: 'to2_act'
                             }
+                        ],
+                    }
+                ]
+            }
+        },
+        {
+            id: '2_flr',
+            plot_id_list: ['I1_plt'],
+            dialog_scene: {
+                id: '2_dsc',
+                blocks: [
+                    {
+                        id: 'A03_dbk',
+                        in_signatures: ['I1.1_sig'],
+                        dialogs: [
+                            {
+                                person_id: 'me_psg',
+                                text: { zh_cn: '赢光光', en: 'WWW' },
+                                layout: DialogLayout.MIDDLE
+                            },
                         ]
                     }
-                },
-                {
-                    id: 'A02_dbk',
-                    in_signatures: [],
-                    dialogs: [
-                        {
-                            person_id: 'jacob_psg',
-                            text: { zh_cn: '好似喵', en: 'nice dead' },
-                            layout: DialogLayout.LEFT,
-                            action_id: 'to2_act'
-                        }
-                    ],
-                }
-            ]
+                ]
+            }
         }
-    },
-    {
-        id: '2_flr',
-        plot_id_list: ['I1_plt'],
-        dialog_scene: {
-            id: '2_dsc',
-            blocks: [
-                {
-                    id: 'A03_dbk',
-                    in_signatures: ['I1.1_sig'],
-                    dialogs: [
-                        {
-                            person_id: 'me_psg',
-                            text: { zh_cn: '赢光光', en: 'WWW' },
-                            layout: DialogLayout.MIDDLE
-                        },
-                    ]
-                }
-            ]
-        }
-    }
-]);
-const game_ui_string_raw = {
-    'PERSON_NUM': { zh_cn: '人数', en: 'Persons' },
-    'COPY': { zh_cn: '复制', en: 'COPY' },
-    'IMPORT': { zh_cn: '导入', en: 'IMP' },
-    'EXPORT': { zh_cn: '导出', en: 'EXP' }
-};
-const game = new Game();
+    ]);
+    const game_ui_string_raw = {
+        'PERSON_NUM': { zh_cn: '人数', en: 'Persons' },
+        'COPY': { zh_cn: '复制', en: 'COPY' },
+        'IMPORT': { zh_cn: '导入', en: 'IMP' },
+        'EXPORT': { zh_cn: '导出', en: 'EXP' }
+    };
+    const game = new Game();
 //# sourceMappingURL=elev.js.map</script>
 
 </html>
