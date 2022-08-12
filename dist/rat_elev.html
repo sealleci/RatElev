@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./favicon.png">
 <style type="text/css">
 body {
     display: flex;
@@ -811,10 +812,10 @@ body {
     font-family: "Palatino Linotype";
     word-wrap: break-word;
     word-break: break-all;
-    outline: 2px solid rgba(255, 255, 255, .6);
+    border: 2px solid rgba(255, 255, 255, .6);
     color: rgba(255, 255, 255, 1);
     /* padding: 4px 5px; */
-    transition: background-color .2s, color .2s, outline .2s;
+    transition: background-color .2s, color .2s, border-color .2s;
     border-radius: 15px 15px 15px 0;
     text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
     overflow-y: scroll;
@@ -825,12 +826,13 @@ body {
 }
 
 .option-button:hover {
-    background-color: rgba(244, 115, 185, .6);
+    background-color: rgba(244, 115, 185, .75);
 }
 
 .option-button:active {
-    outline-color: rgba(244, 115, 185, .75);
-    background-color: rgba(244, 115, 185, .75);
+    border-color: transparent;
+    background-color: rgba(244, 115, 185, .9);
+    box-shadow: 0 0 4px rgba(0, 0, 0, .25);
 }
 
 #save-panel {
