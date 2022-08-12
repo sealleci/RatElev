@@ -1,8 +1,3 @@
-/* TODO: main
- * - [x] save
- * - [ ] jump to bottom
- */
-
 function sleep(time: number) {
     return new Promise((resolve) => {
         setTimeout(resolve, time)
@@ -240,7 +235,6 @@ interface SignatureJSON {
     status: string
 }
 
-// TODO: toString, fromJSON
 class Signature {
     /**
      * regex: /[^_]+_sig/
