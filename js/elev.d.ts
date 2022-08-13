@@ -213,6 +213,7 @@ declare class DialogBlock {
     in_signatures: string[];
     data: DialogBlockItem[];
     constructor(id: string, in_signatures: string[], dialogs: DialogObject[], select?: SelectObject | null);
+    getLength(): number;
     getItemByIndex(index: number): DialogBlockItem | null;
     getItemById(id: string): DialogBlockItem | null;
     getCurItem(): DialogBlockItem | null;
@@ -522,6 +523,7 @@ declare class Game {
     static renderDialog(dialog: Dialog, lang: string, is_not_first?: boolean): boolean;
     static renderSelect(select: BranchSelect, lang: string): void;
     static stepDialog(block: DialogBlock, lang: string, is_do_action?: boolean): void;
+    static renderBrElement(): void;
     static renderBlock(block: DialogBlock, lang: string, is_render_all?: boolean): void;
     renderFloor(): void;
     isLiftable(): boolean;

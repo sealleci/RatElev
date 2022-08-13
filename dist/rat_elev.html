@@ -675,6 +675,14 @@ body {
     border-radius: 10px;
 }
 
+.block-br {
+    width: 80%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, .05);
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
 #jump-button {
     display: flex;
     justify-content: center;
@@ -1937,6 +1945,9 @@ class DialogBlock {
         }
         this.cur_item_index = 0;
     }
+    getLength() {
+        return this.data.length;
+    }
     getItemByIndex(index) {
         return index < 0 || index >= this.data.length ? null : this.data[index];
     }
@@ -2914,6 +2925,7 @@ class Game {
             if (floor === null || next === null) {
                 return;
             }
+            Game.renderBrElement();
             floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id);
             floor.dialog_scene.setCurDialogBlock(next);
             const block = floor.dialog_scene.getCurDialogBlock();
@@ -2974,13 +2986,22 @@ class Game {
                 Game.showGoOnButton();
             }
             else {
+                Game.renderBrElement();
                 Game.hideGoOnButton();
             }
         }
     }
+    static renderBrElement() {
+        let br_row = document.createElement('div');
+        br_row.classList.add('dialog-row', 'mid-dialog-row');
+        let br_element = document.createElement('div');
+        br_element.classList.add('block-br');
+        br_row.appendChild(br_element);
+        qs('#dialog-container').appendChild(br_row);
+    }
     static renderBlock(block, lang, is_render_all = true) {
         let pre_id = '';
-        for (let i = 0; i < block.data.length; ++i) {
+        for (let i = 0; i < block.getLength(); ++i) {
             if (!is_render_all && i >= block.cur_item_index) {
                 if (i === 0) {
                     Game.hideOptions();
@@ -3010,6 +3031,9 @@ class Game {
                 }
             }
         }
+        if (block.getLength() > 0 && is_render_all) {
+            Game.renderBrElement();
+        }
     }
     renderFloor() {
         Game.hideGoOnButton();
@@ -3034,6 +3058,9 @@ class Game {
             Game.renderBlock(cur_block, this.lang, false);
             if (cur_block.isFinished()) {
                 Game.hideGoOnButton();
+                if (cur_block.isLastItemNotSelect()) {
+                    Game.renderBrElement();
+                }
             }
         }
         Game.hideJumpButton();
@@ -3228,6 +3255,7 @@ class Game {
             this.lift_direction = FloorLiftStatus.NONE;
             this.cur_dest = 0;
             this.pending_queue.clear();
+            qsa('.number-button').forEach(button => { button.classList.remove('button-selected'); });
             this.floor_display.updateNumber(this.cur_floor);
             this.passenger_display.reset(json_data.game.passenger_display);
             this.task_display.reset(json_data.game.task_display);
@@ -3590,10 +3618,20 @@ const game_floor_list = new FloorList([
                     in_signatures: [],
                     dialogs: [
                         {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '嘻嘻', en: 'hehe' },
+                            layout: DialogLayout.RIGHT,
+                            action_id: 'to2_act'
+                        },
+                        {
                             person_id: 'jacob_psg',
                             text: { zh_cn: '不要南通', en: 'no homo' },
-                            layout: DialogLayout.LEFT,
-                            action_id: 'to2_act'
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '嗦牛牛', en: 'sword new new' },
+                            layout: DialogLayout.LEFT
                         }
                     ],
                 },

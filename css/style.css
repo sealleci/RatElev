@@ -666,6 +666,14 @@ body {
     border-radius: 10px;
 }
 
+.block-br {
+    width: 80%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, .05);
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
 #jump-button {
     display: flex;
     justify-content: center;

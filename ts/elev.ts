@@ -774,6 +774,9 @@ class DialogBlock {
         }
         this.cur_item_index = 0
     }
+    getLength(): number {
+        return this.data.length
+    }
     getItemByIndex(index: number): DialogBlockItem | null {
         return index < 0 || index >= this.data.length ? null : this.data[index]
     }
@@ -2080,6 +2083,7 @@ class Game {
             if (floor === null || next === null) {
                 return
             }
+            Game.renderBrElement()
             floor.dialog_scene.addVisitedBlock(floor.dialog_scene.cur_block_id)
             floor.dialog_scene.setCurDialogBlock(next)
             const block = floor.dialog_scene.getCurDialogBlock()
@@ -2137,6 +2141,7 @@ class Game {
             if (!block.isFinished()) {
                 Game.showGoOnButton()
             } else {
+                Game.renderBrElement()
                 Game.hideGoOnButton()
             }
         }
@@ -2146,9 +2151,17 @@ class Game {
      * @param block 
      * @param is_render_all - if true, will not render select; if false, render to `cur_item_index`
      */
+    static renderBrElement() {
+        let br_row = document.createElement('div')
+        br_row.classList.add('dialog-row', 'mid-dialog-row')
+        let br_element = document.createElement('div')
+        br_element.classList.add('block-br')
+        br_row.appendChild(br_element)
+        qs('#dialog-container').appendChild(br_row)
+    }
     static renderBlock(block: DialogBlock, lang: string, is_render_all: boolean = true) {
         let pre_id = ''
-        for (let i = 0; i < block.data.length; ++i) {
+        for (let i = 0; i < block.getLength(); ++i) {
             if (!is_render_all && i >= block.cur_item_index) {
                 if (i === 0) {
                     // this block haven't been rendered, so render the first dialog
@@ -2179,6 +2192,9 @@ class Game {
                 }
             }
         }
+        if (block.getLength() > 0 && is_render_all) {
+            Game.renderBrElement()
+        }
     }
     renderFloor() {
         Game.hideGoOnButton()
@@ -2205,6 +2221,9 @@ class Game {
             Game.renderBlock(cur_block, this.lang, false)
             if (cur_block.isFinished()) {
                 Game.hideGoOnButton()
+                if (cur_block.isLastItemNotSelect()) {
+                    Game.renderBrElement()
+                }
             }
         }
         Game.hideJumpButton()
@@ -2400,6 +2419,7 @@ class Game {
             this.lift_direction = FloorLiftStatus.NONE
             this.cur_dest = 0
             this.pending_queue.clear()
+            qsa('.number-button').forEach(button => { button.classList.remove('button-selected') })
             this.floor_display.updateNumber(this.cur_floor)
             this.passenger_display.reset(json_data.game.passenger_display)
             this.task_display.reset(json_data.game.task_display)
@@ -2800,6 +2820,7 @@ const game_floor_list = new FloorList([
                     ],
                     select: {
                         options: [
+
                             {
                                 next: 'A02_dbk',
                                 text: { zh_cn: '我是0', en: 'im bottom' }
@@ -2816,10 +2837,20 @@ const game_floor_list = new FloorList([
                     in_signatures: [],
                     dialogs: [
                         {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '嘻嘻', en: 'hehe' },
+                            layout: DialogLayout.RIGHT,
+                            action_id: 'to2_act'
+                        },
+                        {
                             person_id: 'jacob_psg',
                             text: { zh_cn: '不要南通', en: 'no homo' },
-                            layout: DialogLayout.LEFT,
-                            action_id: 'to2_act'
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '嗦牛牛', en: 'sword new new' },
+                            layout: DialogLayout.LEFT
                         }
                     ],
                 },
