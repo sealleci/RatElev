@@ -359,7 +359,7 @@ class GameAction {
             game.passenger_display.render(game.lang);
         };
     }
-    static genStepActionAct(id) {
+    static genStepPlotThredAct(id) {
         return () => {
             var _a;
             (_a = game_plot_thread_list.getById(id)) === null || _a === void 0 ? void 0 : _a.step();
@@ -563,6 +563,12 @@ class DialogBlock {
         }
         return true;
     }
+    isLastItemNotSelect() {
+        if (this.data.length <= 0) {
+            return false;
+        }
+        return !this.data[this.data.length - 1].isSelect();
+    }
     toString() {
         return `{"id":"${this.id}","cur_item_index":${this.cur_item_index}}`;
     }
@@ -634,7 +640,7 @@ class Floor {
         this.background = background !== null && background !== void 0 ? background : { bg_color: 'rgba(0, 0, 0, .7)', inner_html: '' };
     }
     checkPlotThreads() {
-        var _a, _b;
+        var _a, _b, _c;
         let selected_block_id = '';
         let max_prioeity = -Infinity;
         for (let plot_id of this.plot_id_list) {
@@ -642,10 +648,10 @@ class Floor {
             if (plot === null || !plot.isUnlocked() || plot.isFinished() || plot.getCurFloorId() !== this.id) {
                 continue;
             }
-            let sig_id = plot.getCurSignatureId();
+            let signature_id = plot.getCurSignatureId();
             let is_set = false;
             for (let block_id of Object.keys(this.dialog_scene.dialog_in_dict)) {
-                if (this.dialog_scene.dialog_in_dict[block_id].indexOf(sig_id) === -1) {
+                if (this.dialog_scene.dialog_in_dict[block_id].indexOf(signature_id) === -1) {
                     continue;
                 }
                 const block = this.dialog_scene.getDialogBlock(block_id);
@@ -664,9 +670,10 @@ class Floor {
             }
         }
         console.log(`slt: ${selected_block_id},\ncur: ${this.dialog_scene.cur_block_id},\nis_cur_finish: ${(_a = this.dialog_scene.getCurDialogBlock()) === null || _a === void 0 ? void 0 : _a.isFinished()}`);
-        if (this.dialog_scene.cur_block_id === '' || ((_b = this.dialog_scene.getCurDialogBlock()) === null || _b === void 0 ? void 0 : _b.isFinished())) {
+        if (this.dialog_scene.cur_block_id === '' || (((_b = this.dialog_scene.getCurDialogBlock()) === null || _b === void 0 ? void 0 : _b.isFinished()) && ((_c = this.dialog_scene.getCurDialogBlock()) === null || _c === void 0 ? void 0 : _c.isLastItemNotSelect()))) {
             this.dialog_scene.setCurDialogBlock(selected_block_id);
         }
+        return selected_block_id !== '';
     }
     toString() {
         return `{"id":"${this.id}","dialog_scene":${this.dialog_scene.toString()}}`;
@@ -1389,6 +1396,20 @@ class Game {
             return icon_f;
         }
     }
+    static checkWhenBlockFinish(floor, block) {
+        if (block.isFinished() && block.isLastItemNotSelect()) {
+            Game.hideOptions();
+            if (floor.checkPlotThreads()) {
+                Game.showGoOnButton();
+            }
+            else {
+                Game.hideGoOnButton();
+            }
+            if (block.id !== floor.dialog_scene.cur_block_id) {
+                floor.dialog_scene.addVisitedBlock(block.id);
+            }
+        }
+    }
     static createAvatar(psg_id, lang) {
         const psg = game_passenger_list.getById(psg_id);
         let pfp = document.createElement('div');
@@ -1473,6 +1494,7 @@ class Game {
             }
             block.resetIndex();
             Game.stepDialog(block, game.lang);
+            Game.checkWhenBlockFinish(floor, block);
             Game.jumpToBottom();
         });
         return opt_btn;
@@ -1580,7 +1602,7 @@ class Game {
             }
         }
         const cur_block = floor.dialog_scene.getCurDialogBlock();
-        if (cur_block !== null) {
+        if (cur_block !== null && floor.dialog_scene.visited_blocks.indexOf(cur_block.id) === -1) {
             Game.renderBlock(cur_block, this.lang, false);
             if (cur_block.isFinished()) {
                 Game.hideGoOnButton();
@@ -1726,49 +1748,49 @@ class Game {
         let is_catch = false;
         try {
             const json_data = JSON.parse(EncryptTool.decipher(encrypted));
-            for (let sig_json of json_data.signatures) {
-                const sig = game_signature_list.getById(sig_json.id);
-                if (sig !== null) {
-                    sig.status = Signature.convertStatus(sig_json.status);
+            for (let signature_json of json_data.signatures) {
+                const signature = game_signature_list.getById(signature_json.id);
+                if (signature !== null) {
+                    signature.status = Signature.convertStatus(signature_json.status);
                 }
             }
-            for (let tsk_json of json_data.tasks) {
-                const tsk = game_task_list.getById(tsk_json.id);
-                if (tsk !== null) {
-                    tsk.status = GameTask.convertStatus(tsk_json.status);
+            for (let task_json of json_data.tasks) {
+                const task = game_task_list.getById(task_json.id);
+                if (task !== null) {
+                    task.status = GameTask.convertStatus(task_json.status);
                 }
             }
-            for (let f_json of json_data.floors) {
-                const flr = game_floor_list.getById(f_json.id);
-                if (flr === null) {
+            for (let floor_json of json_data.floors) {
+                const floor = game_floor_list.getById(floor_json.id);
+                if (floor === null) {
                     continue;
                 }
-                if (flr.dialog_scene.id !== f_json.dialog_scene.id) {
+                if (floor.dialog_scene.id !== floor_json.dialog_scene.id) {
                     continue;
                 }
-                flr.dialog_scene.setCurDialogBlock(f_json.dialog_scene.cur_block_id);
-                flr.dialog_scene.visited_blocks = f_json.dialog_scene.visited_blocks;
-                for (let b_json of f_json.dialog_scene.dialog_blocks) {
-                    const blk = flr.dialog_scene.getDialogBlock(b_json.id);
-                    if (blk === null) {
+                floor.dialog_scene.setCurDialogBlock(floor_json.dialog_scene.cur_block_id);
+                floor.dialog_scene.visited_blocks = floor_json.dialog_scene.visited_blocks;
+                for (let block_json of floor_json.dialog_scene.dialog_blocks) {
+                    const block = floor.dialog_scene.getDialogBlock(block_json.id);
+                    if (block === null) {
                         continue;
                     }
-                    blk.cur_item_index = b_json.cur_item_index;
+                    block.cur_item_index = block_json.cur_item_index;
                 }
             }
             this.lang = json_data.game.lang;
             for (let rows of this.floor_buttons) {
-                for (let btn of rows) {
-                    let pos = json_data.game.floor_buttons.map(x => x.index).indexOf(btn.index);
-                    if (pos === -1) {
+                for (let number_button of rows) {
+                    let position = json_data.game.floor_buttons.map(x => x.index).indexOf(number_button.index);
+                    if (position === -1) {
                         continue;
                     }
-                    btn.is_available = json_data.game.floor_buttons[pos].is_available;
-                    const num_btn = qs(`.number-button[index="${btn.index}"]`);
+                    number_button.is_available = json_data.game.floor_buttons[position].is_available;
+                    const num_btn = qs(`.number-button[index="${number_button.index}"]`);
                     if (num_btn === null) {
                         continue;
                     }
-                    if (btn.is_available) {
+                    if (number_button.is_available) {
                         num_btn.classList.remove('invisible');
                     }
                 }
@@ -1788,7 +1810,7 @@ class Game {
         }
         catch (err) {
             is_catch = true;
-            console.log(`deserializate error: ${err.message}`);
+            console.log(`Deserialization error: ${err.message}`);
         }
         if (!is_catch) {
             if (this.door.is_open) {
@@ -1839,7 +1861,7 @@ class Game {
         return __awaiter(this, void 0, void 0, function* () {
             qs('#open-button').click();
             qs('#top-arch').click();
-            qs('#go-on-button').click();
+            qs('#go-on-button-row').click();
         });
     }
     toString() {
@@ -1926,8 +1948,15 @@ const binding_buttons = [
         func: () => {
             clearChildren(qs('#save-export-button'));
             clearChildren(qs('#save-import-button'));
-            qs('#save-export-button').appendChild(Game.getTFIcon(true));
-            qs('#save-text-area').value = game.serializate();
+            let is_catch = false;
+            try {
+                qs('#save-text-area').value = game.serializate();
+            }
+            catch (err) {
+                is_catch = true;
+                console.log(`Serialization error: ${err.message}`);
+            }
+            qs('#save-export-button').appendChild(Game.getTFIcon(!is_catch));
         }
     },
     {
@@ -1971,6 +2000,10 @@ const binding_buttons = [
                 return;
             }
             Game.stepDialog(block, game.lang);
+            const cur_floor = game.getCurrentFloor();
+            if (cur_floor !== null) {
+                Game.checkWhenBlockFinish(cur_floor, block);
+            }
             Game.jumpToBottom();
         }
     },
@@ -2010,6 +2043,7 @@ document.addEventListener('DOMContentLoaded', () => {
     game.initialize();
     bindButtonFunctions();
     addDialogScrollListener();
+    game.debug();
 });
 const game_lang_list = new LanguageList([
     { id: 'zh_cn', name: '中文' },
@@ -2018,12 +2052,13 @@ const game_lang_list = new LanguageList([
 const game_default_lang = 'zh_cn';
 const game_signature_list = new SignatureList([
     { id: 'I1_sig', status: SignatureStatus.ACTIVE },
-    { id: 'I1.1_sig' }
+    { id: 'I1.1_sig' },
+    { id: 'I1.2_sig', status: SignatureStatus.ACTIVE }
 ]);
 const game_action_list = new GameActionList([
     {
         id: 'to2_act',
-        action: GameAction.polyActs(GameAction.genActivateSignatureAct('I1.1_sig'), GameAction.genStepActionAct('I1_plt'), GameAction.genFinishTaskAct('t1_tsk'))
+        action: GameAction.polyActs(GameAction.genActivateSignatureAct('I1.1_sig'), GameAction.genStepPlotThredAct('I1_plt'), GameAction.genFinishTaskAct('t1_tsk'))
     },
     {
         id: 't1_act',
@@ -2039,10 +2074,18 @@ const game_task_list = new GameTaskList([
 const game_plot_thread_list = new PlotThreadList([
     {
         id: 'I1_plt',
-        priority: 1,
+        priority: 10,
         signature_floor_list: [
             { signature: 'I1_sig', floor: '1_flr' },
             { signature: 'I1.1_sig', floor: '2_flr' },
+        ],
+        in_signatures: []
+    },
+    {
+        id: 'I2_plt',
+        priority: 1,
+        signature_floor_list: [
+            { signature: 'I1.2_sig', floor: '1_flr' }
         ],
         in_signatures: []
     }
@@ -2067,7 +2110,7 @@ const game_passenger_me = 'me_psg';
 const game_floor_list = new FloorList([
     {
         id: '1_flr',
-        plot_id_list: ['I1_plt'],
+        plot_id_list: ['I1_plt', 'I2_plt'],
         background: {
             bg_color: '#73A9AD',
             inner_html: ''
@@ -2123,6 +2166,17 @@ const game_floor_list = new FloorList([
                             text: { zh_cn: '不要南通', en: 'no homo' },
                             layout: DialogLayout.LEFT,
                             action_id: 'to2_act'
+                        }
+                    ],
+                },
+                {
+                    id: 'A04_dbk',
+                    in_signatures: ['I1.2_sig'],
+                    dialogs: [
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '紧随其后', en: 'following' },
+                            layout: DialogLayout.MIDDLE
                         }
                     ],
                 }

@@ -120,7 +120,7 @@ declare class GameAction {
     static genFinishTaskAct(id: string): () => void;
     static genAddPassengerAct(id: string): () => void;
     static genRemovePassengerAct(id: string): () => void;
-    static genStepActionAct(id: string): () => void;
+    static genStepPlotThredAct(id: string): () => void;
     static polyActs(...fs: Array<() => void>): () => void;
 }
 interface GameActionObject {
@@ -222,6 +222,7 @@ declare class DialogBlock {
     isNotFirstLine(): boolean;
     isFinished(): boolean;
     isUnlocked(): boolean;
+    isLastItemNotSelect(): boolean;
     toString(): string;
 }
 interface DialogBlockObject {
@@ -272,7 +273,7 @@ declare class Floor {
     plot_id_list: string[];
     background: Background;
     constructor(id: string, scene: DialogSceneObject, plot_id_list: string[], background?: Background | null);
-    checkPlotThreads(): void;
+    checkPlotThreads(): boolean;
     toString(): string;
 }
 interface FloorObject {
@@ -514,6 +515,7 @@ declare class Game {
     static showOptions(): void;
     getCurrentFloor(): Floor | null;
     static getTFIcon(icon_type: boolean): HTMLElement;
+    static checkWhenBlockFinish(floor: Floor, block: DialogBlock): void;
     static createAvatar(psg_id: string, lang: string): HTMLElement;
     static createDialogElement(dialog: Dialog, lang: string, is_not_first?: boolean): HTMLElement | null;
     static createOptionElement(opt: SelectOption, lang: string): HTMLElement;
