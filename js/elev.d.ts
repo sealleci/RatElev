@@ -489,14 +489,14 @@ declare class EncryptTool {
 }
 declare class Game {
     lang: string;
-    floor_buttons: FloorButton[][];
+    private floor_buttons;
     cur_floor: number;
     max_floor: number;
     min_floor: number;
     is_lifting: boolean;
     private lift_interval;
     private lift_direction;
-    cur_dest: number;
+    private cur_dest;
     pending_queue: PendingQueue;
     door: Door;
     dots_animation: WaitingDotsAnimation;
@@ -525,6 +525,7 @@ declare class Game {
     static stepDialog(block: DialogBlock, lang: string, is_do_action?: boolean): void;
     static renderBrElement(): void;
     static renderBlock(block: DialogBlock, lang: string, is_render_all?: boolean): void;
+    getCurDestination(): number;
     renderFloor(): void;
     isLiftable(): boolean;
     calcLiftDirection(): void;
@@ -537,6 +538,7 @@ declare class Game {
     deserializate(encrypted: string): boolean;
     switchUiLanguge(): void;
     switchTextLanguage(): void;
+    isFloorButtonAvailableByIndex(index: number): boolean;
     initialize(): void;
     debug(): Promise<void>;
     toString(): string;
@@ -552,12 +554,15 @@ declare function bindButtonFunctions(): void;
 declare function addDialogScrollListener(): void;
 declare const game_lang_list: LanguageList;
 declare const game_default_lang = "zh_cn";
-declare const game_signature_list: SignatureList;
-declare const game_action_list: GameActionList;
 declare const game_task_list: GameTaskList;
+declare const game_action_list: GameActionList;
+declare const game_signature_list: SignatureList;
 declare const game_plot_thread_list: PlotThreadList;
 declare const game_passenger_list: PassengerList;
 declare const game_passenger_me = "me_psg";
+declare const bg_colors: {
+    [name: string]: string;
+};
 declare const game_floor_list: FloorList;
 declare const game_ui_string_raw: UiStringDictRaw;
 declare const game: Game;

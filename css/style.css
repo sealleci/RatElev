@@ -7,7 +7,7 @@ body {
     min-width: 780px;
     /* background-color: #343641; */
     /* background-color: rgb(14, 14, 14); */
-    background-color: rgba(0, 0, 0, .7);
+    background-color: #3A3A3A
 }
 
 #elev-container {
@@ -30,12 +30,13 @@ body {
     align-items: center;
     width: 20%;
     max-width: 20%;
-    flex-grow: 0;
     height: 100%;
     background-color: #A0A0A0;
     border-right: 4px solid #524A4E;
     box-shadow: 3px 0 4px rgba(0, 0, 0, .2);
     z-index: 50;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 #elev-right {
@@ -51,14 +52,17 @@ body {
     border-left: 4px solid #524A4E;
     box-shadow: -3px 0 4px rgba(0, 0, 0, .2);
     z-index: 50;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 #elev-center {
     position: relative;
     width: 60%;
     max-width: 60%;
-    flex-grow: 0;
     height: 100%;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 #passenger-panel {
@@ -213,7 +217,7 @@ body {
     -moz-user-select: text;
     user-select: text;
     word-wrap: break-word;
-    word-break: break-all;
+    word-break: keep-all;
     font-family: "Palatino Linotype";
     color: #2C3333;
     border-bottom: 2px solid rgba(240, 84, 84, .4);
@@ -609,20 +613,23 @@ body {
 }
 
 .dialog-box {
-    color: white;
     font-family: "Palatino Linotype";
-    max-width: 70%;
+    max-width: 75%;
     min-height: 1.2rem;
     padding: 6px 8px;
-    background-color: rgba(125, 125, 125, 0.4);
-    text-shadow: black 0 0 1px;
-    /* border: 1px solid white; */
+    color: rgb(253, 253, 253);
+    /* background-color: rgb(58, 58, 58); */
+    /* text-shadow: black 0 0 1px; */
     flex-wrap: wrap;
     -webkit-user-select: text;
     -moz-user-select: text;
     user-select: text;
     word-wrap: break-word;
-    word-break: break-all;
+    word-break: keep-all;
+    box-shadow: 0 0 2px rgba(255, 255, 255, .5);
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .dialog-row.left-dialog-row {
@@ -661,9 +668,10 @@ body {
 
 .dialog-box.mid-dialog-box {
     /* background: linear-gradient(90deg, transparent 0%, rgba(125, 125, 125, .6) 50%, transparent 100%); */
-    max-width: 90%;
+    max-width: 77%;
     /* background-color: rgba(125, 125, 125, .6); */
     border-radius: 10px;
+    text-align: center;
 }
 
 .block-br {
@@ -672,6 +680,16 @@ body {
     background-color: rgba(255, 255, 255, .05);
     border-radius: 5px;
     margin: 5px 0;
+}
+
+@keyframes jump-button-appear {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 100%;
+    }
 }
 
 #jump-button {
@@ -694,6 +712,7 @@ body {
     white-space: nowrap;
     transition: background-color .2s;
     box-shadow: 0 0 2px rgba(0, 0, 0, .2);
+    animation: jump-button-appear .25s 1;
 }
 
 #jump-button:hover {
@@ -810,10 +829,10 @@ body {
     font-size: 1rem;
     font-family: "Palatino Linotype";
     word-wrap: break-word;
-    word-break: break-all;
+    word-break: keep-all;
     border: 2px solid rgba(255, 255, 255, .6);
     color: rgba(255, 255, 255, 1);
-    /* padding: 4px 5px; */
+    padding: 2px 4px;
     transition: background-color .2s, color .2s, border-color .2s;
     border-radius: 15px 15px 15px 0;
     text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
@@ -821,6 +840,7 @@ body {
 }
 
 .option-button>div {
+    max-width: 100%;
     margin: auto;
 }
 

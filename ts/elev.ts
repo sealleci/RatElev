@@ -817,7 +817,8 @@ class DialogBlock {
         const pre = this.getItemByIndex(this.cur_item_index - 1)
         if (cur !== null && pre !== null &&
             !cur.isSelect() && !pre.isSelect() &&
-            (cur as Dialog).person_id === (pre as Dialog).person_id) {
+            (cur as Dialog).person_id === (pre as Dialog).person_id &&
+            (cur as Dialog).layout === (pre as Dialog).layout) {
             return true
         }
         return false
@@ -1020,12 +1021,13 @@ class Floor {
                 if (block === null || !block.isUnlocked() || this.dialog_scene.cur_block_id === block.id) {
                     continue
                 }
-                // if plot's current corresponding block is finished, step plot to next
+                // TODO: need step?
+                // if plot's current corresponding block finished, step plot to next
                 if (block.isFinished()) {
                     plot.step()
                     continue
                 }
-                // priority of [...signature of plot] is MAX([...plot.priority])
+                // priority of [...plot.signature] is MAX([...plot.priority])
                 if (plot.priority > max_prioeity && !is_set) {
                     selected_block_id = block.id
                     max_prioeity = plot.priority
@@ -1036,6 +1038,9 @@ class Floor {
         console.log(`slt: ${selected_block_id},\ncur: ${this.dialog_scene.cur_block_id},\nis_cur_finish: ${this.dialog_scene.getCurDialogBlock()?.isFinished()}`)
         // only if cur block finished, new block can be set
         if (this.dialog_scene.cur_block_id === '' || (this.dialog_scene.getCurDialogBlock()?.isFinished() && this.dialog_scene.getCurDialogBlock()?.isLastItemNotSelect())) {
+            if (this.dialog_scene.cur_block_id !== '') {
+                this.dialog_scene.addVisitedBlock(this.dialog_scene.cur_block_id)
+            }
             this.dialog_scene.setCurDialogBlock(selected_block_id)
         }
 
@@ -1486,14 +1491,14 @@ enum FloorLiftStatus {
 }
 
 class FloorDisplay {
-    private display_number: HTMLElement
-    private up_icon: HTMLElement
-    private down_icon: HTMLElement
+    private display_number: HTMLElement | null
+    private up_icon: HTMLElement | null
+    private down_icon: HTMLElement | null
 
     constructor() {
-        this.display_number = {} as HTMLElement
-        this.up_icon = {} as HTMLElement
-        this.down_icon = {} as HTMLElement
+        this.display_number = null
+        this.up_icon = null
+        this.down_icon = null
     }
     /**
      * 
@@ -1501,10 +1506,10 @@ class FloorDisplay {
      * string
      */
     updateIcon(status: FloorLiftStatus) {
-        if (this.up_icon !== {} as HTMLElement) {
+        if (this.up_icon === null) {
             this.up_icon = qs('#up-icon')
         }
-        if (this.down_icon !== {} as HTMLElement) {
+        if (this.down_icon === null) {
             this.down_icon = qs('#down-icon')
         }
         const class_name = 'invisible'
@@ -1530,7 +1535,7 @@ class FloorDisplay {
         }
     }
     updateNumber(num: number) {
-        if (this.display_number !== {} as HTMLElement) {
+        if (this.display_number === null) {
             this.display_number = qs('#display-number')
         }
         this.display_number.textContent = num.toString()
@@ -1908,14 +1913,14 @@ class EncryptTool {
 
 class Game {
     public lang: string
-    public floor_buttons: FloorButton[][]
+    private floor_buttons: FloorButton[][]
     public cur_floor: number
     public max_floor: number
     public min_floor: number
     public is_lifting: boolean
     private lift_interval: number
     private lift_direction: FloorLiftStatus
-    public cur_dest: number
+    private cur_dest: number
     public pending_queue: PendingQueue
     public door: Door
     public dots_animation: WaitingDotsAnimation
@@ -2196,6 +2201,9 @@ class Game {
             Game.renderBrElement()
         }
     }
+    getCurDestination(): number {
+        return this.cur_dest
+    }
     renderFloor() {
         Game.hideGoOnButton()
         Game.hideOptions()
@@ -2347,6 +2355,9 @@ class Game {
             let row = document.createElement('div')
             row.classList.add('button-row')
             for (let button of button_row) {
+                // if (!button.is_available) {
+                //     continue
+                // }
                 let col = document.createElement('div')
                 col.classList.add('button-col', 'unselectable', 'number-button')
                 if (!button.is_available) {
@@ -2477,6 +2488,14 @@ class Game {
         // task
         this.task_display.render(this.lang)
     }
+    isFloorButtonAvailableByIndex(index: number): boolean {
+        const flatten_arr = flattenNestArray(this.floor_buttons)
+        const find_index = flatten_arr.map(x => x.index).indexOf(index)
+        if (find_index === -1) {
+            return false
+        }
+        return flatten_arr[find_index].is_available
+    }
     initialize() {
         this.createFloorButtons()
         this.renderFloorButtons()
@@ -2531,13 +2550,16 @@ const binding_buttons: BindingButton[] = [
         func: (event) => {
             const class_name = 'button-selected'
             const index = parseInt((event.target as HTMLElement).getAttribute('index')!)
+            if (!game.isFloorButtonAvailableByIndex(index)) {
+                return
+            }
             if (!game.is_lifting && index === game.cur_floor) {
                 return
             }
             if ((event.target as HTMLElement).classList.contains(class_name)) {
                 (event.target as HTMLElement).classList.remove(class_name)
                 game.pending_queue.remove(index)
-                if (index === game.cur_dest) {
+                if (index === game.getCurDestination()) {
                     game.calcLiftDirection()
                 }
             } else {
@@ -2717,48 +2739,69 @@ const game_lang_list = new LanguageList([
     { id: 'en', name: 'EN' }
 ])
 const game_default_lang = 'zh_cn'
-const game_signature_list = new SignatureList([
-    { id: 'I1_sig', status: SignatureStatus.ACTIVE },
-    { id: 'I1.1_sig' },
-    { id: 'I1.2_sig', status: SignatureStatus.ACTIVE }
-
+const game_task_list = new GameTaskList([
+    {
+        id: 'skate_tsk',
+        description: { zh_cn: '霜杰想向朋友借一块滑板。', en: 'Jacob wants to borrow a skateboard from his friend.' },
+    }
 ])
 const game_action_list = new GameActionList([
     {
-        id: 'to2_act',
+        id: 'naked1_act',
         action: GameAction.polyActs(
-            GameAction.genActivateSignatureAct('I1.1_sig'),
-            GameAction.genStepPlotThredAct('I1_plt'),
-            GameAction.genFinishTaskAct('t1_tsk')
+            GameAction.genActiveTaskAct('skate_tsk'),
+            GameAction.genAddPassengerAct('jacob_psg'),
+            GameAction.genActivateSignatureAct('naked.meet_sig'),
+            GameAction.genStepPlotThredAct('naked_plt')
         )
     },
     {
-        id: 't1_act',
-        action: GameAction.genActiveTaskAct('t1_tsk')
+        id: 'naked2#1_act',
+        action: GameAction.polyActs(
+            GameAction.genRemovePassengerAct('jacob_psg')
+        )
+    },
+    {
+        id: 'naked2#2_act',
+        action: GameAction.polyActs(
+            GameAction.genActivateSignatureAct('naked.call_sig'),
+            GameAction.genStepPlotThredAct('naked_plt')
+        )
+    },
+    {
+        id: 'naked3.1_act',
+        action: GameAction.polyActs(
+            GameAction.genAddPassengerAct('jacon_psg'),
+            GameAction.genActivateSignatureAct('naked.mask_sig'),
+            GameAction.genStepPlotThredAct('naked_plt')
+        )
+    },
+    {
+        id: 'naked3.2_act',
+        action: GameAction.polyActs(
+            GameAction.genFinishTaskAct('skate_tsk')
+        )
     }
 ])
-const game_task_list = new GameTaskList([
-    {
-        id: 't1_tsk',
-        description: { zh_cn: '你好老鼠', en: 'hello world' },
-    }
+const game_signature_list = new SignatureList([
+    { id: 'naked.enter_sig', status: SignatureStatus.ACTIVE },
+    { id: 'naked.meet_sig' },
+    { id: 'naked.call_sig' },
+    { id: 'naked.mask_sig' },
+    { id: 'naked.berserk_sig' },
+    { id: 'naked.kill_sig' },
 ])
 const game_plot_thread_list = new PlotThreadList([
     {
-        id: 'I1_plt',
-        priority: 10,
+        id: 'naked_plt',
+        priority: 1000,
         signature_floor_list: [
-            { signature: 'I1_sig', floor: '1_flr' },
-            { signature: 'I1.1_sig', floor: '2_flr' },
-            // { signature: 'I1.2_sig', floor: '1_flr' },
-        ],
-        in_signatures: []
-    },
-    {
-        id: 'I2_plt',
-        priority: 1,
-        signature_floor_list: [
-            { signature: 'I1.2_sig', floor: '1_flr' }
+            { signature: 'naked.enter_sig', floor: '1_flr' },
+            { signature: 'naked.meet_sig', floor: '3_flr' },
+            { signature: 'naked.call_sig', floor: '1_flr' },
+            { signature: 'naked.mask_sig', floor: '3_flr' },
+            { signature: 'naked.berserk_sig', floor: '1_flr' },
+            { signature: 'naked.kill_sig', floor: '3_flr' },
         ],
         in_signatures: []
     }
@@ -2778,34 +2821,53 @@ const game_passenger_list = new PassengerList([
         avatar_font_color: 'white',
         avatar_text: { zh_cn: '杰', en: 'JD' },
     },
+    {
+        id: 'woman_psg',
+        name: { zh_cn: '无名女子', en: 'Unkown Woman' },
+        avatar_color: '#FCE2DB',
+        avatar_font_color: '#B270A2',
+        avatar_text: { zh_cn: '女', en: 'UK' },
+    }
 ])
 const game_passenger_me = 'me_psg'
+const bg_colors: { [name: string]: string } = {
+    f1: '#343434',
+    f2: '#393232'
+}
 const game_floor_list = new FloorList([
     {
         id: '1_flr',
-        plot_id_list: ['I1_plt', 'I2_plt'],
+        plot_id_list: ['naked_plt'],
         background: {
-            bg_color: '#73A9AD',
+            bg_color: bg_colors['f1'],
             inner_html: ''
         },
         dialog_scene: {
             id: '1_dsc',
             blocks: [
                 {
-                    id: 'A01_dbk',
-                    in_signatures: ['I1_sig'],
+                    id: 'naked1_dbk',
+                    in_signatures: ['naked.enter_sig'],
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '老鼠老鼠', en: 'rat rat' },
-                            layout: DialogLayout.RIGHT,
-                            action_id: 't1_act'
-
+                            text: { zh_cn: '总觉得', en: 'i always think that' },
+                            layout: DialogLayout.RIGHT
                         },
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '老鼠在哪里', en: 'where the rat is' },
-                            layout: DialogLayout.RIGHT,
+                            text: { zh_cn: '万事开头难呢', en: 'taking your first step is the hardest part' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '直巴', en: 'straight' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '七<br/>七<br/>七<br/>七<br/>七<br/>七<br/>七<br/>', en: '7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>7<br/>' },
+                            layout: DialogLayout.LEFT
                         },
                         {
                             person_id: 'me_psg',
@@ -2814,75 +2876,364 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '这素在', en: 'wat is that' },
+                            text: { zh_cn: '什么动静', en: 'wat happened' },
                             layout: DialogLayout.RIGHT
                         },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '在游戏里练枪练累了', en: 'tired of practicing my shooting skill in game' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '去滑板公园玩玩', en: 'wanna go to skateboard park' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '滑板小鸟啊', en: 'skatebird' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '试过手指滑板吗？', en: 'have you tried the fingerboard?' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '手指滑板牛的', en: 'fingerboard meta' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我兜里就有一个', en: 'there is one in my pocket' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '说着他从兜里掏出来一块手指滑板，其外形精致小巧', en: 'He took out a fingerboard from his pocket, which was small and exquisite' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '然后他匍匐在地面上，将中指和无名指立在手指滑板上', en: 'Then he crawled on the floor and placed his middle finger and ring finger on the fingerboard' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '在几次尝试后完成了一次漂亮的板翻', en: 'After several attempts he finally succeeded to make a perfect flip' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '我去，厉害', en: 'ong super meta' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '滑板大师', en: 'very pro' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '对了', en: 'btw' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我叫霜杰', en: 'you can call me Jacob' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '你好啊小杰', en: 'hello Jacob' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '祝你滑得开心', en: 'have fun with skateboard' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '呃', en: 'uh' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '其实我的滑板坏了，笑死', en: 'in fact my skateboard was broken lol' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '那咋办', en: 'what\'s your plan' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我打算想向朋友借滑板一用', en: 'im gonna borrow a skateboard from my fren' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '朋友家就在三楼', en: 'his room is on the 3rd floor' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '好呢', en: 'cool' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '走走走', en: 'gogogo' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '来哩', en: 'hop on' },
+                            layout: DialogLayout.LEFT,
+                            action_id: 'naked1_act'
+                        }
+                    ]
+                },
+                {
+                    id: 'naked3_dbk',
+                    in_signatures: ['naked.call_sig'],
+                    dialogs: [
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '', en: '' },
+                            layout: DialogLayout.RIGHT
+
+                        }
                     ],
                     select: {
                         options: [
-
                             {
-                                next: 'A02_dbk',
-                                text: { zh_cn: '我是0', en: 'im bottom' }
+                                next: 'naked3.1_dbk',
+                                text: { zh_cn: '去吧', en: 'Go to check again' }
                             },
                             {
-                                next: 'A02_dbk',
-                                text: { zh_cn: '我是1', en: 'im top' }
-                            }
+                                next: 'naked3.2_dbk',
+                                text: { zh_cn: '别去了', en: 'Don\'t go' }
+                            },
                         ]
                     }
                 },
                 {
-                    id: 'A02_dbk',
+                    id: 'naked3.1_dbk',
                     in_signatures: [],
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '嘻嘻', en: 'hehe' },
-                            layout: DialogLayout.RIGHT,
-                            action_id: 'to2_act'
-                        },
-                        {
-                            person_id: 'jacob_psg',
-                            text: { zh_cn: '不要南通', en: 'no homo' },
-                            layout: DialogLayout.LEFT
-                        },
-                        {
-                            person_id: 'jacob_psg',
-                            text: { zh_cn: '嗦牛牛', en: 'sword new new' },
-                            layout: DialogLayout.LEFT
+                            text: { zh_cn: '', en: '' },
+                            layout: DialogLayout.RIGHT
+
                         }
-                    ],
+                    ]
                 },
                 {
-                    id: 'A04_dbk',
-                    in_signatures: ['I1.2_sig'],
+                    id: 'naked3.2_dbk',
+                    in_signatures: [],
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '紧随其后', en: 'following' },
-                            layout: DialogLayout.MIDDLE
+                            text: { zh_cn: '', en: '' },
+                            layout: DialogLayout.RIGHT
+
                         }
-                    ],
+                    ]
                 }
             ]
         }
     },
     {
-        id: '2_flr',
-        plot_id_list: ['I1_plt'],
+        id: '3_flr',
+        plot_id_list: ['naked_plt'],
+        background: {
+            bg_color: bg_colors['f2'],
+            inner_html: ''
+        },
         dialog_scene: {
             id: '2_dsc',
             blocks: [
                 {
-                    id: 'A03_dbk',
-                    in_signatures: ['I1.1_sig'],
+                    id: 'naked2_dbk',
+                    in_signatures: ['naked.meet_sig'],
                     dialogs: [
                         {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '不知道朋友在不在家', en: 'idk whether my fren is at home or not' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
                             person_id: 'me_psg',
-                            text: { zh_cn: '测试', en: 'test' },
+                            text: { zh_cn: '你没提前打招呼啊', en: 'didn\'t you tell him in advance' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '没有', en: 'nope' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '他一般都在家的', en: 'he is usually at home' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我敲个门先', en: 'let me have a look' },
+                            layout: DialogLayout.LEFT,
+                            action_id: 'naked2#1_act'
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '霜杰走出电梯轿厢，然后径直地向前走去，在正对着电梯门的那扇门前停了下来', en: 'Jacob walked out of the elevator, walked straight forward and stopped in front of the door facing the elevator' },
                             layout: DialogLayout.MIDDLE
                         },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '霜杰按下了门铃，在等了两分钟后有人打开了门', en: 'Jacob rang the doorbell, after two minutes someone opened the door' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '嘿我就知道你在家', en: 'i know you are at home' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '你好', en: 'hello' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '？？？', en: '???' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '你是谁', en: 'who are you' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '打开门的是一位女士，霜杰似乎不认识她', en: 'it was a lady who opened the door, but it seemed that Jacob didn\'t know her' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '那位女士现在只把头探了出来', en: 'That lady only stretched out her head now' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '什么叫我是谁', en: 'wdym who am i' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '我一直住在这里', en: 'i\' ve always lived here' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我朋友呢？', en: 'where is my fren?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '哦，你是指……', en: 'oh, you mean...' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '我刚刚吃的热狗？', en: 'the hotdog i just ate?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '啥玩意？！', en: 'wtf?!' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '那位女士把门完全打开，露出了一丝不挂的全身', en: 'That lady opened the door completely, and showed her naked body' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '霜杰惊恐地看着这一景象，然后用双手把自己的眼睛遮住', en: 'Jacob looked at this scenerio scene in horror, then covered his eyes with hands' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '啊啊啊什么东西', en: 'ahhh what hell' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '我把你朋友吃了', en: 'i ate your friend' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '加了许多辣酱', en: 'with a lot of chili sauce' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '口感还是比较嫩的', en: 'but it tasted good' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '太怪了', en: 'too weird' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '确实', en: 'fr' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '为什么要放很多辣酱？', en: 'why with too much hot sauce?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '呃，因为肉比较酸，人肉都这样', en: 'uh, because the flesh is kinda sour, human flesh is always like that' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我怕辣，一提到辣的就浑身不自在', en: 'i\'m afraid of spicy food, i will feel uncomfortable when someone mentions that' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '遗憾', en: 'rip' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我先溜了', en: 'i have to go first' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '__psg',
+                            text: { zh_cn: '霜杰头也不回地跑向楼梯间，然后大步流星地下楼去了', en: 'Jacob ran to the stairwell without looking back, and went downstairs with great strides' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '没意思，这就跑了', en: 'so boring, he is just ruuning away' },
+                            layout: DialogLayout.LEFT,
+                            action_id: 'naked2#2_act'
+                        }
                     ]
                 }
             ]
