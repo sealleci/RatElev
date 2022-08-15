@@ -2561,7 +2561,7 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '去吧，我觉得你朋友不会骗你的', en: 'yes, i think your friend won\'t cheat you' },
+                            text: { zh_cn: '去吧，我觉得你朋友不会骗你的', en: 'yes, i think your friend won\'t deceive you' },
                             layout: DialogLayout.RIGHT
                         },
                         {
