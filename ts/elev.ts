@@ -3364,7 +3364,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '七七', en: 'chi chi' },
+                            text: { zh_cn: '期期', en: 'chi chi' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -3374,7 +3374,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '七七七莫七莫', en: 'chi chi chi mo chi mo' },
+                            text: { zh_cn: '期期期莫期莫', en: 'chi chi chi mo chi mo' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -3384,7 +3384,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '米七诺七莫西', en: 'mi chi no chi mo shi' },
+                            text: { zh_cn: '米期诺期莫西', en: 'mi chi no chi mo shi' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -3410,7 +3410,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '七七七莫七莫', en: 'chi chi chi mo chi mo' },
+                            text: { zh_cn: '期期期莫期莫', en: 'chi chi chi mo chi mo' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -3445,7 +3445,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '七七七莫七莫~', en: 'chi chi chi mo chi mo~' },
+                            text: { zh_cn: '期期期莫期莫~', en: 'chi chi chi mo chi mo~' },
                             layout: DialogLayout.LEFT
                         },
                         {
