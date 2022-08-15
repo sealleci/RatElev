@@ -2829,7 +2829,7 @@ const game_action_list = new GameActionList([
     {
         id: 'naked3.1_act',
         action: GameAction.polyActs(
-            GameAction.genAddPassengerAct('jacon_psg'),
+            GameAction.genAddPassengerAct('jacob_psg'),
             GameAction.genActivateSignatureAct('naked.mask_sig'),
             GameAction.genStepPlotThredAct('naked_plt')
         )
@@ -2837,7 +2837,7 @@ const game_action_list = new GameActionList([
     {
         id: 'naked3.2_act',
         action: GameAction.polyActs(
-            GameAction.genFinishTaskAct('skate_tsk')
+            GameAction.genDeactivateTaskAct('skate_tsk')
         )
     },
     {
@@ -3109,16 +3109,130 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '', en: '' },
+                            text: { zh_cn: '你在这里啊', en: 'you are here' },
                             layout: DialogLayout.RIGHT
-
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '太可怕了，兄弟', en: 'that\'s so terrible, bud' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '你看到了吗？那个女人', en: 'did you see it? that WOMAN' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '恐怖的很', en: 'horrible' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我不知道该如何是好', en: 'idk what to do next' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '给你朋友打个电话？', en: 'call your friend?' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '确实应该打一个', en: 'yeah i really shoud call him' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰拿出手机，拨打了朋友的号码，在大约一分钟的等待后，对方接听了电话', en: 'Jacob took out his cellphone and dialed his friend\'s number, after waiting for about one minute, his friend answered the call' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '罗迈，你在家吗？', en: 'Mike, are you at home?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰似乎开了免提，罗迈的声音能被清晰地听见', en: 'It seemed that Jacob turned on the speakerphone, so Mike\'s voice could be clearly heard' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '罗迈说他一直在家', en: 'Mike said he was always at home' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '真的吗？为什么刚刚我去的时候，你没在？', en: 'really? why weren\'t you at home when i went before?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '罗迈说霜杰可能搞错房间号了', en: 'Mike said Jacob might have confused the room number' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '难道不是在三楼吗？三楼正对着电梯的那一家', en: 'isn\'t it on the 3rd floor? the one facing the elevator' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '罗迈说那没错啊', en: 'Mike said that\'s right' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '可是刚才给我开门的是个女人', en: 'but it was a woman who opened the door for me' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '她还说把你吃掉了', en: 'she also said she ate you up' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '电话那头传来了几声嘲笑，然后罗迈说不要开玩笑了', en: 'A few jeers came from the other end of the cellphone, then Mike said don\'t be kidding' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '这……好吧，你确定你现在真的在家？', en: 'alr, are you sure you\'re really at home now?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '罗迈说他真的在，并告诉霜杰他可以现在就过来', en: 'Mike said he was, and told Jacob that he could come right now' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '嗯，行', en: 'okay' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰挂断了电话', en: 'Jacob hung up the cellphone' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '呃，我现在有点犹豫', en: 'well i\'m a little hesitant now' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我要不要再去一次呢？', en: 'should i go again?' },
+                            layout: DialogLayout.LEFT
                         }
                     ],
                     select: {
                         options: [
                             {
                                 next: 'naked3.1_dbk',
-                                text: { zh_cn: '去吧', en: 'Go to check again' }
+                                text: { zh_cn: '去吧', en: 'Go again' }
                             },
                             {
                                 next: 'naked3.2_dbk',
@@ -3133,9 +3247,34 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '', en: '' },
+                            text: { zh_cn: '去吧，我觉得你朋友不会骗你的', en: 'yes, i think your friend won\'t deceive you' },
                             layout: DialogLayout.RIGHT
-
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '是，他人挺好', en: 'well, he\'s nice though' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '……', en: '...' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '算了，没啥可顾虑的', en: 'nvm, nothing to worry about' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '走', en: 'go' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '走走走', en: 'let\'s go' },
+                            layout: DialogLayout.RIGHT,
+                            action_id: 'naked3.1_act'
                         }
                     ]
                 },
@@ -3145,9 +3284,49 @@ const game_floor_list = new FloorList([
                     dialogs: [
                         {
                             person_id: 'me_psg',
-                            text: { zh_cn: '', en: '' },
+                            text: { zh_cn: '呃，还是别去了', en: 'uh, i think you shouldn\'t go again' },
                             layout: DialogLayout.RIGHT
-
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '万一那个女人还没走', en: 'what if that woman hasn\'t left' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '十分恐怖啊', en: 'so terrible' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '啊啊啊', en: 'ahhh' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我现在没心情去玩滑板了', en: 'i have no intention to go skateboarding now' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我想回去了', en: 'i want to go back' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '改天再说吧，今天真糟心', en: 'maybe another day for skateboarding, but not today' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '溜了溜了，逃离这里', en: 'i get to go, get out of here' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '再见', en: 'bye' },
+                            layout: DialogLayout.RIGHT,
+                            action_id: 'naked3.2_act'
                         }
                     ]
                 }
@@ -3511,6 +3690,17 @@ const game_floor_list = new FloorList([
                             text: { zh_cn: '没意思，这就跑了', en: 'so boring, he is just ruuning away' },
                             layout: DialogLayout.LEFT,
                             action_id: 'naked2#2_act'
+                        }
+                    ]
+                },
+                {
+                    id: 'naked4_dbk',
+                    in_signatures: ['naked.mask_sig'],
+                    dialogs: [
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '', en: '' },
+                            layout: DialogLayout.LEFT
                         }
                     ]
                 }
