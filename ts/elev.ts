@@ -2258,12 +2258,14 @@ class Game {
         Game.hideGoOnButton()
         Game.hideOptions()
         clearChildren(qs('#dialog-container') as HTMLElement)
+        const bg: HTMLElement = qs('#background')
         const floor = this.getCurrentFloor()
         if (floor === null) {
+            bg.style.backgroundColor = ''
+            bg.innerHTML = ''
             return
         }
         floor.checkPlotThreads()
-        const bg: HTMLElement = qs('#background')
         bg.style.backgroundColor = floor.background.bg_color
         bg.innerHTML = floor.background.inner_html
         // render visited blocks
@@ -2923,12 +2925,19 @@ const game_passenger_list = new PassengerList([
         avatar_color: '#BAFFB4',
         avatar_font_color: '#FF6363',
         avatar_text: { zh_cn: '桃', en: 'HP' }
+    },
+    {
+        id: 'mike_psg',
+        name: { zh_cn: '罗迈', en: 'Mike Robert' },
+        avatar_color: 'white',
+        avatar_font_color: 'black',
+        avatar_text: { zh_cn: '罗', en: 'MR' }
     }
 ])
 const game_passenger_me = 'me_psg'
 const bg_colors: { [name: string]: string } = {
     f1: '#343434',
-    f2: '#2E0249',
+    f2: '#2D2424',
     f3: '#393232'
 }
 const game_floor_list = new FloorList([
@@ -3149,7 +3158,7 @@ const game_floor_list = new FloorList([
         id: '2_flr',
         plot_id_list: ['peach_plt'],
         background: {
-            bg_color: bg_colors['f3'],
+            bg_color: bg_colors['f2'],
             inner_html: ''
         },
         dialog_scene: {
@@ -3201,18 +3210,18 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '在小女孩唱出第一句歌词后，你发觉电梯轿厢里的重力的减弱了', en: 'After the little girl sang the first lyrics, you found that the gravity in the elevator was reduced' },
+                            text: { zh_cn: '在小女孩唱出第一句歌词后，你发觉电梯轿厢里的重力减弱了', en: 'After the little girl sang the first lyrics, you found that the gravity in the elevator was reduced' },
                             layout: DialogLayout.MIDDLE,
                             action_id: 'peach.start_act'
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '楼层显示板上的数值开始抖动抽搐，而且所有按钮都失效了', en: 'The floor display panel began to show random numbers, and all the buttons didn\'t work anymore' },
+                            text: { zh_cn: '楼层显示板上的数值开始浮动，而且所有按钮都失效了', en: 'The floor display panel began to show random numbers, and all the buttons didn\'t work anymore' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '然后你发现在电梯里镜子中，也有一个镜像猫耳小女孩在疯狂地跳舞', en: 'Then you found that in the mirror of the elevator, there was another little girl dancing crazily' },
+                            text: { zh_cn: '然后你发现在电梯的镜子里，也有一个镜像猫耳小女孩在疯狂地跳舞', en: 'Then you found that in the mirror of the elevator, there was another little girl dancing crazily' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
@@ -3247,7 +3256,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '鼠蕾娜可爱喵', en: 'Ratrana is cute nya' },
+                            text: { zh_cn: '鼠蕾娜可爱喵', en: 'Ratrena is cute nya' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -3489,7 +3498,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'jacob_psg',
-                            text: { zh_cn: '我先溜了', en: 'i have to go first' },
+                            text: { zh_cn: '我先溜了', en: 'i get to go first' },
                             layout: DialogLayout.LEFT
                         },
                         {
