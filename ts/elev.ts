@@ -3358,7 +3358,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '霜杰走出电梯轿厢，然后径直地向前走去，在正对着电梯门的那扇门前停了下来', en: 'Jacob walked out of the elevator, walked straight forward and stopped in front of the door facing the elevator' },
+                            text: { zh_cn: '霜杰走出电梯轿厢，然后径直地向前走去，在正对着电梯门的那扇门前停了下来', en: 'Jacob walked out of the elevator, then walked straight forward and stopped in front of the door facing the elevator' },
                             layout: DialogLayout.MIDDLE,
                             action_id: 'naked2#1_act'
                         },
