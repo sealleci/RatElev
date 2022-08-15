@@ -149,7 +149,7 @@ body {
     opacity: .75;
 }
 
-#task-list-warp {
+#task-list-wrap {
     width: 80%;
     position: relative;
     display: flex;
@@ -183,7 +183,7 @@ body {
     overflow-y: scroll;
 }
 
-#task-list-warp::before {
+#task-list-wrap::before {
     content: '';
     position: absolute;
     width: 12px;
@@ -348,6 +348,10 @@ body {
 .invisible {
     opacity: 0;
     cursor: default !important;
+    pointer-events: none;
+}
+
+.unclickable {
     pointer-events: none;
 }
 
@@ -544,6 +548,43 @@ body {
     width: 100%;
     height: 90%;
     z-index: 10;
+}
+
+@keyframes flash {
+    0% {
+        background-color: #2E0249;
+    }
+
+    16.67% {
+        background-color: #570A57;
+    }
+
+    33.33% {
+        background-color: #A91079;
+    }
+
+    50% {
+        background-color: #F806CC;
+    }
+
+    66.67% {
+        background-color: #A91079;
+
+    }
+
+    83.33% {
+        background-color: #570A57;
+
+    }
+
+    100% {
+        background-color: #2E0249;
+    }
+}
+
+.color-flash {
+    animation: flash 1s infinite;
+    transition: background-color .018s;
 }
 
 #background {
@@ -837,6 +878,9 @@ body {
     border-radius: 15px 15px 15px 0;
     text-shadow: rgba(0, 0, 0, .8) 0 0 2px;
     overflow-y: scroll;
+    background-color: rgba(89, 89, 89, .2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .option-button>div {
@@ -851,7 +895,7 @@ body {
 .option-button:active {
     border-color: transparent;
     background-color: rgba(244, 115, 185, .9);
-    box-shadow: 0 0 4px rgba(0, 0, 0, .25);
+    box-shadow: 0 0 4px rgba(255, 255, 255, .2);
 }
 
 #save-panel {
@@ -952,7 +996,7 @@ body {
     /* background-color: #2C3333; */
 }
 
-#save-text-area-warp {
+#save-text-area-wrap {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -1009,7 +1053,7 @@ body {
     width: 100%;
 }
 
-.save-button-warp {
+.save-button-wrap {
     position: relative;
     display: flex;
     flex-direction: row;
@@ -1024,19 +1068,19 @@ body {
     overflow: hiddens;
 }
 
-.save-button-warp:hover {
+.save-button-wrap:hover {
     outline: 2px solid rgba(255, 255, 255, .25);
 }
 
-.save-button-warp:active {
+.save-button-wrap:active {
     outline: 2px solid rgba(255, 255, 255, .6);
 }
 
-.save-button-warp:active>#save-export-button {
+.save-button-wrap:active>#save-export-button {
     background-color: #aaeefa;
 }
 
-.save-button-warp:active>#save-import-button {
+.save-button-wrap:active>#save-import-button {
     background-color: #fde6b0;
 }
 

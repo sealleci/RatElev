@@ -1,4 +1,5 @@
 declare function sleep(time: number): Promise<unknown>;
+declare function getRandomInt(min: number, max?: number): number;
 declare function range(...args: number[]): number[];
 declare type NestedArray<T> = Array<NestedArray<T> | T>;
 declare function flattenNestArray<T>(nest_array: NestedArray<T>): T[];
@@ -386,9 +387,13 @@ declare class FloorDisplay {
     private display_number;
     private up_icon;
     private down_icon;
+    private static random_timer;
+    private static pre_number;
     constructor();
     updateIcon(status: FloorLiftStatus): void;
     updateNumber(num: number): void;
+    static startRandomDisplay(): void;
+    static stopRandomDisplay(): void;
 }
 declare enum SavePanelDir {
     OPEN = "open",
@@ -515,6 +520,10 @@ declare class Game {
     static hideOptions(): void;
     static showOptions(): void;
     getCurrentFloor(): Floor | null;
+    static disableFloorButtons(): void;
+    static enableFloorButtons(): void;
+    static disableSaveButtons(): void;
+    static enableSaveButtons(): void;
     static getTFIcon(icon_type: boolean): HTMLElement;
     static checkWhenBlockFinish(floor: Floor, block: DialogBlock): void;
     static createAvatar(psg_id: string, lang: string): HTMLElement;

@@ -13,6 +13,13 @@ function sleep(time) {
         setTimeout(resolve, time);
     });
 }
+function getRandomInt(min, max) {
+    if (max === undefined) {
+        max = min;
+        min = 0;
+    }
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 function range(...args) {
     let start = 0;
     let end = 0;
@@ -1017,6 +1024,8 @@ class FloorDisplay {
         this.display_number = null;
         this.up_icon = null;
         this.down_icon = null;
+        FloorDisplay.random_timer = undefined;
+        FloorDisplay.pre_number = undefined;
     }
     updateIcon(status) {
         if (this.up_icon === null) {
@@ -1052,6 +1061,26 @@ class FloorDisplay {
             this.display_number = qs('#display-number');
         }
         this.display_number.textContent = num.toString();
+    }
+    static startRandomDisplay() {
+        var _a, _b;
+        FloorDisplay.pre_number = (_b = parseInt((_a = qs('#display-number').textContent) !== null && _a !== void 0 ? _a : '')) !== null && _b !== void 0 ? _b : 0;
+        FloorDisplay.random_timer = setInterval(() => {
+            const display = qs('#display-number');
+            if (display !== null) {
+                display.textContent = getRandomInt(-99, 99).toString();
+            }
+        }, 200);
+    }
+    static stopRandomDisplay() {
+        var _a;
+        if (FloorDisplay.random_timer) {
+            clearInterval(FloorDisplay.random_timer);
+            const display = qs('#display-number');
+            if (display !== null) {
+                display.textContent = ((_a = FloorDisplay.pre_number) !== null && _a !== void 0 ? _a : 0).toString();
+            }
+        }
     }
 }
 var SavePanelDir;
@@ -1384,6 +1413,26 @@ class Game {
     }
     getCurrentFloor() {
         return game_floor_list.getById(`${this.cur_floor}_flr`);
+    }
+    static disableFloorButtons() {
+        qsa('.button-col').forEach(button => {
+            button.classList.add('unclickable');
+        });
+    }
+    static enableFloorButtons() {
+        qsa('.button-col').forEach(button => {
+            button.classList.remove('unclickable');
+        });
+    }
+    static disableSaveButtons() {
+        qsa('.save-button-wrap').forEach(button => {
+            button.classList.add('unclickable');
+        });
+    }
+    static enableSaveButtons() {
+        qsa('.save-button-wrap').forEach(button => {
+            button.classList.remove('unclickable');
+        });
     }
     static getTFIcon(icon_type) {
         if (icon_type) {
@@ -1981,7 +2030,7 @@ const binding_buttons = [
         })
     },
     {
-        selector: '#save-export-button-warp',
+        selector: '#save-export-button-wrap',
         is_single: true,
         func: () => {
             clearChildren(qs('#save-export-button'));
@@ -1998,7 +2047,7 @@ const binding_buttons = [
         }
     },
     {
-        selector: '#save-import-button-warp',
+        selector: '#save-import-button-wrap',
         is_single: true,
         func: () => {
             clearChildren(qs('#save-export-button'));
@@ -2114,6 +2163,14 @@ const game_action_list = new GameActionList([
     {
         id: 'naked3.2_act',
         action: GameAction.polyActs(GameAction.genFinishTaskAct('skate_tsk'))
+    },
+    {
+        id: 'peach.start_act',
+        action: GameAction.polyActs(Game.disableFloorButtons, Game.disableSaveButtons, FloorDisplay.startRandomDisplay, () => { var _a; (_a = qs('#background')) === null || _a === void 0 ? void 0 : _a.classList.add('color-flash'); })
+    },
+    {
+        id: 'peach.stop_act',
+        action: GameAction.polyActs(Game.enableFloorButtons, Game.enableSaveButtons, FloorDisplay.stopRandomDisplay, () => { var _a; (_a = qs('#background')) === null || _a === void 0 ? void 0 : _a.classList.remove('color-flash'); })
     }
 ]);
 const game_signature_list = new SignatureList([
@@ -2123,11 +2180,12 @@ const game_signature_list = new SignatureList([
     { id: 'naked.mask_sig' },
     { id: 'naked.berserk_sig' },
     { id: 'naked.kill_sig' },
+    { id: 'peach_sig', status: SignatureStatus.ACTIVE }
 ]);
 const game_plot_thread_list = new PlotThreadList([
     {
         id: 'naked_plt',
-        priority: 1000,
+        priority: 1001,
         signature_floor_list: [
             { signature: 'naked.enter_sig', floor: '1_flr' },
             { signature: 'naked.meet_sig', floor: '3_flr' },
@@ -2135,6 +2193,14 @@ const game_plot_thread_list = new PlotThreadList([
             { signature: 'naked.mask_sig', floor: '3_flr' },
             { signature: 'naked.berserk_sig', floor: '1_flr' },
             { signature: 'naked.kill_sig', floor: '3_flr' },
+        ],
+        in_signatures: []
+    },
+    {
+        id: 'peach_plt',
+        priority: 101,
+        signature_floor_list: [
+            { signature: 'peach_sig', floor: '2_flr' }
         ],
         in_signatures: []
     }
@@ -2160,12 +2226,20 @@ const game_passenger_list = new PassengerList([
         avatar_color: '#FCE2DB',
         avatar_font_color: '#B270A2',
         avatar_text: { zh_cn: '女', en: 'UK' },
+    },
+    {
+        id: 'peach_psg',
+        name: { zh_cn: '桃乐乐', en: 'Happy Peach' },
+        avatar_color: '#BAFFB4',
+        avatar_font_color: '#FF6363',
+        avatar_text: { zh_cn: '桃', en: 'HP' }
     }
 ]);
 const game_passenger_me = 'me_psg';
 const bg_colors = {
     f1: '#343434',
-    f2: '#393232'
+    f2: '#2E0249',
+    f3: '#393232'
 };
 const game_floor_list = new FloorList([
     {
@@ -2243,17 +2317,17 @@ const game_floor_list = new FloorList([
                             layout: DialogLayout.LEFT
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '说着他从兜里掏出来一块手指滑板，其外形精致小巧', en: 'He took out a fingerboard from his pocket, which was small and exquisite' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '然后他匍匐在地面上，将中指和无名指立在手指滑板上', en: 'Then he crawled on the floor and placed his middle finger and ring finger on the fingerboard' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '在几次尝试后完成了一次漂亮的板翻', en: 'After several attempts he finally succeeded to make a perfect flip' },
                             layout: DialogLayout.MIDDLE
                         },
@@ -2379,10 +2453,181 @@ const game_floor_list = new FloorList([
         }
     },
     {
+        id: '2_flr',
+        plot_id_list: ['peach_plt'],
+        background: {
+            bg_color: bg_colors['f3'],
+            inner_html: ''
+        },
+        dialog_scene: {
+            id: '3_dsc',
+            blocks: [
+                {
+                    id: 'peach_dbk',
+                    in_signatures: ['peach_sig'],
+                    dialogs: [
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '在电梯门打开后，你看到了一位身材矮小的小女孩', en: 'After the elevator door opened, you saw a little girl' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '这个小女孩有着粉色的头发，而且身着粉色的连衣裙，头上还戴着浅绿色的猫耳', en: 'This little girl had pink hair, and she was wearing a pink dress and light green cat ears on her head' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '小女孩正看着你，不知道她有何打算', en: 'The little girl was looking at you, nobody knew what she was going to do' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '七七', en: 'chi chi' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '什么？', en: 'what?' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '七七七莫七莫', en: 'chi chi chi mo chi mo' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '什么歌儿？', en: 'what song?' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '米七诺七莫西', en: 'mi chi no chi mo shi' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '在小女孩唱出第一句歌词后，你发觉电梯轿厢里的重力的减弱了', en: 'After the little girl sang the first lyrics, you found that the gravity in the elevator was reduced' },
+                            layout: DialogLayout.MIDDLE,
+                            action_id: 'peach.start_act'
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '楼层显示板上的数值开始抖动抽搐，而且所有按钮都失效了', en: 'The floor display panel began to show random numbers, and all the buttons didn\'t work anymore' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '然后你发现在电梯里镜子中，也有一个镜像猫耳小女孩在疯狂地跳舞', en: 'Then you found that in the mirror of the elevator, there was another little girl dancing crazily' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '我去……', en: 'ong...' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '七七七莫七莫', en: 'chi chi chi mo chi mo' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '只见小女孩边唱边跳，几束粉色的激光从她身上向外射出', en: 'The little girl sang and danced, and several pink lasers shot out from her' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '粉色激光充斥了整个电梯轿厢，一切都被浸润在粉色的闪烁之中', en: 'The pink lasers filled the whole elevator, and everything was soaked in the pink light' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '在被激光射中后，你的身体也开始起舞，如同脱缰的野马，一发不可收拾', en: 'After being shot by lasers, your body also started to dance, like a runaway wild horse, totally out of control' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '绯红档案好玩喵', en: 'Scarlet Documentation is a good game nya' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '鼠蕾娜可爱喵', en: 'Ratrana is cute nya' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '我去……', en: 'ong...' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '七七七莫七莫~', en: 'chi chi chi mo chi mo~' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '小女孩歌声让整个电梯都在颤抖，而炫光更是强化了这一震感', en: 'The little girl\'s voice made the whole elevator tremble, and the pink lasers strengthened the the feeling of shock' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '你担心电梯会在某一时刻坠落，但你的舞步却重重地踏在电梯的地板上', en: 'You worried that the elevator would fall at a certain moment, but your dance steps were heavily on the floor of the elevator' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '小女孩越跳越起劲，节奏不断加快，你的舞蹈节奏也随之加快', en: 'The little girl danced harder and harder, and her rhythm kept accelerating, so did your dancing rhythm' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'peach_psg',
+                            text: { zh_cn: '喵呐~', en: 'nya na~' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '不要二次元……', en: 'no more anime...' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '一切戛然而止', en: 'Everything suddenly stopped' },
+                            layout: DialogLayout.MIDDLE,
+                            action_id: 'peach.stop_act'
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '歌声消失了，炫光消失了，舞蹈消失了，小女孩也消失了', en: 'The song disappeared, the pink light disappeared, the dance disappeared, and the little girl disappeared' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '电梯也回到了原来安全的样子，不再那么摇摇欲坠了', en: 'The elevator had also returned to the safe state and was no longer dangerous' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '只留下你一个人在原地迷茫', en: 'And you were thrown into confusion' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '刚刚是什么动静……', en: 'what just happened...' },
+                            layout: DialogLayout.RIGHT
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
         id: '3_flr',
         plot_id_list: ['naked_plt'],
         background: {
-            bg_color: bg_colors['f2'],
+            bg_color: bg_colors['f3'],
             inner_html: ''
         },
         dialog_scene: {
@@ -2419,12 +2664,12 @@ const game_floor_list = new FloorList([
                             action_id: 'naked2#1_act'
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '霜杰走出电梯轿厢，然后径直地向前走去，在正对着电梯门的那扇门前停了下来', en: 'Jacob walked out of the elevator, walked straight forward and stopped in front of the door facing the elevator' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '霜杰按下了门铃，在等了两分钟后有人打开了门', en: 'Jacob rang the doorbell, after two minutes someone opened the door' },
                             layout: DialogLayout.MIDDLE
                         },
@@ -2449,12 +2694,12 @@ const game_floor_list = new FloorList([
                             layout: DialogLayout.LEFT
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '打开门的是一位女士，霜杰似乎不认识她', en: 'it was a lady who opened the door, but it seemed that Jacob didn\'t know her' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '那位女士现在只把头探了出来', en: 'That lady only stretched out her head now' },
                             layout: DialogLayout.MIDDLE
                         },
@@ -2489,18 +2734,18 @@ const game_floor_list = new FloorList([
                             layout: DialogLayout.LEFT
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '那位女士把门完全打开，露出了一丝不挂的全身', en: 'That lady opened the door completely, and showed her naked body' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
-                            person_id: '__psg',
-                            text: { zh_cn: '霜杰惊恐地看着这一景象，然后用双手把自己的眼睛遮住', en: 'Jacob looked at this scenerio scene in horror, then covered his eyes with hands' },
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰惊恐地看着这一景象，然后用双手把自己的眼睛遮住', en: 'Jacob looked at this scene in horror, then covered his eyes with hands' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
                             person_id: 'jacob_psg',
-                            text: { zh_cn: '啊啊啊什么东西', en: 'ahhh what hell' },
+                            text: { zh_cn: '啊啊啊什么东西', en: 'ahhh what the hell' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -2535,12 +2780,12 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'woman_psg',
-                            text: { zh_cn: '呃，因为肉比较酸，人肉都这样', en: 'uh, because the flesh is kinda sour, human flesh is always like that' },
+                            text: { zh_cn: '呃，因为你朋友尝起来比较酸，人肉都这样', en: 'uh, because your friend tasted sour, human flesh is always like that' },
                             layout: DialogLayout.LEFT
                         },
                         {
                             person_id: 'jacob_psg',
-                            text: { zh_cn: '我怕辣，一提到辣的就浑身不自在', en: 'i\'m afraid of spicy food, i will feel uncomfortable when someone mentions that' },
+                            text: { zh_cn: '我怕辣，一提到辣的就浑身不自在', en: 'i\'m afraid of spicy food, and i will feel uncomfortable when someone mentions that' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -2554,7 +2799,7 @@ const game_floor_list = new FloorList([
                             layout: DialogLayout.LEFT
                         },
                         {
-                            person_id: '__psg',
+                            person_id: '&_psg',
                             text: { zh_cn: '霜杰头也不回地跑向楼梯间，然后大步流星地下楼去了', en: 'Jacob ran to the stairwell without looking back, and went downstairs with great strides' },
                             layout: DialogLayout.MIDDLE
                         },
