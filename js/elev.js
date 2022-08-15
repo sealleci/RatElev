@@ -2171,6 +2171,10 @@ const game_action_list = new GameActionList([
     {
         id: 'peach.stop_act',
         action: GameAction.polyActs(Game.enableFloorButtons, Game.enableSaveButtons, FloorDisplay.stopRandomDisplay, () => { var _a; (_a = qs('#background')) === null || _a === void 0 ? void 0 : _a.classList.remove('color-flash'); })
+    },
+    {
+        id: 'peach.finish_act',
+        action: GameAction.polyActs(GameAction.genStepPlotThredAct('peach_plt'))
     }
 ]);
 const game_signature_list = new SignatureList([
@@ -2616,7 +2620,8 @@ const game_floor_list = new FloorList([
                         {
                             person_id: 'me_psg',
                             text: { zh_cn: '刚刚是什么动静……', en: 'what just happened...' },
-                            layout: DialogLayout.RIGHT
+                            layout: DialogLayout.RIGHT,
+                            action_id: 'peach.finish_act'
                         }
                     ]
                 }

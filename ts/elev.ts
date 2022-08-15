@@ -2763,7 +2763,7 @@ function bindButtonFunctions() {
         if (bind.is_single) {
             qs(bind.selector).addEventListener('click', bind.func)
         } else {
-            for (let button of Array.from(qsa(bind.selector)) as HTMLElement[]) {
+            for (let button of Array.from(qsa(bind.selector))) {
                 button.addEventListener('click', bind.func)
             }
         }
@@ -2854,6 +2854,12 @@ const game_action_list = new GameActionList([
             Game.enableSaveButtons,
             FloorDisplay.stopRandomDisplay,
             () => { qs('#background')?.classList.remove('color-flash') }
+        )
+    },
+    {
+        id: 'peach.finish_act',
+        action: GameAction.polyActs(
+            GameAction.genStepPlotThredAct('peach_plt')
         )
     }
 ])
@@ -3303,7 +3309,8 @@ const game_floor_list = new FloorList([
                         {
                             person_id: 'me_psg',
                             text: { zh_cn: '刚刚是什么动静……', en: 'what just happened...' },
-                            layout: DialogLayout.RIGHT
+                            layout: DialogLayout.RIGHT,
+                            action_id: 'peach.finish_act'
                         }
                     ]
                 }
@@ -3347,13 +3354,13 @@ const game_floor_list = new FloorList([
                         {
                             person_id: 'jacob_psg',
                             text: { zh_cn: '我敲个门先', en: 'let me have a look' },
-                            layout: DialogLayout.LEFT,
-                            action_id: 'naked2#1_act'
+                            layout: DialogLayout.LEFT
                         },
                         {
                             person_id: '&_psg',
                             text: { zh_cn: '霜杰走出电梯轿厢，然后径直地向前走去，在正对着电梯门的那扇门前停了下来', en: 'Jacob walked out of the elevator, walked straight forward and stopped in front of the door facing the elevator' },
-                            layout: DialogLayout.MIDDLE
+                            layout: DialogLayout.MIDDLE,
+                            action_id: 'naked2#1_act'
                         },
                         {
                             person_id: '&_psg',
