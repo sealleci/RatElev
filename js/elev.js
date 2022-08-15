@@ -2582,7 +2582,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '小女孩歌声让整个电梯都在颤抖，而炫光更是强化了这一震感', en: 'The little girl\'s voice made the whole elevator tremble, and the pink lasers strengthened the the feeling of shock' },
+                            text: { zh_cn: '小女孩的歌声让整个电梯都在颤抖，而炫光更是强化了这一震感', en: 'The little girl\'s voice made the whole elevator tremble, and the pink lasers strengthened the the feeling of shock' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
