@@ -3162,7 +3162,7 @@ const game_floor_list = new FloorList([
             inner_html: ''
         },
         dialog_scene: {
-            id: '3_dsc',
+            id: '2_dsc',
             blocks: [
                 {
                     id: 'peach_dbk',
@@ -3251,7 +3251,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '绯红档案好玩喵', en: 'Scarlet Documentation is a good game nya' },
+                            text: { zh_cn: '绯红文档好玩喵', en: 'Scarlet Documentation is a good game nya' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -3334,7 +3334,7 @@ const game_floor_list = new FloorList([
             inner_html: ''
         },
         dialog_scene: {
-            id: '2_dsc',
+            id: '3_dsc',
             blocks: [
                 {
                     id: 'naked2_dbk',

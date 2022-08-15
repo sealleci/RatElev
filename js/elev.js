@@ -2239,6 +2239,13 @@ const game_passenger_list = new PassengerList([
         avatar_color: '#BAFFB4',
         avatar_font_color: '#FF6363',
         avatar_text: { zh_cn: '桃', en: 'HP' }
+    },
+    {
+        id: 'mike_psg',
+        name: { zh_cn: '罗迈', en: 'Mike Robert' },
+        avatar_color: 'white',
+        avatar_font_color: 'black',
+        avatar_text: { zh_cn: '罗', en: 'MR' }
     }
 ]);
 const game_passenger_me = 'me_psg';
@@ -2466,7 +2473,7 @@ const game_floor_list = new FloorList([
             inner_html: ''
         },
         dialog_scene: {
-            id: '3_dsc',
+            id: '2_dsc',
             blocks: [
                 {
                     id: 'peach_dbk',
@@ -2555,7 +2562,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'peach_psg',
-                            text: { zh_cn: '绯红档案好玩喵', en: 'Scarlet Documentation is a good game nya' },
+                            text: { zh_cn: '绯红文档好玩喵', en: 'Scarlet Documentation is a good game nya' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -2638,7 +2645,7 @@ const game_floor_list = new FloorList([
             inner_html: ''
         },
         dialog_scene: {
-            id: '2_dsc',
+            id: '3_dsc',
             blocks: [
                 {
                     id: 'naked2_dbk',
