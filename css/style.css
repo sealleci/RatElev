@@ -709,7 +709,7 @@ body {
 
 .dialog-box.mid-dialog-box {
     /* background: linear-gradient(90deg, transparent 0%, rgba(125, 125, 125, .6) 50%, transparent 100%); */
-    max-width: 77%;
+    max-width: 76%;
     /* background-color: rgba(125, 125, 125, .6); */
     border-radius: 10px;
     text-align: center;

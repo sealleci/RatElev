@@ -2178,7 +2178,11 @@ class Game {
                 block.stepIndex()
                 Game.showGoOnButton()
             } else {
-                Game.hideOptions()
+                if (block.isLastItemNotSelect()) {
+                    Game.hideOptions()
+                } else {
+                    Game.showOptions()
+                }
                 Game.hideGoOnButton()
             }
             return
@@ -2601,6 +2605,33 @@ async function clickSwitchLangButton(dir: LangBtnDir) {
     }
 }
 
+function clickGoOnButton() {
+    const block = game.getCurrentFloor()?.dialog_scene.getCurDialogBlock()
+    if (!block) {
+        return
+    }
+    Game.stepDialog(block, game.lang)
+    const cur_floor = game.getCurrentFloor()
+    if (cur_floor !== null) {
+        Game.checkWhenBlockFinish(cur_floor, block)
+    }
+    // if (block.isFinished() && block.isLastItemNotSelect()) {
+    //     Game.hideOptions()
+    //     const cur_floor = game.getCurrentFloor()
+    //     if (cur_floor !== null) {
+    //         if (cur_floor.checkPlotThreads()) {
+    //             Game.showGoOnButton()
+    //         } else {
+    //             Game.hideGoOnButton()
+    //         }
+    //         if (block.id !== cur_floor.dialog_scene.cur_block_id) {
+    //             cur_floor.dialog_scene.addVisitedBlock(block.id)
+    //         }
+    //     }
+    // }
+    Game.jumpToBottom()
+}
+
 const binding_buttons: BindingButton[] = [
     {
         selector: '.number-button',
@@ -2724,30 +2755,7 @@ const binding_buttons: BindingButton[] = [
         selector: '#go-on-button-row',
         is_single: true,
         func: () => {
-            const block = game.getCurrentFloor()?.dialog_scene.getCurDialogBlock()
-            if (!block) {
-                return
-            }
-            Game.stepDialog(block, game.lang)
-            const cur_floor = game.getCurrentFloor()
-            if (cur_floor !== null) {
-                Game.checkWhenBlockFinish(cur_floor, block)
-            }
-            // if (block.isFinished() && block.isLastItemNotSelect()) {
-            //     Game.hideOptions()
-            //     const cur_floor = game.getCurrentFloor()
-            //     if (cur_floor !== null) {
-            //         if (cur_floor.checkPlotThreads()) {
-            //             Game.showGoOnButton()
-            //         } else {
-            //             Game.hideGoOnButton()
-            //         }
-            //         if (block.id !== cur_floor.dialog_scene.cur_block_id) {
-            //             cur_floor.dialog_scene.addVisitedBlock(block.id)
-            //         }
-            //     }
-            // }
-            Game.jumpToBottom()
+            clickGoOnButton()
         }
     },
     {
@@ -2785,9 +2793,27 @@ function addDialogScrollListener() {
 }
 
 // main
+let long_press_timer: number = NaN
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize()
     bindButtonFunctions()
+    window.addEventListener('keydown', (event) => {
+        if (event.code === 'KeyZ' &&
+            game.door.is_open &&
+            qs('#go-on-button-row').style.display !== 'none') {
+            if (isNaN(long_press_timer)) {
+                long_press_timer = setInterval(() => {
+                    clickGoOnButton()
+                }, 25)
+            }
+        }
+    })
+    window.addEventListener('keyup', (event) => {
+        if (event.code === 'KeyZ') {
+            clearInterval(long_press_timer)
+            long_press_timer = NaN
+        }
+    })
     addDialogScrollListener()
     game.debug()
 })
@@ -2838,6 +2864,40 @@ const game_action_list = new GameActionList([
         id: 'naked3.2_act',
         action: GameAction.polyActs(
             GameAction.genDeactivateTaskAct('skate_tsk')
+        )
+    },
+    {
+        id: 'naked4#1_act',
+        action: GameAction.polyActs(
+            GameAction.genRemovePassengerAct('jacob_psg')
+        )
+    },
+    {
+        id: 'naked4#2_act',
+        action: GameAction.polyActs(
+            GameAction.genActivateSignatureAct('naked.berserk_sig'),
+            GameAction.genStepPlotThredAct('naked_plt')
+        )
+    },
+    {
+        id: 'naked5_act',
+        action: GameAction.polyActs(
+            GameAction.genAddPassengerAct('jacob_psg'),
+            GameAction.genActivateSignatureAct('naked.kill_sig'),
+            GameAction.genStepPlotThredAct('naked_plt')
+        )
+    },
+    {
+        id: 'naked6#1_act',
+        action: GameAction.polyActs(
+            GameAction.genRemovePassengerAct('jacob_psg')
+        )
+    },
+    {
+        id: 'naked6#2_act',
+        action: GameAction.polyActs(
+            GameAction.genFinishTaskAct('skate_tsk'),
+            GameAction.genStepPlotThredAct('naked_plt')
         )
     },
     {
@@ -3139,7 +3199,7 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: 'jacob_psg',
-                            text: { zh_cn: '确实应该打一个', en: 'yeah i really shoud call him' },
+                            text: { zh_cn: '确实应该打一下', en: 'yeah i really shoud call him' },
                             layout: DialogLayout.LEFT
                         },
                         {
@@ -3327,6 +3387,17 @@ const game_floor_list = new FloorList([
                             text: { zh_cn: '再见', en: 'bye' },
                             layout: DialogLayout.RIGHT,
                             action_id: 'naked3.2_act'
+                        }
+                    ]
+                },
+                {
+                    id: 'naked5_dbk',
+                    in_signatures: ['naked.berserk_sig'],
+                    dialogs: [
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '', en: '' },
+                            layout: DialogLayout.RIGHT
                         }
                     ]
                 }
@@ -3701,6 +3772,17 @@ const game_floor_list = new FloorList([
                             person_id: 'mike_psg',
                             text: { zh_cn: '', en: '' },
                             layout: DialogLayout.LEFT
+                        }
+                    ]
+                },
+                {
+                    id: 'naked6_dbk',
+                    in_signatures: ['naked.kill_sig'],
+                    dialogs: [
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '', en: '' },
+                            layout: DialogLayout.RIGHT
                         }
                     ]
                 }

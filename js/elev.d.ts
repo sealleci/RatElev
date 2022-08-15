@@ -558,9 +558,11 @@ interface BindingButton {
     func: (this: HTMLElement, event: MouseEvent) => void;
 }
 declare function clickSwitchLangButton(dir: LangBtnDir): Promise<void>;
+declare function clickGoOnButton(): void;
 declare const binding_buttons: BindingButton[];
 declare function bindButtonFunctions(): void;
 declare function addDialogScrollListener(): void;
+declare let long_press_timer: number;
 declare const game_lang_list: LanguageList;
 declare const game_default_lang = "zh_cn";
 declare const game_task_list: GameTaskList;
