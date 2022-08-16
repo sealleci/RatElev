@@ -563,6 +563,7 @@ declare const binding_buttons: BindingButton[];
 declare function bindButtonFunctions(): void;
 declare function addDialogScrollListener(): void;
 declare let long_press_timer: number;
+declare let is_ban_key_z: boolean;
 declare const game_lang_list: LanguageList;
 declare const game_default_lang = "zh_cn";
 declare const game_task_list: GameTaskList;

@@ -2794,11 +2794,12 @@ function addDialogScrollListener() {
 
 // main
 let long_press_timer: number = NaN
+let is_ban_key_z: boolean = false
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize()
     bindButtonFunctions()
     window.addEventListener('keydown', (event) => {
-        if (event.code === 'KeyZ' &&
+        if (event.code === 'Space' &&
             game.door.is_open &&
             qs('#go-on-button-row').style.display !== 'none') {
             if (isNaN(long_press_timer)) {
@@ -2809,9 +2810,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
     window.addEventListener('keyup', (event) => {
-        if (event.code === 'KeyZ') {
+        if (event.code === 'Space') {
             clearInterval(long_press_timer)
             long_press_timer = NaN
+        }
+    })
+    window.addEventListener('keypress', async (event) => {
+        if (event.code === 'KeyZ' && !is_ban_key_z) {
+            if (!game.is_lifting &&
+                !game.door.is_moving) {
+                if (game.door.is_open) {
+                    await game.door.start(DoorDir.CLOSE)
+                    game.checkBeforeLift()
+                } else {
+                    game.renderFloor()
+                    await game.door.start(DoorDir.OPEN)
+                }
+            }
         }
     })
     addDialogScrollListener()
@@ -2907,7 +2922,10 @@ const game_action_list = new GameActionList([
             Game.disableFloorButtons,
             Game.disableSaveButtons,
             FloorDisplay.startRandomDisplay,
-            () => { qs('#background')?.classList.add('color-flash') }
+            () => {
+                qs('#background')?.classList.add('color-flash')
+                is_ban_key_z = true
+            }
         )
     },
     {
@@ -2916,7 +2934,10 @@ const game_action_list = new GameActionList([
             Game.enableFloorButtons,
             Game.enableSaveButtons,
             FloorDisplay.stopRandomDisplay,
-            () => { qs('#background')?.classList.remove('color-flash') }
+            () => {
+                qs('#background')?.classList.remove('color-flash')
+                is_ban_key_z = false
+            }
         )
     },
     {

@@ -2137,11 +2137,12 @@ function addDialogScrollListener() {
     });
 }
 let long_press_timer = NaN;
+let is_ban_key_z = false;
 document.addEventListener('DOMContentLoaded', () => {
     game.initialize();
     bindButtonFunctions();
     window.addEventListener('keydown', (event) => {
-        if (event.code === 'KeyZ' &&
+        if (event.code === 'Space' &&
             game.door.is_open &&
             qs('#go-on-button-row').style.display !== 'none') {
             if (isNaN(long_press_timer)) {
@@ -2152,11 +2153,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     window.addEventListener('keyup', (event) => {
-        if (event.code === 'KeyZ') {
+        if (event.code === 'Space') {
             clearInterval(long_press_timer);
             long_press_timer = NaN;
         }
     });
+    window.addEventListener('keypress', (event) => __awaiter(void 0, void 0, void 0, function* () {
+        if (event.code === 'KeyZ' && !is_ban_key_z) {
+            if (!game.is_lifting &&
+                !game.door.is_moving) {
+                if (game.door.is_open) {
+                    yield game.door.start(DoorDir.CLOSE);
+                    game.checkBeforeLift();
+                }
+                else {
+                    game.renderFloor();
+                    yield game.door.start(DoorDir.OPEN);
+                }
+            }
+        }
+    }));
     addDialogScrollListener();
     game.debug();
 });
@@ -2214,11 +2230,19 @@ const game_action_list = new GameActionList([
     },
     {
         id: 'peach.start_act',
-        action: GameAction.polyActs(Game.disableFloorButtons, Game.disableSaveButtons, FloorDisplay.startRandomDisplay, () => { var _a; (_a = qs('#background')) === null || _a === void 0 ? void 0 : _a.classList.add('color-flash'); })
+        action: GameAction.polyActs(Game.disableFloorButtons, Game.disableSaveButtons, FloorDisplay.startRandomDisplay, () => {
+            var _a;
+            (_a = qs('#background')) === null || _a === void 0 ? void 0 : _a.classList.add('color-flash');
+            is_ban_key_z = true;
+        })
     },
     {
         id: 'peach.stop_act',
-        action: GameAction.polyActs(Game.enableFloorButtons, Game.enableSaveButtons, FloorDisplay.stopRandomDisplay, () => { var _a; (_a = qs('#background')) === null || _a === void 0 ? void 0 : _a.classList.remove('color-flash'); })
+        action: GameAction.polyActs(Game.enableFloorButtons, Game.enableSaveButtons, FloorDisplay.stopRandomDisplay, () => {
+            var _a;
+            (_a = qs('#background')) === null || _a === void 0 ? void 0 : _a.classList.remove('color-flash');
+            is_ban_key_z = false;
+        })
     },
     {
         id: 'peach.finish_act',
