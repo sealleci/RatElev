@@ -2210,7 +2210,7 @@ const game_action_list = new GameActionList([
     },
     {
         id: 'naked6#2_act',
-        action: GameAction.polyActs(GameAction.genFinishTaskAct('skate_tsk'), GameAction.genStepPlotThredAct('naked_plt'))
+        action: GameAction.polyActs(GameAction.genFinishTaskAct('skate_tsk'), GameAction.genStepPlotThredAct('naked_plt'), GameAction.genActivateSignatureAct('bottom.in.naked_sig'))
     },
     {
         id: 'peach.start_act',
@@ -2232,7 +2232,8 @@ const game_signature_list = new SignatureList([
     { id: 'naked.mask_sig' },
     { id: 'naked.berserk_sig' },
     { id: 'naked.kill_sig' },
-    { id: 'peach_sig', status: SignatureStatus.ACTIVE }
+    { id: 'peach_sig', status: SignatureStatus.ACTIVE },
+    { id: 'bottom.in.naked_sig' }
 ]);
 const game_plot_thread_list = new PlotThreadList([
     {
@@ -2377,17 +2378,17 @@ const game_floor_list = new FloorList([
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '说着他从兜里掏出来一块手指滑板，其外形精致小巧', en: 'He took out a fingerboard from his pocket, which was small and exquisite' },
+                            text: { zh_cn: '说着霜杰从兜里掏出来一块手指滑板，其外形精致小巧', en: 'Jacob took out a fingerboard from his pocket, which was small and exquisite' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '然后他匍匐在地面上，将中指和无名指立在手指滑板上', en: 'Then he crawled on the floor and placed his middle finger and ring finger on the fingerboard' },
+                            text: { zh_cn: '然后霜杰匍匐在地面上，将中指和无名指立在手指滑板上', en: 'Then Jacob crawled on the floor and placed his middle finger and ring finger on the fingerboard' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
                             person_id: '&_psg',
-                            text: { zh_cn: '在几次尝试后完成了一次漂亮的板翻', en: 'After several attempts he finally succeeded to make a perfect flip' },
+                            text: { zh_cn: '在几次尝试后完成了一次漂亮的板翻', en: 'After several attempts Jacob finally succeeded to make a perfect flip' },
                             layout: DialogLayout.MIDDLE
                         },
                         {
@@ -2695,9 +2696,60 @@ const game_floor_list = new FloorList([
                     in_signatures: ['naked.berserk_sig'],
                     dialogs: [
                         {
+                            person_id: '&_psg',
+                            text: { zh_cn: '电梯门打开后，你感受到一股杀气', en: 'When the elevator door opened, you felt a sense of pressure' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '有个人正背对着你，但其身影有些熟悉', en: 'There was a person with its back to you, but its figure was familiar' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '当这个人转过身后，你发现是霜杰', en: 'When the person turned around, you found it was Jacob' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
                             person_id: 'me_psg',
-                            text: { zh_cn: '', en: '' },
+                            text: { zh_cn: '这是在……', en: 'wat the...' },
                             layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我现在是一名狂战士', en: 'i\'m a berserk now' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰举起右手，然后用力握紧拳头', en: 'Jacob raised his right hand, then clenched his fist' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '一把黑色巨剑凭空出现在了霜杰的手上', en: 'A giant black sword appeared in Jacob\'s hand' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '那把剑散发着清冷的光芒，寒气逼人，倘若在其身边驻留太久的话，就会被裹上严冰', en: 'That sword radiated cold light and froze nearby air, if you stayed by its side for too long, you would be wrapped with thick ice' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '剑的侧锋倒映着霜杰沉默的神情，饱经沧桑又不怒自威', en: 'Jacob\'s silent expression was reflected on the side edge of the sword, it seemed that he had experienced a lot, and he was not angry but powerful' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰将剑收在背后，稳重地走进电梯轿厢，然后斩钉截铁地说道', en: 'Jacob put the sword behind his back, walked into the elevator steadily, and then said decisively' },
+                            layout: DialogLayout.MIDDLE,
+                            action_id: 'naked5_act'
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '去三楼', en: 'to the 3rd floor' },
+                            layout: DialogLayout.LEFT
                         }
                     ]
                 }
@@ -3069,9 +3121,171 @@ const game_floor_list = new FloorList([
                     in_signatures: ['naked.mask_sig'],
                     dialogs: [
                         {
-                            person_id: 'mike_psg',
-                            text: { zh_cn: '', en: '' },
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '到了', en: 'arrived' },
                             layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '呃啊', en: 'uh ah' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰深呼吸了一口气，然后鼓足勇气走出了电梯', en: 'Jacob took a deep breath, then walked out of the elevator' },
+                            layout: DialogLayout.MIDDLE,
+                            action_id: 'naked4#1_act'
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰走到那扇门前，在片刻犹豫后按下了门铃', en: 'Jacob went to that door, and after a moment of hesitation he rang the doorbell' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '但这次开门的是一位男性', en: 'But this time it was a male who opened the door' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '罗迈', en: 'Mike' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '谢天谢地', en: 'thanks god' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '咋了？', en: 'are you okay?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '那个女人呢？', en: 'where is that woman?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '女人？', en: 'woman?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '算了，你就当我乱说吧', en: 'nvm, you can just think i\'m talking nonsense' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '哈哈', en: 'haha' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '嘻嘻', en: 'hehe' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '对了，之前我给你推荐的电视剧看了吗', en: 'btw, have you seen the TV shows i recommended to you before' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '你是说《白帼女捕头》？', en: '\"The Girls\"?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '没错', en: 'yep' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '还差两集就看完第二季了', en: '2 more episodes to finish the season 2' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '不错哦，这电视剧好看不', en: 'wow, is it nice?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '看着挺爽的', en: 'very meta' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '好', en: 'good' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '说来你是来借滑板的？', en: 'so you\'re here to borrow a skateboard?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '对啊', en: 'right' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'mike_psg',
+                            text: { zh_cn: '那你稍等一下', en: 'wait a second' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '罗迈把右手伸向颈后，并做了个下拉的动作，然后发出了拉链被拉开的声音', en: 'Mike extended his right hand to the back of his neck and made a pull-down movement with the sound of unzipping' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '罗迈的头套被脱了下来，里面露出了之前那个女人的面孔', en: 'Mike\'s mask was taken off, and the face of that woman appeared' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '？？？', en: '???' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '你想要借滑板？', en: 'you want to borrow a skateboard?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '但这里并没有滑板', en: 'but there\'s no skateboard' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '我可以用你朋友的骨头做一块给你', en: 'i can make one for you with bones from your friend' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '需要吗？', en: 'do you need?' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '啊啊啊啊啊', en: 'ahhhhh' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰一边叫喊着一边跑进楼梯间', en: 'Jacob ran into the stairwell while screaming' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'woman_psg',
+                            text: { zh_cn: '怎么又跑了', en: 'running away again' },
+                            layout: DialogLayout.LEFT,
+                            action_id: 'naked4#2_act'
                         }
                     ]
                 },
@@ -3080,8 +3294,95 @@ const game_floor_list = new FloorList([
                     in_signatures: ['naked.kill_sig'],
                     dialogs: [
                         {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰无言地走出电梯，而后直奔那扇门', en: 'Jacob walked out of the elevator without a word, then went straight to that door' },
+                            layout: DialogLayout.MIDDLE,
+                            action_id: 'naked6#1_act'
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '这次霜杰没有按门铃，而是用巨剑把门撬开了', en: 'But this time Jacob didn\'t ring the doorbell, he broke the door with his giant sword' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰步入了房间', en: 'Jacob enetered the room' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '随后有物体碰撞的声音传了出来，又有刀剑在空中挥舞劈砍的声音', en: 'The sound of objects colliding came out, and the sound of swords waving and chopping followed' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '有血开始渗出门外，然后快速凝结', en: 'Blood began to flow out of the door and then quickly coagulated' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '结束了', en: 'DONE' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰从房间里走了出来，脸上沾着猩红的血迹', en: 'Jacob came out of the room with scarlet blood stains on his face' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '我先斩断了她的喉咙', en: 'i cut her throat first' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '然后便是七七四十九块', en: 'then chopped her into 7*7=49 pieces' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '这是她的眼珠', en: 'this is her eye' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰伸出他的左手，然后张开手掌，在其手心上有一个眼珠，眼珠的瞳孔是棕色的', en: 'Jacob stretched out his left hand and opened his palm, there was an eye in his palm of his hand which was brown' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'jacob_psg',
+                            text: { zh_cn: '这把剑就是我的滑板了', en: 'the sword is my skateboard' },
+                            layout: DialogLayout.LEFT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '霜杰把巨剑平铺在地板上，将双脚立在剑上，然后剑悬浮了起来', en: 'Jacob laid the giant sword on the floor, put his feet on the sword, then the sword hovered in the air' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '在稳定之后，霜杰便御剑从楼梯间扬长而去', en: 'Jacob flew away from the stairwell with his sword' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '剧终。', en: 'Fin.' },
+                            layout: DialogLayout.MIDDLE,
+                            action_id: 'naked6#2_act'
+                        },
+                        {
                             person_id: 'me_psg',
-                            text: { zh_cn: '', en: '' },
+                            text: { zh_cn: '我去……', en: 'ong...' },
+                            layout: DialogLayout.RIGHT
+                        },
+                        {
+                            person_id: '&_psg',
+                            text: { zh_cn: '当你望向那扇门的时候，发现血迹消失了，而且没有看到任何人体组织', en: 'When you looked into the door, you found that the blood had disappeared, and you did\'t see any human tissue' },
+                            layout: DialogLayout.MIDDLE
+                        },
+                        {
+                            person_id: 'me_psg',
+                            text: { zh_cn: '神秘', en: 'weird' },
                             layout: DialogLayout.RIGHT
                         }
                     ]
