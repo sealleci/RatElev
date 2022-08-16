@@ -1011,8 +1011,10 @@ class Floor {
     checkPlotThreads(): boolean {
         let selected_block_id: string = ''
         let max_prioeity = -Infinity
+        // console.log(this.plot_id_list)
         for (let plot_id of this.plot_id_list) {
             const plot = game_plot_thread_list.getById(plot_id)
+            // console.log(plot)
             if (plot === null || !plot.isUnlocked() || plot.isFinished() || plot.getCurFloorId() !== this.id) {
                 continue
             }
@@ -1029,13 +1031,14 @@ class Floor {
                 if (block === null || !block.isUnlocked() || this.dialog_scene.cur_block_id === block.id) {
                     continue
                 }
-                // TODO: need step?
+                // TODO: no need step
                 // if plot's current corresponding block finished, step plot to next
                 if (block.isFinished()) {
-                    plot.step()
+                    // plot.step()
                     continue
                 }
                 // priority of [...plot.signature] is MAX([...plot.priority])
+                // console.log(plot.priority, max_prioeity, is_set)
                 if (plot.priority > max_prioeity && !is_set) {
                     selected_block_id = block.id
                     max_prioeity = plot.priority

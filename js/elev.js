@@ -670,7 +670,6 @@ class Floor {
                     continue;
                 }
                 if (block.isFinished()) {
-                    plot.step();
                     continue;
                 }
                 if (plot.priority > max_prioeity && !is_set) {
