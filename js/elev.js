@@ -1951,7 +1951,6 @@ class Game {
         return __awaiter(this, void 0, void 0, function* () {
             qs('#open-button').click();
             qs('#top-arch').click();
-            qs('#go-on-button-row').click();
         });
     }
     toString() {
@@ -2316,7 +2315,28 @@ const game_passenger_list = new PassengerList([
         avatar_color: 'white',
         avatar_font_color: 'black',
         avatar_text: { zh_cn: '罗', en: 'MR' }
-    }
+    },
+    {
+        id: 'poop1_psg',
+        name: { zh_cn: '一坨粪便', en: 'one poop' },
+        avatar_color: '',
+        avatar_font_color: '',
+        avatar_text: {}
+    },
+    {
+        id: 'poop2_psg',
+        name: { zh_cn: '两坨粪便', en: 'two poop' },
+        avatar_color: '',
+        avatar_font_color: '',
+        avatar_text: {}
+    },
+    {
+        id: 'poop2_psg',
+        name: { zh_cn: '三坨粪便', en: 'three poop' },
+        avatar_color: '',
+        avatar_font_color: '',
+        avatar_text: {}
+    },
 ]);
 const game_passenger_me = 'me_psg';
 const bg_colors = {
