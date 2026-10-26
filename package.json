@@ -1,15 +1,36 @@
 {
-    "name": "rat_elev",
-    "version": "0.0.1",
-    "description": "Ups adn downs.",
-    "scripts": {
-        "build": "tsc",
-        "watch": "tsc -w",
-        "dist": "node ./script/dist.js",
-        "start": "npm run build & npm run dist"
-    },
-    "author": "sealleci",
-    "devDependencies": {
-        "typescript": "^4.7.2"
-    }
+  "name": "rat-elev",
+  "version": "0.5.0",
+  "description": "Ups adn downs.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "arktype": "2.2.9",
+    "i18next": "26.5.11",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-i18next": "17.1.9",
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.2",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "5.0.5"
+  }
 }

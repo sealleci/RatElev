@@ -1,16 +1,14 @@
 {
-    "liveServer.settings.ignoreFiles": [
-        ".vscode/**",
-        "**/*.ts",
-        "script/**",
-        "design/**",
-        "node_modules/**",
-        "tmp/**",
-        "dist/**",
-        ".gitignore",
-        "package-lock.json",
-        "package.json",
-        "README.md",
-        "tsconfig.json"
-    ]
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.biome": "explicit",
+        "source.organizeImports.biome": "explicit"
+    },
+    "editor.quickSuggestions": {
+        "strings": "on"
+    }
 }
