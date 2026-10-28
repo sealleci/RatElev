@@ -1,0 +1,14 @@
+:root {
+    --color-panel-background: #a0a0a0;
+    --color-panel-border: #524a4e;
+
+    --font-family-en:
+        Georgia, 'Times New Roman', serif;
+    --font-family-zh-cn:
+        'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+    --font-family-ui: var(--font-family-en);
+}
+
+:root:lang(zh-CN) {
+    --font-family-ui: var(--font-family-zh-cn);
+}

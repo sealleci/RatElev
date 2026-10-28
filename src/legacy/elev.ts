@@ -147,11 +147,6 @@ interface SaveData {
     game: GameSnapshot
 }
 
-interface SaveRoot {
-    status: boolean
-    data: SaveData
-}
-
 interface SignalDefinition {
     id: string
     status?: SignalStatus

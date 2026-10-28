@@ -1,0 +1,36 @@
+.root {
+    --door-leaf-border: 2px solid var(--color-panel-border);
+    --z-door: 1;
+
+    position: relative;
+    z-index: var(--z-door);
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    height: calc(100% - var(--lintel-height));
+}
+
+.leftDoorLeaf,
+.rightDoorLeaf {
+    position: relative;
+    left: 0;
+
+    box-sizing: border-box;
+
+    flex: 0 0 50%;
+    height: 100%;
+
+    background-color: var(--color-panel-background);
+}
+
+.leftDoorLeaf {
+    border-right: var(--door-leaf-border);
+}
+
+.rightDoorLeaf {
+    border-left: var(--door-leaf-border);
+}

@@ -1,0 +1,114 @@
+.root {
+    --indicator-width: 80px;
+    --color-background: #000;
+    --color-foreground: #4e9f3d;
+
+    position: relative;
+
+    flex-direction: column;
+
+    width: var(--indicator-width);
+    height: calc(var(--indicator-width) * 2);
+    margin: 80px 0 40px 0;
+
+    color: var(--color-foreground);
+
+    background-color: var(--color-background);
+    border-radius: 50% / 25%;
+}
+
+.root,
+.directionIcon,
+.arrow,
+.floorNumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.directionIcon,
+.floorNumber {
+    flex-shrink: 0;
+
+    width: 100%;
+}
+
+.directionIcon {
+    --icon-height: 32px;
+    --left-stroke-angle: -45deg;
+    --animation-direction: normal;
+
+    position: relative;
+
+    height: var(--icon-height);
+    overflow: hidden;
+}
+
+.directionIcon[data-direction="down"] {
+    --left-stroke-angle: 45deg;
+    --animation-direction: reverse;
+}
+
+.arrow {
+    animation: moveArrow 1s linear infinite;
+    animation-direction: var(--animation-direction);
+}
+
+.directionIcon.invisible>.arrow {
+    animation: none;
+}
+
+@keyframes moveArrow {
+    from {
+        transform: translateY(var(--icon-height));
+    }
+
+    to {
+        transform: translateY(calc(-1 * var(--icon-height)));
+    }
+}
+
+.leftStroke,
+.rightStroke {
+    --stroke-thickness: 6px;
+    --stroke-offset: 5px;
+
+    position: relative;
+
+    flex-shrink: 0;
+
+    width: 20px;
+    background-color: currentColor;
+
+    border: calc(var(--stroke-thickness) / 2) solid currentColor;
+    border-radius: var(--stroke-thickness);
+}
+
+.leftStroke {
+    left: var(--stroke-offset);
+
+    transform: rotate(var(--left-stroke-angle));
+}
+
+.rightStroke {
+    left: calc(var(--stroke-offset) * -1);
+
+    transform: rotate(calc(-1 * var(--left-stroke-angle)));
+}
+
+.floorNumber {
+    --font-size: 2.25rem;
+
+    height: calc(var(--font-size) + 0.25rem);
+
+    font-family: var(--font-family-ui);
+    font-size: var(--font-size);
+
+    transform: translateY(-0.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .arrow {
+        animation: none;
+    }
+}
